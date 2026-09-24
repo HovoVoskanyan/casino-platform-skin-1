@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Caveat:wght@600;700&amp;display=swap" rel="stylesheet">
+<script src="qa-audit.js"></script>
+<script src="qa-wallet.js"></script>
+<script src="qa-journeys.js"></script>
+<style>html, body { margin: 0; background: #0d0118; } a { color: #ffc93c; } a:hover { color: #ffe08a; }</style>
+</helmet>
+<div style="display: flex; flex-direction: column; gap: 12px; padding: 12px; font-family: monospace; color: #e9e0f5;">
+  <div id="qa-snaps" style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; zoom: .6;"></div>
+  <pre id="qa-out" style="margin: 0; font-size: 11px; line-height: 1.45; white-space: pre-wrap;">Internal QA board — not player-facing.</pre>
+  <iframe id="qa" title="QA frame" style="position: fixed; left: 0; top: 0; width: 390px; height: 800px; border: 0; opacity: .02; pointer-events: none; z-index: 0;"></iframe>
+</div>
+</x-dc>
+</body>
+</html>

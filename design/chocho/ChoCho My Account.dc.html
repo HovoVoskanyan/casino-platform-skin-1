@@ -1,0 +1,1382 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Caveat:wght@600;700&amp;display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; background: #130124; }
+  a { color: #ffc93c; text-decoration: none; }
+  a:hover { color: #ffe08a; }
+  @keyframes wFade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes wRise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  @keyframes wPulse { 0%, 100% { opacity: .45; } 50% { opacity: .8; } }
+  @keyframes chochoTigerWave { 0% { transform: translateY(0) rotate(0deg); } 8% { transform: translateY(1.5px) rotate(.6deg); } 16% { transform: translateY(0) rotate(0deg); } 24% { transform: translateY(1.5px) rotate(-.6deg); } 32% { transform: translateY(0) rotate(0deg); } 48% { transform: translateY(-4px) rotate(-2deg); } 56% { transform: translateY(-5px) rotate(-9deg); } 64% { transform: translateY(-5px) rotate(7deg); } 72% { transform: translateY(-5px) rotate(-7deg); } 80% { transform: translateY(-5px) rotate(6deg); } 100% { transform: translateY(0) rotate(0deg); } }
+  :focus-visible { outline: 2px solid #ffc93c; outline-offset: 2px; }
+  [data-tabstrip]::-webkit-scrollbar { height: 0; }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+<script src="chocho-account.js"></script>
+<script src="chocho-site.js"></script>
+</helmet>
+<div style="min-height: 100vh; background: radial-gradient(1100px 640px at 50% -8%, #3a0269 0%, #250143 42%, #130124 100%); font-family: Manrope, sans-serif; color: #fff; display: flex; justify-content: center; padding-bottom: 128px; padding-right: max(0px, min(132px, calc(100vw - 720px)));">
+  <div style="width: 100%; max-width: 1024px; display: flex; flex-direction: column; gap: 34px; padding-bottom: 44px;">
+
+    <dc-import name="ChoCho Header" active="none" style="position: sticky; top: 0; z-index: 40;" hint-size="100%,76px"></dc-import>
+
+    <sc-if value="{{ gated }}" hint-placeholder-val="{{ false }}">
+      <section aria-labelledby="gate-title" style="margin: 0 clamp(16px, 2.4vw, 22px); padding: clamp(22px, 5vw, 32px); border: 1px solid rgba(167,139,250,.22); border-radius: 20px; background: linear-gradient(160deg, rgba(124,58,237,.18) 0%, rgba(22,9,38,.96) 60%); display: flex; flex-direction: column; align-items: flex-start; gap: 16px;">
+        <span id="gate-title" style="font-size: clamp(20px, 5vw, 24px); font-weight: 800; letter-spacing: -.4px; line-height: 1.25; color: #fff; text-wrap: pretty;">Sign in to view My Account</span>
+        <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+          <button onClick="{{ gateSignin }}" style="min-height: 44px; padding: 0 20px; border: 1px solid rgba(167,139,250,.32); border-radius: 11px; background: rgba(255,255,255,.03); color: #fff; font-family: Manrope, sans-serif; font-size: 14px; font-weight: 700; cursor: pointer;" style-hover="background: rgba(255,255,255,.08)">Sign in</button>
+          <button onClick="{{ gateRegister }}" style="min-height: 44px; padding: 0 22px; border: 0; border-radius: 11px; background: linear-gradient(180deg, #ffd766, #eb9c0d); color: #2c1400; font-family: Manrope, sans-serif; font-size: 14px; font-weight: 800; cursor: pointer; box-shadow: 0 8px 22px rgba(235,156,13,.3);" style-hover="filter: brightness(1.06)">Register</button>
+        </div>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{ showPersonal }}" hint-placeholder-val="{{ false }}">
+
+    <section style="padding: 0 22px; display: flex; flex-direction: column; gap: 22px;">
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+          <span style="width: 4px; height: 28px; border-radius: 999px; background: linear-gradient(180deg, #ffd766, #e07f05); box-shadow: 0 0 12px rgba(240,150,10,.5); flex: none;"></span>
+          <h1 style="margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -.6px; color: #fff;">My Account</h1>
+        </div>
+        <span style="font-size: 13.5px; font-weight: 500; line-height: 1.5; padding-left: 16px; color: #a795c5;">Manage your profile, security, verification, and preferences.</span>
+      </div>
+
+      <div style="padding: 18px 20px; border: 1px solid rgba(167,139,250,.2); border-radius: 18px; background: linear-gradient(180deg, #23103f 0%, #180a2c 100%); display: flex; flex-wrap: wrap; align-items: center; gap: 14px 18px;">
+        <span style="width: 52px; height: 52px; flex: none; border-radius: 14px; background: linear-gradient(180deg, #ffd766, #eb9c0d); color: #2c1400; font-size: 19px; font-weight: 800; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(235,156,13,.32);">{{ initials }}</span>
+        <span style="flex: 1 1 160px; min-width: 0; display: flex; flex-direction: column; gap: 4px;">
+          <span style="font-size: 18px; font-weight: 800; letter-spacing: -.3px; color: #fff;">{{ displayName }}</span>
+          <span style="font-size: 12.5px; font-weight: 500; color: #a795c5;">{{ memberSince }}</span>
+        </span>
+        <span style="flex: 0 1 auto; min-width: 0; max-width: 100%; display: flex; flex-direction: column; gap: 6px;">
+          <span style="font-size: 10.5px; font-weight: 800; letter-spacing: 1.1px; color: #8f7aae;">PLAYER ID</span>
+          <span style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <span style="min-height: 40px; display: flex; align-items: center; padding: 0 14px; border: 1px solid rgba(167,139,250,.22); border-radius: 11px; background: rgba(255,255,255,.03); font-size: 14.5px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: .4px; white-space: nowrap; color: #e6ddf5;">{{ playerId }}</span>
+            <button onClick="{{ copyPlayerId }}" style="flex: none; min-height: 40px; padding: 0 14px; border: 1px solid rgba(167,139,250,.3); border-radius: 11px; background: rgba(255,255,255,.04); color: #e9e0f5; font-family: Manrope, sans-serif; font-size: 13px; font-weight: 700; cursor: pointer;" style-hover="background: rgba(167,139,250,.18); color: #fff">{{ copyIdLabel }}</button>
+          </span>
+        </span>
+        <span aria-live="polite" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0);">{{ copyAnnounce }}</span>
+      </div>
+
+      <div data-tabstrip="1" role="tablist" aria-label="Account sections" style="display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px;">
+        <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="4">
+          <button onClick="{{ t.onClick }}" role="tab" id="{{ t.id }}" aria-selected="{{ t.selected }}" aria-controls="{{ t.panelId }}" style="flex: none; height: 44px; padding: 0 20px; border: 1px solid {{ t.border }}; border-radius: 999px; background: {{ t.bg }}; color: {{ t.color }}; font-family: Manrope, sans-serif; font-size: 14px; font-weight: 700; white-space: nowrap; cursor: pointer; transition: background .18s ease, border-color .18s ease, color .18s ease;">{{ t.label }}</button>
+        </sc-for>
+      </div>
+    </section>
+
+    <sc-if value="{{ isProfile }}" hint-placeholder-val="{{ true }}">
+      <section role="tabpanel" id="panel-profile" aria-labelledby="tab-profile" style="padding: 0 22px; display: grid; grid-template-columns: {{ twoCol }}; gap: 18px; align-items: start;">
+
+        <div style="padding: 22px; border: 1px solid rgba(167,139,250,.2); border-radius: 20px; background: linear-gradient(180deg, #23103f 0%, #180a2c 100%); display: flex; flex-direction: column; gap: 16px;">
+          <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px;">
+            <h2 style="margin: 0; flex: 1 1 auto; min-width: 0; font-size: 19px; font-weight: 800; letter-spacing: -.3px; color: #fff;">Personal details</h2>
+            <sc-if value="{{ showEditDetails }}" hint-placeholder-val="{{ true }}">
+              <button onClick="{{ startEdit }}" style="flex: none; min-height: 42px; padding: 0 18px; border: 1px solid rgba(167,139,250,.34); border-radius: 12px; background: rgba(255,255,255,.04); color: #fff; font-family: Manrope, sans-serif; font-size: 13.5px; font-weight: 700; white-space: nowrap; cursor: pointer;" style-hover="border-color: rgba(167,139,250,.7); background: rgba(255,255,255,.08)">Edit details</button>
+            </sc-if>
+          </div>
+
+          <sc-if value="{{ profileLoading }}" hint-placeholder-val="{{ false }}">
+            <div aria-busy="true" aria-label="Loading personal details" style="display: flex; flex-direction: column; gap: 10px;">
+              <sc-for list="{{ skeletons }}" as="k" hint-placeholder-count="3">
+                <span style="height: 56px; border-radius: 14px; border: 1px solid rgba(167,139,250,.14); background: rgba(255,255,255,.03); animation: wPulse 1.4s ease-in-out infinite;"></span>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ profileSummary }}" hint-placeholder-val="{{ true }}">
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <sc-for list="{{ summaryRows }}" as="r" hint-placeholder-count="4">
+                <div style="padding: 12px 15px; border: 1px solid rgba(167,139,250,.16); border-radius: 14px; background: rgba(255,255,255,.03); display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px;">
+                  <span style="flex: 1 1 130px; min-width: 0; display: flex; flex-direction: column; gap: 4px;">
+                    <span style="font-size: 10.5px; font-weight: 800; letter-spacing: 1.1px; color: #8f7aae;">{{ r.label }}</span>
+                    <span style="font-size: 14.5px; font-weight: 700; color: #fff; overflow-wrap: anywhere;">{{ r.value }}</span>
+                  </span>
+                  <sc-if value="{{ r.lockLabel }}" hint-placeholder-val="{{ false }}">
+                    <span style="height: 26px; flex: none; white-space: nowrap; display: inline-flex; align-items: center; padding: 0 10px; border-radius: 999px; border: 1px solid rgba(167,139,250,.28); background: rgba(167,139,250,.1); font-size: 10.5px; font-weight: 800; letter-spacing: .6px; color: #c4b5fd;">{{ r.lockLabel }}</span>
+                  </sc-if>
+                </div>
+              </sc-for>
+              <sc-if value="{{ hasLockedFields }}" hint-placeholder-val="{{ true }}">
+                <span style="font-size: 12.5px; font-weight: 500; line-height: 1.55; color: #a795c5; text-wrap: pretty;">Your registered name is locked for account security. <button onClick="{{ openSupport }}" data-help-trigger="1" style="display: inline; text-align: left; border: 0; background: transparent; padding: 0; font-family: Manrope, sans-serif; font-size: 12.5px; font-weight: 700; color: #ffc93c; cursor: pointer; text-decoration: underline;">Request a name correction</button> and our team will guide you.</span>
+              </sc-if>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ profileEditing }}" hint-placeholder-val="{{ false }}">
+            <div style="display: flex; flex-direction: column; gap: 14px;">
+              <sc-for list="{{ editFields }}" as="f" hint-placeholder-count="3">
+                <label style="display: flex; flex-direction: column; gap: 7px;">
+                  <span style="font-size: 12.5px; font-weight: 700; color: #cbb6e6;">{{ f.label }}</span>
+                  <input value="{{ f.value }}" onChange="{{ f.onChange }}" disabled="{{ f.disabled }}" aria-invalid="{{ f.invalid }}" aria-describedby="{{ f.describedBy }}" autoComplete="{{ f.autoComplete }}" placeholder="{{ f.placeholder }}" style="height: 50px; box-sizing: border-box; padding: 0 15px; border: 1px solid {{ f.border }}; border-radius: 13px; background: {{ f.bg }}; color: {{ f.textColor }}; font-family: Manrope, sans-serif; font-size: 15px; font-weight: 600; outline: none;">
+                  <sc-if value="{{ f.error }}" hint-placeholder-val="{{ false }}">
+                    <span id="{{ f.errorId }}" role="alert" style="font-size: 12.5px; font-weight: 600; line-height: 1.45; color: #fca5a5;">{{ f.error }}</span>
+                  </sc-if>
+                  <sc-if value="{{ f.hint }}" hint-placeholder-val="{{ false }}">
+                    <span id="{{ f.hintId }}" style="font-size: 12px; font-weight: 500; line-height: 1.45; color: #8f7aae;">{{ f.hint }}</span>
+                  </sc-if>
+                </label>
+              </sc-for>
+
+              <sc-if value="{{ profileFormError }}" hint-placeholder-val="{{ false }}">
+                <span role="alert" style="padding: 12px 14px; border: 1px solid rgba(248,113,113,.4); border-radius: 12px; background: rgba(248,113,113,.08); font-size: 12.5px; font-weight: 600; line-height: 1.5; color: #fca5a5; text-wrap: pretty;">{{ profileFormError }}</span>
+              </sc-if>
+
+              <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                <button onClick="{{ saveProfile }}" disabled="{{ profileSaving }}" style="flex: 1 1 160px; min-height: 50px; border: 0; border-radius: 13px; background: {{ saveProfileBg }}; color: #2c1400; font-family: Manrope, sans-serif; font-size: 14.5px; font-weight: 800; cursor: {{ saveProfileCursor }}; box-shadow: 0 10px 24px rgba(235,156,13,.3);" style-hover="filter: brightness(1.05)">{{ saveProfileLabel }}</button>
+                <button onClick="{{ cancelEdit }}" style="flex: 0 1 130px; min-height: 50px; border: 1px solid rgba(167,139,250,.34); border-radius: 13px; background: rgba(255,255,255,.03); color: #fff; font-family: Manrope, sans-serif; font-size: 14px; font-weight: 700; cursor: pointer;" style-hover="background: rgba(255,255,255,.08)">Cancel</button>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ profileSaved }}" hint-placeholder-val="{{ false }}">
+            <span role="status" style="padding: 12px 14px; border: 1px solid rgba(74,222,128,.34); border-radius: 12px; background: rgba(74,222,128,.09); font-size: 13px; font-weight: 700; color: #86efac;">Changes saved</span>
+          </sc-if>
+        </div>
+
+        <div style="padding: 22px; border: 1px solid rgba(167,139,250,.2); border-radius: 20px; background: linear-gradient(180deg, #23103f 0%, #180a2c 100%); display: flex; flex-direction: column; gap: 16px;">
+          <h2 style="margin: 0; font-size: 19px; font-weight: 800; letter-spacing: -.3px; color: #fff;">Contact information</h2>
+
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <sc-for list="{{ contactRows }}" as="c" hint-placeholder-count="2">
+              <div style="padding: 15px; border: 1px solid rgba(167,139,250,.16); border-radius: 16px; background: rgba(255,255,255,.03); display: flex; flex-direction: column; gap: 11px;">
+                <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px;">
+                  <span style="flex: 1 1 150px; min-width: 0; display: flex; flex-direction: column; gap: 4px;">
+                    <span style="font-size: 10.5px; font-weight: 800; letter-spacing: 1.1px; color: #8f7aae;">{{ c.label }}</span>
+                    <span style="font-size: 14.5px; font-weight: 700; color: {{ c.valueColor }}; overflow-wrap: anywhere;">{{ c.value }}</span>
+                  </span>
+                  <span style="height: 26px; display: inline-flex; align-items: center; gap: 7px; padding: 0 11px; border-radius: 999px; border: 1px solid {{ c.statusBorder }}; background: {{ c.statusBg }}; font-size: 10.5px; font-weight: 800; letter-spacing: .6px; white-space: nowrap; color: {{ c.statusColor }};">
+                    <span style="width: 7px; height: 7px; border-radius: 50%; background: {{ c.statusDot }};"></span>{{ c.statusLabel }}
+                  </span>
+                </div>
+                <sc-if value="{{ c.note }}" hint-placeholder-val="{{ false }}">
+                  <span style="font-size: 12.5px; font-weight: 500; line-height: 1.5; color: #a795c5; text-wrap: pretty;">{{ c.note }}</span>
+                </sc-if>
+                <sc-if value="{{ c.actionLabel }}" hint-placeholder-val="{{ true }}">
+                  <div style="display: flex; flex-wrap: wrap; gap: 9px;">
+                    <button onClick="{{ c.onAction }}" style="min-height: 44px; padding: 0 18px; white-space: nowrap; border: 1px solid rgba(167,139,250,.34); border-radius: 12px; background: rgba(255,255,255,.04); color: #fff; font-family: Manrope, sans-serif; font-size: 13.5px; font-weight: 700; cursor: pointer;" style-hover="border-color: rgba(167,139,250,.7); background: rgba(255,255,255,.08)">{{ c.actionLabel }}</button>
+                    <sc-if value="{{ c.secondaryLabel }}" hint-placeholder-val="{{ false }}">
+                      <button onClick="{{ c.onSecondary }}" style="min-height: 44px; padding: 0 16px; white-space: nowrap; border: 1px solid rgba(167,139,250,.22); border-radius: 12px; background: transparent; color: #cbb6e6; font-family: Manrope, sans-serif; font-size: 13px; font-weight: 700; cursor: pointer;" style-hover="color: #fff; background: rgba(255,255,255,.06)">{{ c.secondaryLabel }}</button>
+                    </sc-if>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+
+          <span style="font-size: 12.5px; font-weight: 500; line-height: 1.55; color: #8f7aae; text-wrap: pretty;">A new mobile number or email address becomes your sign-in detail only after you confirm it. Until then, your current contact stays in effect.</span>
+        </div>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{ isSecurity }}" hint-placeholder-val="{{ false }}">
+      <section role="tabpanel" id="panel-security" aria-labelledby="tab-security" style="padding: 0 22px; display: grid; grid-template-columns: {{ twoCol }}; gap: 18px; align-items: start;">
+
+        <div style="padding: 22px; border: 1px solid rgba(167,139,250,.2); border-radius: 20px; background: linear-gradient(180deg, #23103f 0%, #180a2c 100%); display: flex; flex-direction: column; gap: 16px;">
+          <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px;">
+            <h2 style="margin: 0; flex: 1 1 auto; min-width: 0; font-size: 19px; font-weight: 800; letter-spacing: -.3px; color: #fff;">Password</h2>
+            <sc-if value="{{ showPasswordTrigger }}" hint-placeholder-val="{{ true }}">
+              <button onClick="{{ openPasswordForm }}" style="flex: none; min-height: 42px; padding: 0 18px; border: 1px solid rgba(167,139,250,.34); border-radius: 12px; background: rgba(255,255,255,.04); color: #fff; font-family: Manrope, sans-serif; font-size: 13.5px; font-weight: 700; white-space: nowrap; cursor: pointer;" style-hover="border-color: rgba(167,139,250,.7); background: rgba(255,255,255,.08)">{{ passwordTriggerLabel }}</button>
+            </sc-if>
+          </div>
+
+          <span style="font-size: 13px; font-weight: 500; line-height: 1.55; color: #a795c5; text-wrap: pretty;">{{ passwordIntro }}</span>
+
+          <sc-if value="{{ passwordFormOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="display: flex; flex-direction: column; gap: 14px;">
+              <sc-for list="{{ passwordFields }}" as="p" hint-placeholder-count="3">
+                <label style="display: flex; flex-direction: column; gap: 7px;">
+                  <span style="font-size: 12.5px; font-weight: 700; color: #cbb6e6;">{{ p.label }}</span>
+                  <span style="position: relative; display: flex; align-items: center;">
+                    <input type="{{ p.type }}" value="{{ p.value }}" onChange="{{ p.onChange }}" aria-invalid="{{ p.invalid }}" aria-describedby="{{ p.describedBy }}" autoComplete="{{ p.autoComplete }}" style="flex: 1; min-width: 0; height: 50px; box-sizing: border-box; padding: 0 96px 0 15px; border: 1px solid {{ p.border }}; border-radius: 13px; background: rgba(255,255,255,.04); color: #fff; font-family: Manrope, sans-serif; font-size: 15px; font-weight: 600; outline: none;">
+                    <button type="button" onClick="{{ p.onToggle }}" aria-pressed="{{ p.shown }}" style="position: absolute; right: 8px; min-height: 36px; padding: 0 12px; border: 1px solid rgba(167,139,250,.28); border-radius: 10px; background: rgba(255,255,255,.05); color: #cbb6e6; font-family: Manrope, sans-serif; font-size: 12px; font-weight: 700; cursor: pointer;" style-hover="background: rgba(167,139,250,.18); color: #fff">{{ p.toggleLabel }}</button>
+                  </span>
+                  <sc-if value="{{ p.error }}" hint-placeholder-val="{{ false }}">
+                    <span id="{{ p.errorId }}" role="alert" style="font-size: 12.5px; font-weight: 600; line-height: 1.45; color: #fca5a5;">{{ p.error }}</span>
+                  </sc-if>
+                  <sc-if value="{{ p.hint }}" hint-placeholder-val="{{ false }}">
+                    <span id="{{ p.hintId }}" style="font-size: 12px; font-weight: 500; line-height: 1.45; color: #8f7aae;">{{ p.hint }}</span>
+                  </sc-if>
+                </label>
+              </sc-for>
+
+              <sc-if value="{{ passwordFormError }}" hint-placeholder-val="{{ false }}">
+                <span role="alert" style="padding: 12px 14px; border: 1px solid rgba(248,113,113,.4); border-radius: 12px; background: rgba(248,113,113,.08); font-size: 12.5px; font-weight: 600; line-height: 1.5; color: #fca5a5; text-wrap: pretty;">{{ passwordFormError }}</span>
+              </sc-if>
+
+              <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                <button onClick="{{ submitPassword }}" disabled="{{ passwordSaving }}" style="flex: 1 1 170px; min-height: 50px; border: 0; border-radius: 13px; background: {{ passwordSaveBg }}; color: #2c1400; font-family: Manrope, sans-serif; font-size: 14.5px; font-weight: 800; cursor: {{ passwordSaveCursor }}; box-shadow: 0 10px 24px rgba(235,156,13,.3);" style-hover="filter: brightness(1.05)">{{ passwordSaveLabel }}</button>
+                <button onClick="{{ cancelPassword }}" style="flex: 0 1 130px; min-height: 50px; border: 1px solid rgba(167,139,250,.34); border-radius: 13px; background: rgba(255,255,255,.03); color: #fff; font-family: Manrope, sans-serif; font-size: 14px; font-weight: 700; cursor: pointer;" style-hover="background: rgba(255,255,255,.08)">Cancel</button>
+              </div>
+
+              <button onClick="{{ openSupport }}" data-help-trigger="1" style="align-self: flex-start; border: 0; background: transparent; padding: 0; font-family: Manrope, sans-serif; font-size: 12.5px; font-weight: 600; color: #a795c5; cursor: pointer;" style-hover="color: #fff">Forgot your current password? Use the recovery flow →</button>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ passwordSaved }}" hint-placeholder-val="{{ false }}">
+            <span role="status" style="padding: 12px 14px; border: 1px solid rgba(74,222,128,.34); border-radius: 12px; background: rgba(74,222,128,.09); font-size: 13px; font-weight: 700; line-height: 1.5; color: #86efac; text-wrap: pretty;">Password updated. You’re still signed in on this device.</span>
+          </sc-if>
+        </div>
+
+        <div style="padding: 22px; border: 1px solid rgba(167,139,250,.2); border-radius: 20px; background: linear-gradient(180deg, #23103f 0%, #180a2c 100%); display: flex; flex-direction: column; gap: 16px;">
+          <h2 style="margin: 0; font-size: 19px; font-weight: 800; letter-spacing: -.3px; color: #fff;">Connected login methods</h2>
+
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <sc-for list="{{ methods }}" as="m" hint-placeholder-count="3">
+              <div style="padding: 15px; border: 1px solid rgba(167,139,250,.16); border-radius: 16px; background: rgba(255,255,255,.03); display: flex; flex-direction: column; gap: 11px;">
+                <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px;">
+                  <span style="width: 38px; height: 38px; flex: none; border-radius: 12px; border: 1px solid {{ m.iconBorder }}; background: {{ m.iconBg }}; color: {{ m.iconColor }}; font-size: 16px; font-weight: 800; display: flex; align-items: center; justify-content: center;">{{ m.glyph }}</span>
+                  <span style="flex: 1 1 140px; min-width: 0; display: flex; flex-direction: column; gap: 3px;">
+                    <span style="font-size: 14.5px; font-weight: 700; color: #fff;">{{ m.name }}</span>
+                    <span style="font-size: 12.5px; font-weight: 500; color: #a795c5; overflow-wrap: anywhere;">{{ m.identifier }}</span>
+                  </span>
+                  <span style="height: 26px; display: inline-flex; align-items: center; gap: 7px; padding: 0 11px; border-radius: 999px; border: 1px solid {{ m.statusBorder }}; background: {{ m.statusBg }}; font-size: 10.5px; font-weight: 800; letter-spacing: .6px; white-space: nowrap; color: {{ m.statusColor }};">
+                    <span style="width: 7px; height: 7px; border-radius: 50%; background: {{ m.statusDot }};"></span>{{ m.statusLabel }}
+                  </span>
+                </div>
+                <sc-if value="{{ m.note }}" hint-placeholder-val="{{ false }}">
+                  <span style="font-size: 12.5px; font-weight: 500; line-height: 1.5; color: #a795c5; text-wrap: pretty;">{{ m.note }}</span>
+                </sc-if>
+                <sc-if value="{{ m.actionLabel }}" hint-placeholder-val="{{ true }}">
+                  <div style="display: flex; flex-wrap: wrap; gap: 9px;">
+                    <button onClick="{{ m.onAction }}" style="min-height: 44px; padding: 0 18px; white-space: nowrap; border: {{ m.actionBorder }}; border-radius: 12px; background: {{ m.actionBg }}; color: {{ m.actionColor }}; font-family: Manrope, sans-serif; font-size: 13.5px; font-weight: 700; cursor: pointer;" style-hover="filter: brightness(1.06)">{{ m.actionLabel }}</button>
+                    <sc-if value="{{ m.secondaryLabel }}" hint-placeholder-val="{{ false }}">
+                      <button onClick="{{ m.onSecondary }}" style="min-height: 44px; padding: 0 16px; white-space: nowrap; border: 1px solid rgba(167,139,250,.22); border-radius: 12px; background: transparent; color: #cbb6e6; font-family: Manrope, sans-serif; font-size: 13px; font-weight: 700; cursor: pointer;" style-hover="color: #fff; background: rgba(255,255,255,.06)">{{ m.secondaryLabel }}</button>
+                    </sc-if>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+
+          <span style="font-size: 12.5px; font-weight: 500; line-height: 1.55; color: #8f7aae; text-wrap: pretty;">Telegram sign-in is authorised on Telegram itself — ChoCho never asks for your Telegram password or login code.</span>
+        </div>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{ isVerification }}" hint-placeholder-val="{{ false }}">
+      <section role="tabpanel" id="panel-verification" aria-labelledby="tab-verification" style="padding: 0 22px; display: flex; flex-direction: column; gap: 18px;">
+        <div style="display: flex; flex-direction: column; gap: 7px;">
+          <h2 style="margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -.4px; color: #fff;">Account verification</h2>
+          <span style="font-size: 13.5px; font-weight: 500; line-height: 1.5; color: #a795c5;">View your verification status and any next steps.</span>
+        </div>
+
+        <div style="max-width: 620px; padding: 24px; border: 1px solid {{ verBorder }}; border-radius: 20px; background: linear-gradient(180deg, #23103f 0%, #180a2c 100%); display: flex; flex-direction: column; gap: 16px;">
+          <span style="min-height: 30px; max-width: 100%; align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; padding: 4px 13px; box-sizing: border-box; border-radius: 999px; border: 1px solid {{ verStatusBorder }}; background: {{ verStatusBg }}; font-size: 11.5px; font-weight: 800; letter-spacing: .7px; line-height: 1.3; text-wrap: pretty; color: {{ verStatusColor }};">
+            <span style="width: 7px; height: 7px; border-radius: 50%; background: {{ verStatusDot }};"></span>{{ verStatusLabel }}
+          </span>
+
+          <span style="font-size: 15px; font-weight: 500; line-height: 1.6; color: #e6ddf5; text-wrap: pretty;">{{ verExplanation }}</span>
+
+          <sc-if value="{{ verHasSteps }}" hint-placeholder-val="{{ false }}">
+            <div style="display: flex; flex-direction: column; gap: 9px;">
+              <sc-for list="{{ verSteps }}" as="v" hint-placeholder-count="3">
+                <span style="padding: 12px 15px; border: 1px solid rgba(167,139,250,.16); border-radius: 14px; background: rgba(255,255,255,.03); display: flex; align-items: center; gap: 12px;">
+                  <span style="width: 26px; height: 26px; flex: none; border-radius: 50%; border: 1px solid {{ v.border }}; background: {{ v.bg }}; color: {{ v.color }}; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center;">{{ v.mark }}</span>
+                  <span style="flex: 1; min-width: 0; font-size: 13.5px; font-weight: 600; line-height: 1.45; color: {{ v.textColor }}; text-wrap: pretty;">{{ v.label }}</span>
+                </span>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ verHasFacts }}" hint-placeholder-val="{{ false }}">
+            <div style="display: flex; flex-direction: column; gap: 1px; border: 1px solid rgba(167,139,250,.16); border-radius: 16px; overflow: hidden;">
+              <sc-for list="{{ verFacts }}" as="v" hint-placeholder-count="2">
+                <span style="padding: 13px 16px; background: rgba(255,255,255,.03); display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px;">
+                  <span style="flex: 1 1 150px; min-width: 0; font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #8f7aae;">{{ v.label }}</span>
+                  <span style="font-size: 13.5px; font-weight: 700; color: #e6ddf5; overflow-wrap: anywhere;">{{ v.value }}</span>
+                </span>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+            <sc-if value="{{ verActionLabel }}" hint-placeholder-val="{{ true }}">
+              <button onClick="{{ verAction }}" style="flex: 1 1 200px; min-height: 50px; padding: 0 22px; border: 0; border-radius: 13px; background: linear-gradient(180deg, #ffd766, #eb9c0d); color: #2c1400; font-family: Manrope, sans-serif; font-size: 14.5px; font-weight: 800; cursor: pointer; box-shadow: 0 10px 24px rgba(235,156,13,.3);" style-hover="filter: brightness(1.05)">{{ verActionLabel }}</button>
+            </sc-if>
+            <button onClick="{{ openSupport }}" data-help-trigger="1" style="flex: 0 1 160px; min-height: 50px; padding: 0 20px; border: 1px solid rgba(167,139,250,.32); border-radius: 13px; background: rgba(255,255,255,.03); color: #fff; font-family: Manrope, sans-serif; font-size: 13.5px; font-weight: 700; cursor: pointer;" style-hover="background: rgba(255,255,255,.08)">24/7 Support</button>
+          </div>
+
+          <span style="font-size: 12.5px; font-weight: 500; line-height: 1.55; color: #8f7aae; text-wrap: pretty;">Confirming a contact detail or connecting Telegram doesn’t verify your identity — verification is a separate review.</span>
+        </div>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{ isPreferences }}" hint-placeholder-val="{{ false }}">
+      <section role="tabpanel" id="panel-preferences" aria-labelledby="tab-preferences" style="padding: 0 22px; display: flex; flex-direction: column; gap: 18px;">
+        <div style="display: flex; flex-direction: column; gap: 7px;">
+          <h2 style="margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -.4px; color: #fff;">Preferences</h2>
+          <span style="font-size: 13.5px; font-weight: 500; line-height: 1.5; color: #a795c5; text-wrap: pretty;">Choose how you receive updates and manage supported account settings.</span>
+        </div>
+
+        <div style="max-width: 680px; padding: 22px; border: 1px solid rgba(167,139,250,.2); border-radius: 20px; background: linear-gradient(180deg, #23103f 0%, #180a2c 100%); display: flex; flex-direction: column; gap: 14px;">
+          <sc-for list="{{ prefRows }}" as="p" hint-placeholder-count="6">
+            <div style="display: {{ p.display }}; flex-direction: column; gap: 8px; padding: {{ p.pad }}; border: {{ p.border }}; border-radius: 15px; background: {{ p.bg }};">
+              <sc-if value="{{ p.heading }}" hint-placeholder-val="{{ false }}">
+                <span style="display: flex; flex-direction: column; gap: 4px; padding-top: {{ p.headingTop }};">
+                  <span style="font-size: 11px; font-weight: 800; letter-spacing: 1.2px; color: #8f7aae;">{{ p.heading }}</span>
+                  <sc-if value="{{ p.headingNote }}" hint-placeholder-val="{{ false }}">
+                    <span style="font-size: 12.5px; font-weight: 500; line-height: 1.5; color: #a795c5; text-wrap: pretty;">{{ p.headingNote }}</span>
+                  </sc-if>
+                </span>
+              </sc-if>
+
+              <sc-if value="{{ p.isToggle }}" hint-placeholder-val="{{ true }}">
+                <label style="display: flex; flex-wrap: wrap; align-items: flex-start; gap: 10px 14px; cursor: {{ p.cursor }};">
+                  <input type="checkbox" checked="{{ p.checked }}" onChange="{{ p.onToggle }}" disabled="{{ p.disabled }}" style="width: 22px; height: 22px; flex: none; margin: 2px 0 0; accent-color: #eb9c0d; cursor: {{ p.cursor }};">
+                  <span style="flex: 1 1 220px; min-width: 0; display: flex; flex-direction: column; gap: 4px;">
+                    <span style="font-size: 14.5px; font-weight: 700; color: {{ p.labelColor }};">{{ p.label }}</span>
+                    <span style="font-size: 12.5px; font-weight: 500; line-height: 1.5; color: #a795c5; text-wrap: pretty;">{{ p.desc }}</span>
+                  </span>
+                </label>
+                <sc-if value="{{ p.dependency }}" hint-placeholder-val="{{ false }}">
+                  <span style="margin-left: 36px; font-size: 12.5px; font-weight: 500; line-height: 1.5; color: #f3e6c7; text-wrap: pretty;">{{ p.dependency }} <button onClick="{{ p.onLink }}" style="border: 0; background: transparent; padding: 0; font-family: Manrope, sans-serif; font-size: 12.5px; font-weight: 700; color: #ffc93c; cursor: pointer; text-decoration: underline;">{{ p.linkLabel }}</button></span>
+                </sc-if>
+              </sc-if>
+
+              <sc-if value="{{ p.isSelect }}" hint-placeholder-val="{{ false }}">
+                <label style="display: flex; flex-direction: column; gap: 7px;">
+                  <span style="font-size: 14.5px; font-weight: 700; color: #fff;">{{ p.label }}</span>
+                  <select value="{{ p.value }}" onChange="{{ p.onChange }}" style="height: 50px; box-sizing: border-box; padding: 0 14px; border: 1px solid rgba(167,139,250,.28); border-radius: 13px; background: rgba(255,255,255,.04); color: #fff; font-family: Manrope, sans-serif; font-size: 15px; font-weight: 600; outline: none;">
+                    <sc-for list="{{ p.options }}" as="o" hint-placeholder-count="2">
+                      <option value="{{ o.value }}" style="color: #1a0930;">{{ o.label }}</option>
+                    </sc-for>
+                  </select>
+                </label>
+              </sc-if>
+            </div>
+          </sc-for>
+
+          <sc-if value="{{ prefFormError }}" hint-placeholder-val="{{ false }}">
+            <span role="alert" style="padding: 12px 14px; border: 1px solid rgba(248,113,113,.4); border-radius: 12px; background: rgba(248,113,113,.08); font-size: 12.5px; font-weight: 600; line-height: 1.5; color: #fca5a5; text-wrap: pretty;">{{ prefFormError }}</span>
+          </sc-if>
+
+          <sc-if value="{{ prefSaved }}" hint-placeholder-val="{{ false }}">
+            <span role="status" style="padding: 12px 14px; border: 1px solid rgba(74,222,128,.34); border-radius: 12px; background: rgba(74,222,128,.09); font-size: 13px; font-weight: 700; color: #86efac;">Preferences saved</span>
+          </sc-if>
+
+          <div style="display: flex; flex-wrap: wrap; gap: 10px; padding-top: 2px;">
+            <button onClick="{{ savePrefs }}" disabled="{{ prefSavingFlag }}" style="flex: 1 1 190px; min-height: 50px; border: 0; border-radius: 13px; background: {{ prefSaveBg }}; color: #2c1400; font-family: Manrope, sans-serif; font-size: 14.5px; font-weight: 800; cursor: {{ prefSaveCursor }}; box-shadow: 0 10px 24px rgba(235,156,13,.3);" style-hover="filter: brightness(1.05)">{{ prefSaveLabel }}</button>
+            <button onClick="{{ cancelPrefs }}" style="flex: 0 1 130px; min-height: 50px; border: 1px solid rgba(167,139,250,.34); border-radius: 13px; background: rgba(255,255,255,.03); color: #fff; font-family: Manrope, sans-serif; font-size: 14px; font-weight: 700; cursor: pointer;" style-hover="background: rgba(255,255,255,.08)">Cancel</button>
+          </div>
+        </div>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{ isBonuses }}" hint-placeholder-val="{{ false }}">
+      <section role="tabpanel" id="panel-bonuses" aria-labelledby="tab-bonuses" style="padding: 0 22px;">
+        <dc-import name="ChoCho Bonuses" variant="page" hint-size="100%,520px"></dc-import>
+      </section>
+    </sc-if>
+
+    </sc-if>
+
+    <dc-import name="ChoCho Footer" hint-size="100%,120px"></dc-import>
+
+    <dc-import name="ChoCho Bottom Nav" active="none" hint-size="1px,1px"></dc-import>
+  </div>
+
+  <dc-import name="ChoCho Support" hint-size="1px,1px"></dc-import>
+
+  <sc-if value="{{ dialogOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ backdropClick }}" style="position: fixed; inset: 0; z-index: 200; background: {{ scrimBg }}; display: flex; align-items: {{ scrimAlign }}; justify-content: center; padding: {{ scrimPad }}; overflow: hidden; animation: wFade .18s ease-out;">
+      <div role="dialog" aria-modal="true" aria-labelledby="acct-dialog-title" tabindex="-1" data-acct-dialog="1" onClick="{{ stop }}" style="position: relative; width: {{ sheetWidth }}; max-width: 100%; max-height: {{ sheetMaxHeight }}; overflow-y: auto; -webkit-overflow-scrolling: touch; box-sizing: border-box; padding: 0 26px 26px; border: {{ sheetBorder }}; border-radius: {{ sheetRadius }}; background: linear-gradient(170deg, #2a1049 0%, #1a0930 55%, #160726 100%); box-shadow: 0 30px 80px rgba(4,1,9,.7); display: flex; flex-direction: column; gap: 16px; animation: wRise .22s ease-out;">
+        <div style="position: sticky; top: 0; z-index: 2; margin: 0 -26px; padding: 22px 26px 14px; background: #2a1049; border-bottom: 1px solid rgba(167,139,250,.14); display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
+          <span style="min-width: 0; display: flex; flex-direction: column; gap: 4px;">
+            <span style="font-size: 10.5px; font-weight: 800; letter-spacing: 1.2px; color: #8f7aae;">{{ dialogEyebrow }}</span>
+            <span id="acct-dialog-title" style="font-size: 19px; font-weight: 800; letter-spacing: -.3px; color: #fff;">{{ dialogTitle }}</span>
+          </span>
+          <button onClick="{{ closeDialog }}" aria-label="Close" style="width: 40px; height: 40px; flex: none; border: 1px solid rgba(167,139,250,.28); border-radius: 12px; background: rgba(255,255,255,.06); color: #cbb6e6; font-size: 15px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center;" style-hover="background: rgba(255,255,255,.14); color: #fff">✕</button>
+        </div>
+
+        <sc-if value="{{ dialogIntro }}" hint-placeholder-val="{{ true }}">
+          <span style="font-size: 13.5px; font-weight: 500; line-height: 1.6; color: #cbb6e6; text-wrap: pretty;">{{ dialogIntro }}</span>
+        </sc-if>
+
+        <sc-for list="{{ dialogFields }}" as="f" hint-placeholder-count="2">
+          <label style="display: flex; flex-direction: column; gap: 7px;">
+            <span style="font-size: 12.5px; font-weight: 700; color: #cbb6e6;">{{ f.label }}</span>
+            <input type="{{ f.type }}" value="{{ f.value }}" onChange="{{ f.onChange }}" inputMode="{{ f.inputMode }}" autoComplete="{{ f.autoComplete }}" placeholder="{{ f.placeholder }}" aria-invalid="{{ f.invalid }}" style="height: 50px; box-sizing: border-box; padding: 0 15px; border: 1px solid {{ f.border }}; border-radius: 13px; background: rgba(255,255,255,.04); color: #fff; font-family: Manrope, sans-serif; font-size: 15px; font-weight: 600; outline: none;">
+            <sc-if value="{{ f.error }}" hint-placeholder-val="{{ false }}">
+              <span role="alert" style="font-size: 12.5px; font-weight: 600; line-height: 1.45; color: #fca5a5;">{{ f.error }}</span>
+            </sc-if>
+            <sc-if value="{{ f.hint }}" hint-placeholder-val="{{ false }}">
+              <span style="font-size: 12px; font-weight: 500; line-height: 1.45; color: #8f7aae;">{{ f.hint }}</span>
+            </sc-if>
+          </label>
+        </sc-for>
+
+        <sc-if value="{{ dialogWarning }}" hint-placeholder-val="{{ false }}">
+          <span style="padding: 13px 15px; border: 1px solid rgba(255,201,60,.32); border-radius: 13px; background: rgba(255,201,60,.08); font-size: 12.5px; font-weight: 600; line-height: 1.55; color: #f3e6c7; text-wrap: pretty;">{{ dialogWarning }}</span>
+        </sc-if>
+
+        <sc-if value="{{ dialogError }}" hint-placeholder-val="{{ false }}">
+          <span role="alert" style="padding: 13px 15px; border: 1px solid rgba(248,113,113,.4); border-radius: 13px; background: rgba(248,113,113,.08); font-size: 12.5px; font-weight: 600; line-height: 1.55; color: #fca5a5; text-wrap: pretty;">{{ dialogError }}</span>
+        </sc-if>
+
+        <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+          <sc-if value="{{ dialogPrimaryLabel }}" hint-placeholder-val="{{ true }}">
+            <button onClick="{{ dialogPrimary }}" disabled="{{ dialogBusy }}" style="flex: 1 1 180px; min-height: 50px; padding: 0 20px; border: 0; border-radius: 13px; background: {{ dialogPrimaryBg }}; color: {{ dialogPrimaryColor }}; font-family: Manrope, sans-serif; font-size: 14.5px; font-weight: 800; cursor: {{ dialogPrimaryCursor }}; box-shadow: 0 10px 24px rgba(235,156,13,.3);" style-hover="filter: brightness(1.05)">{{ dialogPrimaryLabel }}</button>
+          </sc-if>
+          <button onClick="{{ closeDialog }}" style="flex: 0 1 130px; min-height: 50px; border: 1px solid rgba(167,139,250,.34); border-radius: 13px; background: rgba(255,255,255,.03); color: #fff; font-family: Manrope, sans-serif; font-size: 14px; font-weight: 700; cursor: pointer;" style-hover="background: rgba(255,255,255,.08)">{{ dialogCancelLabel }}</button>
+        </div>
+
+        <button onClick="{{ openSupport }}" data-help-trigger="1" style="min-height: 46px; border: 1px solid rgba(167,139,250,.3); border-radius: 12px; background: rgba(255,255,255,.03); color: #a795c5; font-family: Manrope, sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;" style-hover="color: #fff; background: rgba(255,255,255,.07)">Need help? <span style="color: #ffc93c; font-weight: 800;">24/7 Support</span></button>
+      </div>
+    </div>
+  </sc-if>
+
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1024,&quot;height&quot;:1100},&quot;layout&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;auto&quot;,&quot;mobile&quot;],&quot;default&quot;:&quot;auto&quot;,&quot;tsType&quot;:&quot;\&quot;auto\&quot; | \&quot;mobile\&quot;&quot;,&quot;section&quot;:&quot;Surface&quot;},&quot;previewSession&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;shared&quot;,&quot;guest&quot;,&quot;signed-in&quot;],&quot;default&quot;:&quot;shared&quot;,&quot;tsType&quot;:&quot;\&quot;signed-in\&quot; | \&quot;signed-out\&quot;&quot;,&quot;section&quot;:&quot;Preview context&quot;},&quot;initialTab&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Profile&quot;,&quot;Security&quot;,&quot;Verification&quot;,&quot;Preferences&quot;,&quot;Bonuses&quot;],&quot;default&quot;:&quot;Profile&quot;,&quot;tsType&quot;:&quot;\&quot;Profile\&quot; | \&quot;Security\&quot; | \&quot;Verification\&quot; | \&quot;Preferences\&quot;&quot;,&quot;section&quot;:&quot;Preview context&quot;},&quot;dataState&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;loaded&quot;,&quot;loading&quot;],&quot;default&quot;:&quot;loaded&quot;,&quot;tsType&quot;:&quot;\&quot;loaded\&quot; | \&quot;loading\&quot;&quot;,&quot;section&quot;:&quot;Preview context&quot;},&quot;contactStatus&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;confirmed&quot;,&quot;unverified-email&quot;,&quot;missing-email&quot;,&quot;loading&quot;],&quot;default&quot;:&quot;confirmed&quot;,&quot;tsType&quot;:&quot;\&quot;confirmed\&quot; | \&quot;unverified-email\&quot; | \&quot;missing-email\&quot; | \&quot;loading\&quot;&quot;,&quot;section&quot;:&quot;Preview context&quot;},&quot;passwordMode&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;has-password&quot;,&quot;telegram-only&quot;],&quot;default&quot;:&quot;has-password&quot;,&quot;tsType&quot;:&quot;\&quot;has-password\&quot; | \&quot;telegram-only\&quot;&quot;,&quot;section&quot;:&quot;Preview context&quot;},&quot;telegram&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;connected&quot;,&quot;not-connected&quot;],&quot;default&quot;:&quot;connected&quot;,&quot;tsType&quot;:&quot;\&quot;connected\&quot; | \&quot;not-connected\&quot;&quot;,&quot;section&quot;:&quot;Preview context&quot;},&quot;telegramConflict&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;no&quot;,&quot;yes&quot;],&quot;default&quot;:&quot;no&quot;,&quot;tsType&quot;:&quot;\&quot;no\&quot; | \&quot;yes\&quot;&quot;,&quot;section&quot;:&quot;Preview context&quot;},&quot;verification&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;not-started&quot;,&quot;incomplete&quot;,&quot;under-review&quot;,&quot;more-info&quot;,&quot;verified&quot;,&quot;error&quot;],&quot;default&quot;:&quot;not-started&quot;,&quot;tsType&quot;:&quot;\&quot;not-started\&quot; | \&quot;incomplete\&quot; | \&quot;under-review\&quot; | \&quot;more-info\&quot; | \&quot;verified\&quot; | \&quot;error\&quot;&quot;,&quot;section&quot;:&quot;Preview context&quot;},&quot;saveResult&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;success&quot;,&quot;error&quot;],&quot;default&quot;:&quot;success&quot;,&quot;tsType&quot;:&quot;\&quot;success\&quot; | \&quot;error\&quot;&quot;,&quot;section&quot;:&quot;Preview context&quot;}}">
+// Identity (player ID, names, initials) comes from the shared account fixture in chocho-account.js.
+const ACCOUNT_DETAILS = {
+  birthDate: "14 March 1994",
+  memberSince: "Member since March 2025",
+  balance: "12,480.50",
+  phone: "+63 917 555 0142",
+  email: "jaypee.r@mail.com"
+};
+
+function ID() {
+  const a = typeof window !== "undefined" && window.ChoChoAccount;
+  return Object.assign({ playerId: "", displayName: "", initials: "", firstName: "", lastName: "" }, ACCOUNT_DETAILS, (a && a.identity) || {});
+}
+
+const PASSWORD_POLICY = "At least 8 characters, including a letter and a number.";
+
+class Component extends DCLogic {
+  state = { authed: (() => { try { return localStorage.getItem("chocho:previewSession") === "signed-in"; } catch (e) { return false; } })(), tab: null, menuOpen: false, accountOpen: false, support: false,
+    copiedId: false,
+    // Profile drafts survive tab switches because they live here.
+    pDraft: null, pEditing: false, pSaving: false, pSaved: false, pErrors: {}, pFormError: "",
+    confirmed: { displayName: ID().displayName, city: "Quezon City" },
+    // Contact changes stay pending until the service approves them.
+    pending: {},
+    // Password
+    pwOpen: false, pw: { current: "", next: "", confirm: "" }, pwShow: {},
+    pwSaving: false, pwSaved: false, pwErrors: {}, pwFormError: "",
+    hasPassword: null, telegram: null,
+    // Verification
+    ver: null, verBusy: false,
+    // Preferences
+    prefDraft: null, prefSaved: false, prefSaving: false, prefError: "",
+    prefConfirmed: {
+      accountEmail: true, accountSms: true,
+      promoEmail: false, promoSms: false, promoTelegram: false,
+      bigWin: true, language: "en-PH"
+    },
+    dialog: null, dialogBusy: false, dialogError: "", dialogFields: {}
+  };
+
+  constructor(props) {
+    super(props);
+    this.helpTrigger = null;
+    this.dialogTrigger = null;
+  }
+
+  dialogNode() { return document.querySelector("[data-acct-dialog]"); }
+  supportNode() { return document.querySelector("[data-support-dialog]"); }
+
+  componentDidMount() {
+    this._onVw = () => { if (window.innerWidth !== this.state.vw) this.setState({ vw: window.innerWidth }); };
+    window.addEventListener("resize", this._onVw);
+    this._onVw();
+    this.connectSite();
+    // The identity fixture may arrive after first render: fill the confirmed name once it does.
+    this._onAcct = () => {
+      if (!this.state.confirmed.displayName && ID().displayName) this.setState(s => ({ confirmed: Object.assign({}, s.confirmed, { displayName: ID().displayName }) }));
+      else this.forceUpdate();
+    };
+    window.addEventListener("chocho:account-ready", this._onAcct);
+    this._onAcct();
+    this.onKey = (e) => {
+      if (e.key === "Escape") {
+        if (this.state.support) { e.stopPropagation(); this.closeSupport(); return; }
+        if (this.state.dialog) { e.stopPropagation(); this.closeDialog(); }
+        return;
+      }
+      if (e.key !== "Tab") return;
+      const root = this.state.support ? this.supportNode() : (this.state.dialog ? this.dialogNode() : null);
+      if (!root) return;
+      const f = Array.from(root.querySelectorAll('button:not([disabled]), a[href], input:not([disabled]), select, [tabindex]:not([tabindex="-1"])'))
+        .filter(el => el.offsetParent !== null);
+      if (!f.length) return;
+      const first = f[0], last = f[f.length - 1], active = document.activeElement;
+      if (!root.contains(active)) { e.preventDefault(); first.focus(); return; }
+      if (e.shiftKey && active === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && active === last) { e.preventDefault(); first.focus(); }
+    };
+    document.addEventListener("keydown", this.onKey, true);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("resize", this._onVw);
+    window.removeEventListener("chocho:account-ready", this._onAcct);
+    if (this._unsubSite) this._unsubSite();
+    document.removeEventListener("keydown", this.onKey, true);
+    // Sensitive values are only ever in memory; drop them on teardown.
+    this.setState({ pw: { current: "", next: "", confirm: "" } });
+    clearTimeout(this.copyTimer);
+    clearTimeout(this.tmr);
+    clearTimeout(this.tmr2);
+  }
+
+/* Guest vs signed-in follows the one shared preview session. A guest never
+     sees personal data: the page shows its sign-in gate instead. */
+  previewValue() {
+    const p = this.props.previewSession;
+    if (p !== undefined) return p;
+    const legacy = this.props.account;
+    return legacy === undefined ? undefined : (legacy === "signed-out" ? "guest" : "signed-in");
+  }
+
+  connectSite() {
+    const s = window.ChoChoSite;
+    if (!s) { window.addEventListener("chocho:site-ready", () => this.connectSite(), { once: true }); return; }
+    s.applyPreviewProp(this.previewValue());
+    this._unsubSite = s.subscribe(() => this.onSession(s.isAuthed()));
+    this.onSession(s.isAuthed());
+    // Direct entry as a guest: ask to sign in over this page, keeping it as the destination.
+    if (!s.isAuthed()) s.openAuth("signin", s.currentUrl());
+  }
+
+  onSession(authed) {
+    if (authed === this.state.authed) return;
+    // Leaving the signed-in preview drops open personal panels and unsaved drafts.
+    if (authed) this.setState({ authed: true });
+    else this.setState({ authed: false, dialog: null, pDraft: null, pEditing: false, pw: { current: "", next: "", confirm: "" }, pwOpen: false, accountOpen: false });
+  }
+
+  componentDidUpdate(prev) {
+    if ((prev.previewSession !== this.props.previewSession || prev.account !== this.props.account) && window.ChoChoSite) window.ChoChoSite.applyPreviewProp(this.previewValue());
+  }
+
+  // ?tab=Verification etc. lets help pages link straight to a section.
+  urlTab() {
+    const t = (window.location.search.match(/[?&]tab=(\w+)/) || [])[1];
+    return ["Profile", "Security", "Verification", "Preferences", "Bonuses"].indexOf(t) >= 0 ? t : null;
+  }
+  tab() { return this.state.tab || this.urlTab() || (this.props.initialTab ?? "Profile"); }
+
+  /* Keeps the chosen tab visible in the horizontally scrolling strip on mobile. */
+  revealTab(id) {
+    const strip = document.querySelector("[data-tabstrip]");
+    const btn = document.getElementById(id);
+    if (!strip || !btn) return;
+    const left = btn.offsetLeft, right = left + btn.offsetWidth;
+    if (left < strip.scrollLeft) strip.scrollLeft = Math.max(0, left - 12);
+    else if (right > strip.scrollLeft + strip.clientWidth) strip.scrollLeft = right - strip.clientWidth + 12;
+  }
+  telegramState() { return this.state.telegram || (this.props.telegram ?? "connected"); }
+  hasPassword() {
+    const s = this.state.hasPassword;
+    if (s !== null) return s;
+    return (this.props.passwordMode ?? "has-password") === "has-password";
+  }
+  verState() { return this.state.ver || (this.props.verification ?? "not-started"); }
+  contactState() { return this.props.contactStatus ?? "confirmed"; }
+  saveFails() { return (this.props.saveResult ?? "success") === "error"; }
+  mobile() { return (this.props.layout ?? "auto") === "mobile" || (this.state.vw || 1024) < 600; }
+
+  chip(kind) {
+    if (kind === "ok") return { color: "#86efac", dot: "#4ade80", bg: "rgba(74,222,128,.1)", border: "rgba(74,222,128,.32)" };
+    if (kind === "warn") return { color: "#ffc93c", dot: "#ffc93c", bg: "rgba(255,201,60,.12)", border: "rgba(255,201,60,.42)" };
+    if (kind === "bad") return { color: "#fca5a5", dot: "#f87171", bg: "rgba(248,113,113,.1)", border: "rgba(248,113,113,.4)" };
+    return { color: "#c4b5fd", dot: "#a78bfa", bg: "rgba(167,139,250,.1)", border: "rgba(167,139,250,.34)" };
+  }
+
+  /* ---- support ---- */
+  openSupport(trigger) {
+    window.dispatchEvent(new CustomEvent("chocho:support"));
+    return;
+    /* legacy inline panel retired — shared support controller owns the panel */
+    this.setState({ support: true }, () => { const r = this.supportNode(); if (r) r.focus(); });
+  }
+  closeSupport() {
+    const t = this.helpTrigger;
+    this.helpTrigger = null;
+    this.setState({ support: false }, () => {
+      const live = (t && t.isConnected) ? t : (this.dialogNode() || document.querySelector("[data-help-trigger]"));
+      if (live) { try { live.focus(); } catch (e) {} }
+    });
+  }
+
+  /* ---- dialogs ---- */
+  openDialog(kind, ev, fields) {
+    this.dialogTrigger = ev && ev.currentTarget;
+    this.setState({ dialog: kind, dialogError: "", dialogBusy: false, dialogFields: fields || {} },
+      () => { const r = this.dialogNode(); if (r) r.focus(); });
+  }
+  closeDialog() {
+    const t = this.dialogTrigger;
+    this.dialogTrigger = null;
+    clearTimeout(this.tmr2);
+    this.setState({ dialog: null, dialogError: "", dialogBusy: false, dialogFields: {} },
+      () => { if (t && t.isConnected) { try { t.focus(); } catch (e) {} } });
+  }
+  setDialogField(key, value) {
+    this.setState(s => ({ dialogFields: Object.assign({}, s.dialogFields, { [key]: value }) }));
+  }
+
+  copyId() {
+    const done = () => {
+      this.setState({ copiedId: true });
+      clearTimeout(this.copyTimer);
+      this.copyTimer = setTimeout(() => this.setState({ copiedId: false }), 2000);
+    };
+    const raw = ID().playerId.replace(/\s/g, "");
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(raw).then(done, done);
+    else done();
+  }
+
+  /* ---- profile ---- */
+  startEdit() {
+    this.setState(s => ({
+      pEditing: true, pSaved: false, pErrors: {}, pFormError: "",
+      pDraft: s.pDraft || Object.assign({}, s.confirmed)
+    }));
+  }
+  cancelEdit() {
+    this.setState(s => ({ pEditing: false, pDraft: null, pErrors: {}, pFormError: "" }));
+  }
+  setDraft(key, value) {
+    this.setState(s => ({ pDraft: Object.assign({}, s.pDraft || s.confirmed, { [key]: value }), pSaved: false }));
+  }
+  saveProfile() {
+    if (this.state.pSaving) return;
+    const d = this.state.pDraft || this.state.confirmed;
+    const errors = {};
+    const name = (d.displayName || "").trim();
+    if (name.length < 3) errors.displayName = "Enter at least 3 characters.";
+    else if (!/^[A-Za-z0-9 ._-]+$/.test(name)) errors.displayName = "Use letters, numbers, spaces, dots, hyphens or underscores only.";
+    if (Object.keys(errors).length) {
+      this.setState({ pErrors: errors, pFormError: "" }, () => {
+        const el = document.querySelector('[aria-invalid="true"]');
+        if (el) { try { el.focus(); } catch (e) {} }
+      });
+      return;
+    }
+    this.setState({ pSaving: true, pErrors: {}, pFormError: "" });
+    clearTimeout(this.tmr);
+    this.tmr = setTimeout(() => {
+      if (this.saveFails()) {
+        // Draft is retained so nothing the user typed is lost.
+        this.setState({ pSaving: false, pFormError: "We couldn’t save your changes. Please try again." });
+        return;
+      }
+      this.setState(s => ({
+        pSaving: false, pEditing: false, pSaved: true, pDraft: null,
+        confirmed: Object.assign({}, s.confirmed, { displayName: name, city: (d.city || "").trim() })
+      }));
+    }, 900);
+  }
+
+  /* ---- password ---- */
+  openPasswordForm(ev) {
+    this.setState({ pwOpen: true, pwSaved: false, pwErrors: {}, pwFormError: "" });
+  }
+  cancelPassword() {
+    this.setState({ pwOpen: false, pw: { current: "", next: "", confirm: "" }, pwShow: {}, pwErrors: {}, pwFormError: "" });
+  }
+  setPw(key, value) {
+    this.setState(s => ({ pw: Object.assign({}, s.pw, { [key]: value }), pwSaved: false }));
+  }
+  submitPassword() {
+    if (this.state.pwSaving) return;
+    const p = this.state.pw, needCurrent = this.hasPassword();
+    const errors = {};
+    if (needCurrent && !p.current) errors.current = "Enter your current password.";
+    if (!/^(?=.*[A-Za-z])(?=.*\d).{8,}$/.test(p.next || "")) errors.next = PASSWORD_POLICY;
+    if (p.confirm !== p.next) errors.confirm = "Both passwords must match.";
+    if (Object.keys(errors).length) {
+      this.setState({ pwErrors: errors, pwFormError: "" }, () => {
+        const el = document.querySelector('[aria-invalid="true"]');
+        if (el) { try { el.focus(); } catch (e) {} }
+      });
+      return;
+    }
+    this.setState({ pwSaving: true, pwErrors: {}, pwFormError: "" });
+    clearTimeout(this.tmr);
+    this.tmr = setTimeout(() => {
+      if (this.saveFails()) {
+        // Recoverable error: the open form keeps what was typed.
+        this.setState({ pwSaving: false, pwFormError: "We couldn’t update your password. Please try again." });
+        return;
+      }
+      this.setState({
+        pwSaving: false, pwOpen: false, pwSaved: true, hasPassword: true,
+        pw: { current: "", next: "", confirm: "" }, pwShow: {}
+      });
+    }, 900);
+  }
+
+  /* ---- contacts ---- */
+  contactValue(kind) {
+    return kind === "phone" ? ID().phone : ID().email;
+  }
+  startContactChange(kind, ev) {
+    const adding = this.contactState() === "missing-email" && kind === "email";
+    this.openDialog(kind === "phone" ? "phone" : "email", ev, { value: "", code: "", step: adding ? "value" : "reauth" });
+  }
+  submitContact() {
+    const f = this.state.dialogFields, kind = this.state.dialog;
+    const step = f.step || "reauth";
+    if (step === "reauth") {
+      if (!f.password) { this.setState({ dialogError: "Enter your password to continue." }); return; }
+      this.setState({ dialogFields: Object.assign({}, f, { step: "value" }), dialogError: "" });
+      return;
+    }
+    if (step === "value") {
+      const v = (f.value || "").trim();
+      if (kind === "phone" && !/^(\+?63|0)?9\d{9}$/.test(v.replace(/[\s-]/g, ""))) {
+        this.setState({ dialogError: "Enter a valid Philippine mobile number." }); return;
+      }
+      if (kind === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)) {
+        this.setState({ dialogError: "Enter a valid email address." }); return;
+      }
+      this.setState({ dialogBusy: true, dialogError: "" });
+      clearTimeout(this.tmr2);
+      this.tmr2 = setTimeout(() => this.setState(s => ({
+        dialogBusy: false, dialogFields: Object.assign({}, s.dialogFields, { step: "code" })
+      })), 800);
+      return;
+    }
+    if (!/^\d{6}$/.test(f.code || "")) { this.setState({ dialogError: "Enter the 6-digit code we sent." }); return; }
+    this.setState({ dialogBusy: true, dialogError: "" });
+    clearTimeout(this.tmr2);
+    this.tmr2 = setTimeout(() => {
+      if (this.saveFails()) {
+        this.setState({ dialogBusy: false, dialogError: "We couldn’t confirm that code. Request a new one or contact support." });
+        return;
+      }
+      // The service has not approved the replacement yet, so it is recorded as
+      // pending — the confirmed contact stays effective until then.
+      this.setState(s => ({ pending: Object.assign({}, s.pending, { [this.state.dialog]: (s.dialogFields.value || "").trim() }) }),
+        () => this.closeDialog());
+    }, 900);
+  }
+
+  /* ---- telegram ---- */
+  connectTelegram(ev) {
+    const conflict = (this.props.telegramConflict ?? "no") === "yes";
+    this.openDialog(conflict ? "tg-conflict" : "tg-connect", ev, {});
+  }
+  authorizeTelegram() {
+    this.setState({ dialogBusy: true, dialogError: "" });
+    clearTimeout(this.tmr2);
+    this.tmr2 = setTimeout(() => {
+      // Connected is shown only after the server confirms the link.
+      if (this.saveFails()) {
+        this.setState({ dialogBusy: false, dialogError: "Telegram didn’t confirm the connection. Please try again." });
+        return;
+      }
+      this.setState({ telegram: "connected" }, () => this.closeDialog());
+    }, 1100);
+  }
+  disconnectTelegram(ev) {
+    const onlyMethod = !this.hasPassword();
+    this.openDialog(onlyMethod ? "tg-last" : "tg-disconnect", ev, {});
+  }
+  confirmDisconnect() {
+    this.setState({ dialogBusy: true, dialogError: "" });
+    clearTimeout(this.tmr2);
+    this.tmr2 = setTimeout(() => this.setState({ telegram: "not-connected" }, () => this.closeDialog()), 800);
+  }
+
+  /* ---- verification ---- */
+  verAction(ev) {
+    const st = this.verState();
+    if (st === "error") {
+      this.setState({ verBusy: true });
+      clearTimeout(this.tmr);
+      this.tmr = setTimeout(() => this.setState({ verBusy: false }), 1000);
+      return;
+    }
+    this.openDialog("verify", ev, { step: "start" });
+  }
+  submitVerification() {
+    this.setState({ dialogBusy: true, dialogError: "" });
+    clearTimeout(this.tmr2);
+    this.tmr2 = setTimeout(() => {
+      if (this.saveFails()) {
+        this.setState({ dialogBusy: false, dialogError: "Your documents didn’t upload. Please check the file and try again." });
+        return;
+      }
+      // A submission means "under review" — never Verified.
+      this.setState({ ver: "under-review" }, () => this.closeDialog());
+    }, 1200);
+  }
+
+  /* ---- preferences ---- */
+  prefs() { return this.state.prefDraft || this.state.prefConfirmed; }
+  setPref(key, value) {
+    this.setState(s => ({
+      prefDraft: Object.assign({}, s.prefDraft || s.prefConfirmed, { [key]: value }),
+      prefSaved: false
+    }));
+  }
+  savePrefs() {
+    if (this.state.prefSaving) return;
+    this.setState({ prefSaving: true, prefError: "" });
+    clearTimeout(this.tmr);
+    this.tmr = setTimeout(() => {
+      if (this.saveFails()) {
+        this.setState({ prefSaving: false, prefError: "We couldn’t save your preferences. Please try again." });
+        return;
+      }
+      this.setState(s => ({
+        prefSaving: false, prefSaved: true,
+        prefConfirmed: Object.assign({}, s.prefConfirmed, s.prefDraft || {}), prefDraft: null
+      }));
+    }, 900);
+  }
+  cancelPrefs() { this.setState({ prefDraft: null, prefError: "", prefSaved: false }); }
+
+  navIcon(name) {
+    const paths = {
+      home: "M4 11.5 12 5l8 6.5V20a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z",
+      games: "M7 8h10a4 4 0 0 1 4 4v2a3 3 0 0 1-5.2 2L14 15h-4l-1.8 1A3 3 0 0 1 3 14v-2a4 4 0 0 1 4-4z",
+      wallet: "M3 8a2 2 0 0 1 2-2h13a1 1 0 0 1 1 1v2M3 8v9a2 2 0 0 0 2 2h14a1 1 0 0 0 1-1v-3m0-4v4m0-4h-4a2 2 0 0 0 0 4h4",
+      gift: "M4 11h16v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1zM3 7h18v4H3zM12 7v14M8 7a2 2 0 1 1 2-3c1.5 0 2 3 2 3M16 7a2 2 0 1 0-2-3c-1.5 0-2 3-2 3",
+      wheel: "M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zm0 0v9m0 0 7.8 4.5M12 12 4.2 16.5"
+    };
+    return React.createElement("svg", {
+      key: name, width: 22, height: 22, viewBox: "0 0 24 24", fill: "none",
+      stroke: "#a795c5", strokeWidth: 1.8, strokeLinecap: "round", strokeLinejoin: "round"
+    }, React.createElement("path", { d: paths[name] }));
+  }
+
+  contactRows() {
+    const st = this.contactState();
+    const loading = st === "loading";
+    const rows = [
+      { kind: "phone", label: "MOBILE NUMBER", value: this.contactValue("phone"), verified: true },
+      { kind: "email", label: "EMAIL ADDRESS", value: this.contactValue("email"), verified: st !== "unverified-email" }
+    ];
+    if (st === "missing-email") rows[1] = { kind: "email", label: "EMAIL ADDRESS", value: "Not added", missing: true };
+    return rows.map(r => {
+      const pending = this.state.pending[r.kind];
+      let chipKind = "ok", statusLabel = "VERIFIED", note = "";
+      if (loading) { chipKind = "neutral"; statusLabel = "CHECKING…"; }
+      else if (r.missing) { chipKind = "neutral"; statusLabel = "NOT ADDED"; note = "Add an email address to receive account and recovery messages."; }
+      else if (!r.verified) { chipKind = "warn"; statusLabel = "NOT CONFIRMED"; note = "Confirm this address to use it for account messages and recovery."; }
+      if (pending) {
+        chipKind = "warn"; statusLabel = "CHANGE PENDING";
+        note = "Change to " + pending + " is awaiting approval. Your current " + (r.kind === "phone" ? "number" : "address") + " stays in effect until it’s confirmed.";
+      }
+      const c = this.chip(chipKind);
+      return {
+        label: r.label,
+        value: r.value,
+        valueColor: r.missing ? "#a795c5" : "#fff",
+        statusLabel: statusLabel,
+        statusColor: c.color, statusDot: c.dot, statusBg: c.bg, statusBorder: c.border,
+        note: note,
+        actionLabel: loading ? "" : (pending ? "Resend confirmation" : r.missing ? "Add email address" : r.kind === "phone" ? "Change mobile number" : "Change email address"),
+        onAction: (e) => this.startContactChange(r.kind, e),
+        secondaryLabel: pending ? "Cancel change" : (!r.missing && !r.verified ? "Send confirmation" : ""),
+        onSecondary: pending
+          ? () => this.setState(s => { const p = Object.assign({}, s.pending); delete p[r.kind]; return { pending: p }; })
+          : (e) => this.startContactChange(r.kind, e)
+      };
+    });
+  }
+
+  methods() {
+    const st = this.contactState();
+    const tg = this.telegramState();
+    const phonePending = this.state.pending.phone, emailPending = this.state.pending.email;
+    const list = [];
+
+    const pc = this.chip(phonePending ? "warn" : "ok");
+    list.push({
+      name: "Phone", glyph: "☎", identifier: ID().phone,
+      iconColor: "#c4b5fd", iconBg: "rgba(167,139,250,.12)", iconBorder: "rgba(167,139,250,.26)",
+      statusLabel: phonePending ? "CHANGE PENDING" : "VERIFIED",
+      statusColor: pc.color, statusDot: pc.dot, statusBg: pc.bg, statusBorder: pc.border,
+      note: phonePending ? "Your new number becomes a sign-in detail only once it’s confirmed." : "",
+      actionLabel: "Manage",
+      actionBorder: "1px solid rgba(167,139,250,.34)", actionBg: "rgba(255,255,255,.04)", actionColor: "#fff",
+      onAction: () => this.setState({ tab: "Profile" })
+    });
+
+    const missing = st === "missing-email";
+    const unver = st === "unverified-email";
+    const ec = this.chip(missing ? "neutral" : (unver || emailPending) ? "warn" : "ok");
+    list.push({
+      name: "Email", glyph: "✉", identifier: missing ? "Not added" : ID().email,
+      iconColor: "#c4b5fd", iconBg: "rgba(167,139,250,.12)", iconBorder: "rgba(167,139,250,.26)",
+      statusLabel: missing ? "NOT ADDED" : emailPending ? "CHANGE PENDING" : unver ? "NOT CONFIRMED" : "VERIFIED",
+      statusColor: ec.color, statusDot: ec.dot, statusBg: ec.bg, statusBorder: ec.border,
+      note: "",
+      actionLabel: "Manage",
+      actionBorder: "1px solid rgba(167,139,250,.34)", actionBg: "rgba(255,255,255,.04)", actionColor: "#fff",
+      onAction: () => this.setState({ tab: "Profile" })
+    });
+
+    if (tg === "connected") {
+      const c = this.chip("ok");
+      list.push({
+        name: "Telegram", glyph: "✈", identifier: "@jaypee_r",
+        iconColor: "#7dd3fc", iconBg: "rgba(56,189,248,.12)", iconBorder: "rgba(56,189,248,.3)",
+        statusLabel: "CONNECTED",
+        statusColor: c.color, statusDot: c.dot, statusBg: c.bg, statusBorder: c.border,
+        note: this.hasPassword() ? "" : "This is currently your only way to sign in. Set a password before disconnecting it.",
+        actionLabel: "Disconnect",
+        actionBorder: "1px solid rgba(248,113,113,.4)", actionBg: "rgba(248,113,113,.08)", actionColor: "#fca5a5",
+        onAction: (e) => this.disconnectTelegram(e)
+      });
+    } else {
+      const c = this.chip("neutral");
+      list.push({
+        name: "Telegram", glyph: "✈", identifier: "Not connected",
+        iconColor: "#7dd3fc", iconBg: "rgba(56,189,248,.12)", iconBorder: "rgba(56,189,248,.3)",
+        statusLabel: "NOT CONNECTED",
+        statusColor: c.color, statusDot: c.dot, statusBg: c.bg, statusBorder: c.border,
+        note: "Sign in with one tap using your Telegram account.",
+        actionLabel: "Connect Telegram",
+        actionBorder: "0", actionBg: "linear-gradient(180deg, #59c1f5, #2a9fe0)", actionColor: "#06263a",
+        onAction: (e) => this.connectTelegram(e)
+      });
+    }
+    return list;
+  }
+
+  verification() {
+    const st = this.state.verBusy ? "loading" : this.verState();
+    const map = {
+      "not-started": {
+        chip: "neutral", label: "NOT STARTED",
+        text: "Verify your identity to unlock withdrawals on your account. You’ll upload one valid government-issued ID and confirm your details.",
+        action: "Start verification"
+      },
+      "incomplete": {
+        chip: "warn", label: "INCOMPLETE",
+        text: "You started verification but haven’t finished. Pick up where you left off — your completed steps are saved.",
+        action: "Continue verification",
+        steps: [
+          { label: "Personal details confirmed", done: true },
+          { label: "Upload the front of your ID", done: false },
+          { label: "Upload the back of your ID", done: false }
+        ]
+      },
+      "under-review": {
+        chip: "warn", label: "UNDER REVIEW",
+        text: "Your documents are with our verification team. We’ll let you know here and by email once the review is complete — there’s nothing more to submit.",
+        action: ""
+      },
+      "more-info": {
+        chip: "warn", label: "MORE INFORMATION REQUIRED",
+        text: "The photo of your ID was too blurry for our team to read. Upload a clearer photo of the same document to continue.",
+        action: "Update information"
+      },
+      "verified": {
+        chip: "ok", label: "VERIFIED",
+        text: "Your identity is verified. No further documents are needed.",
+        action: "",
+        facts: [
+          { label: "VERIFIED NAME", value: ID().firstName + " " + ID().lastName },
+          { label: "DATE OF BIRTH", value: ID().birthDate },
+          { label: "DOCUMENT", value: "Philippine national ID" }
+        ]
+      },
+      "error": {
+        chip: "bad", label: "STATUS UNAVAILABLE",
+        text: "We couldn’t load your verification status right now. Your account hasn’t changed — please try again.",
+        action: "Retry"
+      },
+      "loading": {
+        chip: "neutral", label: "CHECKING…",
+        text: "Checking your verification status.",
+        action: ""
+      }
+    };
+    return map[st] || map["not-started"];
+  }
+
+  prefRows() {
+    const p = this.prefs();
+    const tgConnected = this.telegramState() === "connected";
+    const emailOk = this.contactState() !== "missing-email" && this.contactState() !== "unverified-email";
+    const rows = [];
+    const header = (heading, note, first) => rows.push({
+      key: heading, heading: heading, headingNote: note, isToggle: false, isSelect: false,
+      display: "flex", pad: "0", border: "0", bg: "transparent", headingTop: first ? "0" : "8px"
+    });
+    const toggle = (key, label, desc, opts) => {
+      const o = opts || {};
+      rows.push({
+        key: key, heading: "", isToggle: true, isSelect: false,
+        display: "flex", pad: "14px 15px", border: "1px solid rgba(167,139,250,.16)", bg: "rgba(255,255,255,.03)",
+        label: label, desc: desc,
+        labelColor: o.disabled ? "#cbb6e6" : "#fff",
+        checked: o.locked ? true : !!p[key],
+        disabled: o.disabled || o.locked ? true : undefined,
+        cursor: o.disabled || o.locked ? "default" : "pointer",
+        onToggle: o.disabled || o.locked ? () => {} : (e) => this.setPref(key, e.target.checked),
+        dependency: o.dependency || "",
+        linkLabel: o.linkLabel || "",
+        onLink: o.onLink || (() => {})
+      });
+    };
+
+    header("ACCOUNT & SECURITY MESSAGES", "These confirm deposits, withdrawals, password changes and sign-ins. They’re required, so they can’t be switched off.", true);
+    toggle("accountEmail", "Email", "Sent to " + ID().email + ".", { locked: true });
+    toggle("accountSms", "SMS", "Sent to " + ID().phone + ".", { locked: true });
+
+    header("PROMOTIONS & BONUSES", "Optional. Off until you choose to turn them on.");
+    toggle("promoEmail", "Email", "Bonus drops, tournaments and VIP offers.", emailOk ? {} : {
+      disabled: true,
+      dependency: "Add and confirm an email address first.",
+      linkLabel: "Go to Contact information",
+      onLink: () => this.setState({ tab: "Profile" })
+    });
+    toggle("promoSms", "SMS", "Short alerts for time-limited offers.", {});
+    toggle("promoTelegram", "Telegram", "Offers delivered in your ChoCho Telegram chat.", tgConnected ? {} : {
+      disabled: true,
+      dependency: "Connect Telegram to use this channel.",
+      linkLabel: "Go to Connected login methods",
+      onLink: () => this.setState({ tab: "Security" })
+    });
+
+    header("GAME ACTIVITY");
+    toggle("bigWin", "Big win summaries", "A recap when a session ends with a large win.", {});
+
+    header("LANGUAGE");
+    rows.push({
+      key: "language", heading: "", isToggle: false, isSelect: true,
+      display: "flex", pad: "14px 15px", border: "1px solid rgba(167,139,250,.16)", bg: "rgba(255,255,255,.03)",
+      label: "Account language", value: p.language,
+      options: [
+        { value: "en-PH", label: "English (Philippines)" },
+        { value: "fil", label: "Filipino" }
+      ],
+      onChange: (e) => this.setPref("language", e.target.value)
+    });
+    return rows;
+  }
+
+  dialogModel() {
+    const kind = this.state.dialog, f = this.state.dialogFields;
+    const goldBg = "linear-gradient(180deg, #ffd766, #eb9c0d)";
+    const set = (key) => (e) => this.setDialogField(key, e.target.value);
+    if (!kind) return { open: false, fields: [] };
+
+    if (kind === "phone" || kind === "email") {
+      const isPhone = kind === "phone";
+      const step = f.step || "reauth";
+      const noun = isPhone ? "mobile number" : "email address";
+      if (step === "reauth") {
+        return {
+          open: true, eyebrow: "SECURITY CHECK", title: "Confirm it’s you",
+          intro: "Enter your ChoCho password to change your " + noun + ".",
+          fields: [{ label: "Password", type: "password", value: f.password || "", onChange: set("password"), autoComplete: "current-password" }],
+          primary: "Continue", primaryBg: goldBg, primaryColor: "#2c1400", onPrimary: () => this.submitContact()
+        };
+      }
+      if (step === "value") {
+        return {
+          open: true, eyebrow: "CONTACT INFORMATION", title: (f.stepAdd ? "Add " : "New ") + noun,
+          intro: "We’ll send a 6-digit code to confirm it. Your current " + noun + " stays in effect until then.",
+          fields: [{
+            label: isPhone ? "Mobile number" : "Email address",
+            type: isPhone ? "tel" : "email", value: f.value || "", onChange: set("value"),
+            inputMode: isPhone ? "numeric" : "email",
+            autoComplete: isPhone ? "tel" : "email",
+            placeholder: isPhone ? "+63 9XX XXX XXXX" : "you@example.com"
+          }],
+          primary: "Send code", primaryBg: goldBg, primaryColor: "#2c1400", onPrimary: () => this.submitContact()
+        };
+      }
+      return {
+        open: true, eyebrow: "CONTACT INFORMATION", title: "Enter your code",
+        intro: "We sent a 6-digit code to " + (f.value || "") + ". The change takes effect once it’s approved.",
+        fields: [{ label: "6-digit code", type: "text", value: f.code || "", onChange: set("code"), inputMode: "numeric", autoComplete: "one-time-code", placeholder: "••••••" }],
+        primary: "Confirm change", primaryBg: goldBg, primaryColor: "#2c1400", onPrimary: () => this.submitContact()
+      };
+    }
+
+    if (kind === "tg-connect") {
+      return {
+        open: true, eyebrow: "TELEGRAM", title: "Connect your Telegram account",
+        intro: "You’ll be taken to Telegram to authorise ChoCho. ChoCho never asks for your Telegram password or login code, and we only see the account name Telegram shares with us.",
+        fields: [],
+        primary: "Continue to Telegram", primaryBg: "linear-gradient(180deg, #59c1f5, #2a9fe0)", primaryColor: "#06263a",
+        onPrimary: () => this.authorizeTelegram()
+      };
+    }
+    if (kind === "tg-conflict") {
+      return {
+        open: true, eyebrow: "TELEGRAM", title: "This Telegram account is already in use",
+        intro: "That Telegram account is connected to a different ChoCho account. We can’t move it automatically — our team will confirm who owns each account and help you resolve it.",
+        fields: [], warning: "Your existing sign-in methods are unchanged.",
+        primary: "Contact 24/7 Support", primaryBg: goldBg, primaryColor: "#2c1400",
+        onPrimary: (e) => { this.openSupport(e && e.currentTarget); }
+      };
+    }
+    if (kind === "tg-disconnect") {
+      return {
+        open: true, eyebrow: "TELEGRAM", title: "Disconnect Telegram?",
+        intro: "You’ll no longer be able to sign in with Telegram. You can still sign in with your password, and you can reconnect any time.",
+        fields: [],
+        primary: "Disconnect", primaryBg: "linear-gradient(180deg, #f87171, #dc2626)", primaryColor: "#fff",
+        onPrimary: () => this.confirmDisconnect(), cancel: "Keep connected"
+      };
+    }
+    if (kind === "tg-last") {
+      return {
+        open: true, eyebrow: "TELEGRAM", title: "Add another way to sign in first",
+        intro: "Telegram is currently your only sign-in method. Set a password so you don’t lose access to your account, then disconnect Telegram.",
+        fields: [], warning: "Disconnecting now would lock you out of your account.",
+        primary: "Set a password", primaryBg: goldBg, primaryColor: "#2c1400",
+        onPrimary: () => { this.closeDialog(); this.setState({ tab: "Security", pwOpen: true }); }
+      };
+    }
+    if (kind === "verify") {
+      const st = this.verState();
+      return {
+        open: true, eyebrow: "ACCOUNT VERIFICATION",
+        title: st === "more-info" ? "Upload a clearer photo" : st === "incomplete" ? "Continue verification" : "Start verification",
+        intro: "Upload a photo of one valid government-issued ID. JPG or PNG, up to 10 MB, with all four corners visible and no glare.",
+        fields: [], warning: "Submitting your documents doesn’t verify your account — our team reviews each submission.",
+        primary: "Choose file and submit", primaryBg: goldBg, primaryColor: "#2c1400",
+        onPrimary: () => this.submitVerification()
+      };
+    }
+    return { open: false, fields: [] };
+  }
+
+  renderVals() {
+    const s = this.state, tab = this.tab(), mobile = this.mobile();
+    const draft = s.pDraft || s.confirmed;
+    const ver = this.verification();
+    const verChip = this.chip(ver.chip);
+    const dlg = this.dialogModel();
+    const profileLoadState = this.props.dataState ?? "loaded";
+    const loading = profileLoadState === "loading";
+
+    const tabs = ["Profile", "Security", "Verification", "Preferences", "Bonuses"].map(t => {
+      const on = tab === t;
+      return {
+        label: t,
+        id: "tab-" + t.toLowerCase(),
+        panelId: "panel-" + t.toLowerCase(),
+        selected: on ? "true" : "false",
+        bg: on ? "linear-gradient(180deg, #ffd766, #eb9c0d)" : "rgba(255,255,255,.03)",
+        color: on ? "#2c1400" : "#bfaed8",
+        border: on ? "rgba(255,201,60,.5)" : "rgba(167,139,250,.24)",
+        onClick: () => this.setState({ tab: t }, () => this.revealTab("tab-" + t.toLowerCase()))
+      };
+    });
+
+    const pwFields = [];
+    if (this.hasPassword()) {
+      pwFields.push({ key: "current", label: "Current password", autoComplete: "current-password", hint: "" });
+    }
+    pwFields.push({ key: "next", label: "New password", autoComplete: "new-password", hint: PASSWORD_POLICY });
+    pwFields.push({ key: "confirm", label: "Confirm new password", autoComplete: "new-password", hint: "" });
+
+    return {
+      accountOpen: s.accountOpen,
+      toggleAccount: () => this.setState(st => ({ accountOpen: !st.accountOpen, menuOpen: false })),
+      accountLinks: [
+        { label: "My Account", current: "true", bg: "rgba(255,201,60,.14)", border: "rgba(255,201,60,.4)", color: "#ffc93c", onClick: () => this.setState({ accountOpen: false }) },
+        { label: "My Wallet", bg: "rgba(255,255,255,.04)", border: "rgba(167,139,250,.18)", color: "#e9e0f5", onClick: () => { window.location.href = "ChoCho Wallet.dc.html"; } },
+        { label: "My Promotions", bg: "rgba(255,255,255,.04)", border: "rgba(167,139,250,.18)", color: "#e9e0f5", onClick: () => { window.location.href = "ChoCho Promotions.dc.html"; } },
+        { label: "Support", bg: "rgba(255,255,255,.04)", border: "rgba(167,139,250,.18)", color: "#e9e0f5", onClick: (e) => this.openSupport(e && e.currentTarget) },
+        { label: "Sign out", bg: "rgba(255,255,255,.04)", border: "rgba(167,139,250,.18)", color: "#e9e0f5", onClick: () => { window.location.href = "ChoCho Home.dc.html"; } }
+      ],
+      initials: ID().initials,
+      headerBalance: ID().balance,
+      displayName: s.confirmed.displayName,
+      memberSince: ID().memberSince,
+      playerId: ID().playerId,
+      copyPlayerId: () => this.copyId(),
+      copyIdLabel: s.copiedId ? "Copied" : "Copy",
+      copyAnnounce: s.copiedId ? "Player ID copied to clipboard" : "",
+
+      tabs: tabs,
+      isProfile: tab === "Profile",
+      isSecurity: tab === "Security",
+      isVerification: tab === "Verification",
+      isPreferences: tab === "Preferences",
+      isBonuses: tab === "Bonuses",
+      twoCol: mobile ? "minmax(0, 1fr)" : "repeat(auto-fit, minmax(320px, 1fr))",
+      skeletons: [0, 1, 2],
+
+      /* profile */
+      profileLoading: loading,
+      profileSummary: !loading && !s.pEditing,
+      profileEditing: !loading && s.pEditing,
+      showEditDetails: !loading && !s.pEditing,
+      startEdit: () => this.startEdit(),
+      cancelEdit: () => this.cancelEdit(),
+      hasLockedFields: true,
+      summaryRows: [
+        { label: "PLAYER ID", value: ID().playerId, lockLabel: "READ-ONLY" },
+        { label: "DISPLAY NAME", value: s.confirmed.displayName, lockLabel: "" },
+        { label: "REGISTERED NAME", value: ID().firstName + " " + ID().lastName, lockLabel: "LOCKED" },
+        { label: "DATE OF BIRTH", value: ID().birthDate, lockLabel: "LOCKED" },
+        { label: "CITY", value: s.confirmed.city || "—", lockLabel: "" }
+      ],
+      editFields: [
+        {
+          label: "Display name", value: draft.displayName || "", placeholder: "How other players see you",
+          autoComplete: "nickname",
+          onChange: (e) => this.setDraft("displayName", e.target.value),
+          error: s.pErrors.displayName || "", errorId: "err-display", hintId: "hint-display",
+          hint: s.pErrors.displayName ? "" : "Shown on leaderboards. 3–20 characters.",
+          invalid: s.pErrors.displayName ? "true" : "false",
+          describedBy: s.pErrors.displayName ? "err-display" : "hint-display",
+          border: s.pErrors.displayName ? "rgba(248,113,113,.6)" : "rgba(167,139,250,.28)",
+          bg: "rgba(255,255,255,.04)", textColor: "#fff", disabled: undefined
+        },
+        {
+          label: "City", value: draft.city || "", placeholder: "City", autoComplete: "address-level2",
+          onChange: (e) => this.setDraft("city", e.target.value),
+          error: "", errorId: "err-city", hintId: "hint-city", hint: "", invalid: "false", describedBy: undefined,
+          border: "rgba(167,139,250,.28)", bg: "rgba(255,255,255,.04)", textColor: "#fff", disabled: undefined
+        },
+        {
+          label: "Registered name", value: ID().firstName + " " + ID().lastName, placeholder: "",
+          autoComplete: "name",
+          onChange: () => {}, error: "", errorId: "err-name", hintId: "hint-name",
+          hint: "Locked for account security — request a correction through support.",
+          invalid: "false", describedBy: "hint-name",
+          border: "rgba(167,139,250,.16)", bg: "rgba(255,255,255,.02)", textColor: "#a795c5", disabled: true
+        }
+      ],
+      profileFormError: s.pFormError,
+      profileSaving: s.pSaving ? true : undefined,
+      saveProfile: () => this.saveProfile(),
+      saveProfileLabel: s.pSaving ? "Saving…" : "Save changes",
+      saveProfileBg: s.pSaving ? "linear-gradient(180deg, #d9b769, #b8802a)" : "linear-gradient(180deg, #ffd766, #eb9c0d)",
+      saveProfileCursor: s.pSaving ? "default" : "pointer",
+      profileSaved: s.pSaved,
+
+      contactRows: this.contactRows(),
+
+      /* security */
+      showPasswordTrigger: !s.pwOpen,
+      passwordTriggerLabel: this.hasPassword() ? "Change password" : "Set a password",
+      openPasswordForm: (e) => this.openPasswordForm(e),
+      passwordIntro: this.hasPassword()
+        ? "Your password is never shown or sent to us in readable form. Change it any time."
+        : "You signed up with Telegram, so your account has no password yet. Add one to sign in without Telegram.",
+      passwordFormOpen: s.pwOpen,
+      passwordFields: pwFields.map(f => ({
+        label: f.label,
+        type: s.pwShow[f.key] ? "text" : "password",
+        value: s.pw[f.key] || "",
+        onChange: (e) => this.setPw(f.key, e.target.value),
+        onToggle: () => this.setState(st => ({ pwShow: Object.assign({}, st.pwShow, { [f.key]: !st.pwShow[f.key] }) })),
+        shown: s.pwShow[f.key] ? "true" : "false",
+        toggleLabel: s.pwShow[f.key] ? "Hide" : "Show",
+        autoComplete: f.autoComplete,
+        error: s.pwErrors[f.key] || "",
+        errorId: "pwerr-" + f.key, hintId: "pwhint-" + f.key,
+        hint: s.pwErrors[f.key] ? "" : f.hint,
+        invalid: s.pwErrors[f.key] ? "true" : "false",
+        describedBy: s.pwErrors[f.key] ? "pwerr-" + f.key : (f.hint ? "pwhint-" + f.key : undefined),
+        border: s.pwErrors[f.key] ? "rgba(248,113,113,.6)" : "rgba(167,139,250,.28)"
+      })),
+      passwordFormError: s.pwFormError,
+      passwordSaving: s.pwSaving ? true : undefined,
+      submitPassword: () => this.submitPassword(),
+      cancelPassword: () => this.cancelPassword(),
+      passwordSaveLabel: s.pwSaving ? "Updating…" : (this.hasPassword() ? "Update password" : "Set password"),
+      passwordSaveBg: s.pwSaving ? "linear-gradient(180deg, #d9b769, #b8802a)" : "linear-gradient(180deg, #ffd766, #eb9c0d)",
+      passwordSaveCursor: s.pwSaving ? "default" : "pointer",
+      passwordSaved: s.pwSaved,
+      methods: this.methods(),
+
+      /* verification */
+      verStatusLabel: ver.label,
+      verStatusColor: verChip.color, verStatusDot: verChip.dot,
+      verStatusBg: verChip.bg, verStatusBorder: verChip.border,
+      verBorder: ver.chip === "bad" ? "rgba(248,113,113,.4)" : ver.chip === "ok" ? "rgba(74,222,128,.3)" : "rgba(167,139,250,.2)",
+      verExplanation: ver.text,
+      verHasSteps: !!(ver.steps && ver.steps.length),
+      verSteps: (ver.steps || []).map(v => ({
+        label: v.label,
+        mark: v.done ? "✓" : "•",
+        color: v.done ? "#86efac" : "#a795c5",
+        bg: v.done ? "rgba(74,222,128,.12)" : "rgba(255,255,255,.04)",
+        border: v.done ? "rgba(74,222,128,.34)" : "rgba(167,139,250,.24)",
+        textColor: v.done ? "#a795c5" : "#fff"
+      })),
+      verHasFacts: !!(ver.facts && ver.facts.length),
+      verFacts: ver.facts || [],
+      verActionLabel: ver.action,
+      verAction: (e) => this.verAction(e),
+
+      /* preferences */
+      prefRows: this.prefRows(),
+      prefFormError: s.prefError,
+      prefSaved: s.prefSaved,
+      prefSavingFlag: s.prefSaving ? true : undefined,
+      savePrefs: () => this.savePrefs(),
+      cancelPrefs: () => this.cancelPrefs(),
+      prefSaveLabel: s.prefSaving ? "Saving…" : "Save preferences",
+      prefSaveBg: s.prefSaving ? "linear-gradient(180deg, #d9b769, #b8802a)" : "linear-gradient(180deg, #ffd766, #eb9c0d)",
+      prefSaveCursor: s.prefSaving ? "default" : "pointer",
+
+
+      /* dialog */
+      dialogOpen: dlg.open && this.state.authed,
+      showPersonal: this.state.authed,
+      gated: !this.state.authed,
+      gateSignin: () => { if (window.ChoChoSite) window.ChoChoSite.openAuth("signin", window.ChoChoSite.currentUrl()); },
+      gateRegister: () => { if (window.ChoChoSite) window.ChoChoSite.openAuth("register", window.ChoChoSite.currentUrl()); },
+      dialogEyebrow: dlg.eyebrow || "",
+      dialogTitle: dlg.title || "",
+      dialogIntro: dlg.intro || "",
+      dialogFields: (dlg.fields || []).map(f => ({
+        label: f.label, type: f.type || "text", value: f.value || "", onChange: f.onChange,
+        inputMode: f.inputMode, autoComplete: f.autoComplete, placeholder: f.placeholder || "",
+        error: "", hint: f.hint || "", invalid: "false",
+        border: "rgba(167,139,250,.28)"
+      })),
+      dialogWarning: dlg.warning || "",
+      dialogError: s.dialogError,
+      dialogPrimaryLabel: s.dialogBusy ? "Working…" : (dlg.primary || ""),
+      dialogPrimary: dlg.onPrimary || (() => {}),
+      dialogPrimaryBg: s.dialogBusy ? "linear-gradient(180deg, #d9b769, #b8802a)" : (dlg.primaryBg || "linear-gradient(180deg, #ffd766, #eb9c0d)"),
+      dialogPrimaryColor: dlg.primaryColor || "#2c1400",
+      dialogPrimaryCursor: s.dialogBusy ? "default" : "pointer",
+      dialogBusy: s.dialogBusy ? true : undefined,
+      dialogCancelLabel: dlg.cancel || "Cancel",
+      closeDialog: () => this.closeDialog(),
+      backdropClick: mobile ? () => {} : (e) => { if (e.target === e.currentTarget) this.closeDialog(); },
+      stop: (e) => e.stopPropagation(),
+      scrimBg: mobile ? "#130124" : "rgba(6,2,12,.76)",
+      scrimPad: mobile ? "0" : "24px",
+      scrimAlign: mobile ? "stretch" : "center",
+      sheetWidth: mobile ? "100%" : "460px",
+      sheetMaxHeight: mobile ? "100vh" : "calc(100vh - 48px)",
+      sheetRadius: mobile ? "0" : "22px",
+      sheetBorder: mobile ? "0" : "1px solid rgba(167,139,250,.26)",
+
+      supportOpen: s.support,
+      openSupport: (e) => this.openSupport(e && e.currentTarget),
+      closeSupport: () => this.closeSupport()
+    };
+  }
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Caveat:wght@600;700&amp;display=swap" rel="stylesheet">
+<script src="chocho-account.js"></script>
+<script src="chocho-site.js"></script>
+<style>
+  html, body { margin: 0; padding: 0; background: #130124; }
+  a { color: #ffc93c; text-decoration: none; }
+  a:hover { color: #ffe08a; }
+  @keyframes wFade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes wRise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  @keyframes wSpin { to { transform: rotate(360deg); } }
+  @keyframes wPulse { 0%, 100% { opacity: .45; } 50% { opacity: .8; } }
+  @keyframes chochoTigerWave { 0% { transform: translateY(0) rotate(0deg); } 8% { transform: translateY(1.5px) rotate(.6deg); } 16% { transform: translateY(0) rotate(0deg); } 24% { transform: translateY(1.5px) rotate(-.6deg); } 32% { transform: translateY(0) rotate(0deg); } 48% { transform: translateY(-4px) rotate(-2deg); } 56% { transform: translateY(-5px) rotate(-9deg); } 64% { transform: translateY(-5px) rotate(7deg); } 72% { transform: translateY(-5px) rotate(-7deg); } 80% { transform: translateY(-5px) rotate(6deg); } 100% { transform: translateY(0) rotate(0deg); } }
+  :focus-visible { outline: 2px solid #ffc93c; outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+</helmet>
+<div style="min-height: 100vh; background: radial-gradient(1100px 640px at 50% -8%, #3a0269 0%, #250143 42%, #130124 100%); font-family: Manrope, sans-serif; color: #fff; display: flex; justify-content: center; padding-bottom: 128px; padding-right: max(0px, min(132px, calc(100vw - 720px)));">
+  <div style="width: 100%; max-width: 1024px; display: flex; flex-direction: column; gap: 38px; padding-bottom: 44px;">
+
+    <dc-import name="ChoCho Header" active="none" balance="{{ headerBalance }}" style="position: sticky; top: 0; z-index: 40;" hint-size="100%,76px"></dc-import>
+
+    <sc-if value="{{ gated }}" hint-placeholder-val="{{ false }}">
+      <section aria-labelledby="gate-title" style="margin: 0 clamp(16px, 2.4vw, 22px); padding: clamp(22px, 5vw, 32px); border: 1px solid rgba(167,139,250,.22); border-radius: 20px; background: linear-gradient(160deg, rgba(124,58,237,.18) 0%, rgba(22,9,38,.96) 60%); display: flex; flex-direction: column; align-items: flex-start; gap: 16px;">
+        <span id="gate-title" style="font-size: clamp(20px, 5vw, 24px); font-weight: 800; letter-spacing: -.4px; line-height: 1.25; color: #fff; text-wrap: pretty;">Sign in to view your Wallet</span>
+        <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+          <button onClick="{{ gateSignin }}" style="min-height: 44px; padding: 0 20px; border: 1px solid rgba(167,139,250,.32); border-radius: 11px; background: rgba(255,255,255,.03); color: #fff; font-family: Manrope, sans-serif; font-size: 14px; font-weight: 700; cursor: pointer;" style-hover="background: rgba(255,255,255,.08)">Sign in</button>
+          <button onClick="{{ gateRegister }}" style="min-height: 44px; padding: 0 22px; border: 0; border-radius: 11px; background: linear-gradient(180deg, #ffd766, #eb9c0d); color: #2c1400; font-family: Manrope, sans-serif; font-size: 14px; font-weight: 800; cursor: pointer; box-shadow: 0 8px 22px rgba(235,156,13,.3);" style-hover="filter: brightness(1.06)">Register</button>
+        </div>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{ showPersonal }}" hint-placeholder-val="{{ false }}">
+
+    <section style="padding: 0 22px; display: flex; flex-direction: column; gap: 20px;">
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+          <span style="width: 4px; height: 28px; border-radius: 999px; background: linear-gradient(180deg, #ffd766, #e07f05); box-shadow: 0 0 12px rgba(240,150,10,.5); flex: none;"></span>
+          <h1 style="margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -.6px; color: #fff;">My Wallet</h1>
+        </div>
+        <span style="font-size: 13.5px; font-weight: 500; line-height: 1.5; padding-left: 16px; color: #a795c5;">View your balance and transactions.</span>
+      </div>
+
+      <sc-if value="{{ walletLoading }}" hint-placeholder-val="{{ false }}">
+        <div aria-busy="true" aria-label="Loading wallet balance" style="padding: 24px; border: 1px solid rgba(167,139,250,.2); border-radius: 20px; background: linear-gradient(180deg, #23103f 0%, #180a2c 100%); display: flex; flex-wrap: wrap; align-items: center; gap: 20px;">
+          <div style="flex: 1 1 300px; min-width: 0; display: flex; flex-direction: column; gap: 12px;">
+            <span style="width: 110px; height: 12px; border-radius: 6px; background: rgba(167,139,250,.22); animation: wPulse 1.4s ease-in-out infinite;"></span>
+            <span style="width: 230px; max-width: 100%; height: 34px; border-radius: 10px; background: rgba(167,139,250,.18); animation: wPulse 1.4s ease-in-out infinite;"></span>
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <span style="width: 132px; height: 50px; border-radius: 14px; background: rgba(255,201,60,.18); animation: wPulse 1.4s ease-in-out infinite;"></span>
+            <span style="width: 132px; height: 50px; border-radius: 14px; background: rgba(167,139,250,.14); animation: wPulse 1.4s ease-in-out infinite;"></span>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ walletError }}" hint-placeholder-val="{{ false }}">
+        <div role="alert" style="padding: 22px 24px; border: 1px solid rgba(248,113,113,.4); border-radius: 20px; background: rgba(248,113,113,.08); display: flex; flex-wrap: wrap; align-items: center; gap: 14px 18px;">
+          <span style="flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 5px;">
+            <span style="font-size: 16px; font-weight: 800; color: #fff;">We couldn’t load your wallet. Please try again.</span>
+            <span style="font-size: 12.5px; font-weight: 500; line-height: 1.5; color: #e8b9bd;">Your balance and transactions aren’t available right now.</span>
+          </span>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <button onClick="{{ retry }}" style="height: 46px; padding: 0 22px; border: 0; border-radius: 12px; background: linear-gradient(180deg, #ffd766, #eb9c0d); color: #2c1400; font-family: Manrope, sans-serif; font-size: 14px; font-weight: 800; cursor: pointer; box-shadow: 0 8px 22px rgba(235,156,13,.34);" style-hover="filter: brightness(1.05)">Retry</button>
+            <button onClick="{{ openSupport }}" data-help-trigger="1" style="height: 46px; padding: 0 20px; border: 1px solid rgba(167,139,250,.32); border-radius: 12px; background: rgba(255,255,255,.03); color: #fff; font-family: Manrope, sans-serif; font-size: 13.5px; font-weight: 700; cursor: pointer;" style-hover="border-color: rgba(167,139,250,.6); background: rgba(255,255,255,.06)">24/7 Support</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ walletReady }}" hint-placeholder-val="{{ true }}">
+        <div style="padding: 24px; border: 1px solid rgba(255,201,60,.2); border-radius: 20px; background: linear-gradient(180deg, #23103f 0%, #180a2c 100%); box-shadow: 0 16px 40px rgba(0,0,0,.45); display: flex; flex-wrap: wrap; align-items: center; gap: 20px 24px;">
+          <div style="flex: 1 1 300px; min-width: 0; display: flex; flex-direction: column; gap: 6px;">
+            <span style="display: flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; font-size: 11.5px; font-weight: 800; letter-spacing: 1.3px; white-space: nowrap; color: #a795c5;">
+              WALLET BALANCE
+              <button onClick="{{ toggleBalance }}" aria-pressed="{{ hidden }}" aria-label="{{ balanceToggleLabel }}" style-before="content: ''; position: absolute; inset: -8px -4px;" style="position: relative; flex: none; white-space: nowrap; height: 28px; padding: 0 11px; border: 1px solid rgba(167,139,250,.26); border-radius: 999px; background: rgba(255,255,255,.04); color: #cbb6e6; font-family: Manrope, sans-serif; font-size: 11.5px; font-weight: 700; letter-spacing: .2px; cursor: pointer;" style-hover="background: rgba(167,139,250,.16); color: #fff">{{ balanceToggleLabel }}</button>
+            </span>
+            <span aria-live="polite" style="font-size: 38px; font-weight: 800; letter-spacing: -1px; line-height: 1.1; font-variant-numeric: tabular-nums; color: #fff; overflow-wrap: anywhere;">{{ balance }}</span>
+            <sc-if value="{{ hasSecondary }}" hint-placeholder-val="{{ true }}">
+              <div style="display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 6px;">
+                <sc-for list="{{ secondary }}" as="b" hint-placeholder-count="2">
+                  <span style="display: flex; flex-direction: column; gap: 2px;">
+                    <span style="font-size: 10.5px; font-weight: 800; letter-spacing: 1.1px; color: #8f7aae;">{{ b.label }}</span>
+                    <span style="font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; color: #e6ddf5;">{{ b.value }}</span>
+                  </span>
+                </sc-for>
+              </div>
+            </sc-if>
+          </div>
+          <div style="flex: 1 1 280px; display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end;">
+            <button onClick="{{ deposit }}" style="flex: 1 1 132px; min-width: 132px; height: 52px; border: 0; border-radius: 14px; background: linear-gradient(180deg, #ffd766, #eb9c0d); color: #2c1400; font-family: Manrope, sans-serif; font-size: 15px; font-weight: 800; cursor: pointer; box-shadow: 0 10px 26px rgba(235,156,13,.34); transition: filter .2s ease;" style-hover="filter: brightness(1.05)">Deposit</button>
+            <button onClick="{{ withdraw }}" style="flex: 1 1 132px; min-width: 132px; height: 52px; border: 1px solid rgba(167,139,250,.42); border-radius: 14px; background: rgba(255,255,255,.04); color: #fff; font-family: Manrope, sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: border-color .2s ease, background .2s ease;" style-hover="border-color: rgba(167,139,250,.75); background: rgba(255,255,255,.08)">Withdraw</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ actionNotice }}" hint-placeholder-val="{{ false }}">
+        <div role="status" style="padding: 15px 18px; border: 1px solid rgba(167,139,250,.28); border-radius: 16px; background: rgba(167,139,250,.09); display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px;">
+          <span style="flex: 1 1 300px; min-width: 0; font-size: 13px; font-weight: 600; line-height: 1.5; color: #e6ddf5; text-wrap: pretty;">{{ actionNotice }}</span>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <button onClick="{{ openSupport }}" data-help-trigger="1" style="height: 40px; padding: 0 16px; border: 1px solid rgba(167,139,250,.32); border-radius: 11px; background: rgba(255,255,255,.04); color: #fff; font-family: Manrope, sans-serif; font-size: 13px; font-weight: 700; cursor: pointer;" style-hover="background: rgba(255,255,255,.09)">24/7 Support</button>
+            <button onClick="{{ dismissNotice }}" aria-label="Dismiss notice" style="width: 40px; height: 40px; border: 1px solid rgba(167,139,250,.24); border-radius: 11px; background: rgba(255,255,255,.03); color: #cbb6e6; font-size: 13px; font-weight: 800; cursor: pointer;" style-hover="background: rgba(255,255,255,.09); color: #fff">✕</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ accountNotice }}" hint-placeholder-val="{{ false }}">
+        <div role="status" style="padding: 15px 18px; border: 1px solid rgba(255,201,60,.3); border-radius: 16px; background: rgba(255,201,60,.08); display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px;">
+          <span style="flex: 1 1 300px; min-width: 0; font-size: 13px; font-weight: 600; line-height: 1.5; color: #f3e6c7; text-wrap: pretty;">{{ accountNotice }}</span>
+          <button onClick="{{ noticeAction }}" style="height: 40px; padding: 0 18px; border: 0; border-radius: 11px; background: linear-gradient(180deg, #ffd766, #eb9c0d); color: #2c1400; font-family: Manrope, sans-serif; font-size: 13px; font-weight: 800; cursor: pointer;" style-hover="filter: brightness(1.05)">{{ noticeActionLabel }}</button>
+        </div>
+      </sc-if>
+    </section>
+
+    <section style="padding: 0 22px; display: flex; flex-direction: column; gap: 18px;">
+      <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+        <span style="width: 4px; height: 26px; border-radius: 999px; background: linear-gradient(180deg, #ffd766, #e07f05); box-shadow: 0 0 12px rgba(240,150,10,.5); flex: none;"></span>
+        <h2 style="margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -.5px; color: #fff;">Recent transactions</h2>
+      </div>
+
+      <div role="group" aria-label="Filter transactions" style="display: flex; flex-wrap: wrap; gap: 8px;">
+        <sc-for list="{{ filters }}" as="f" hint-placeholder-count="3">
+          <button onClick="{{ f.onClick }}" aria-pressed="{{ f.on }}" style="height: 40px; padding: 0 18px; border: 1px solid {{ f.border }}; border-radius: 999px; background: {{ f.bg }}; color: {{ f.color }}; font-family: Manrope, sans-serif; font-size: 13.5px; font-weight: 700; cursor: pointer; transition: background .18s ease, border-color .18s ease, color .18s ease;">{{ f.label }}</button>
+        </sc-for>
+      </div>
+
+      <sc-if value="{{ txLoading }}" hint-placeholder-val="{{ false }}">
+        <div aria-busy="true" aria-label="Loading transactions" style="display: flex; flex-direction: column; gap: 10px;">
+          <sc-for list="{{ skeletons }}" as="k" hint-placeholder-count="4">
+            <span style="height: 68px; border-radius: 16px; border: 1px solid rgba(167,139,250,.14); background: rgba(255,255,255,.03); animation: wPulse 1.4s ease-in-out infinite;"></span>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ txError }}" hint-placeholder-val="{{ false }}">
+        <div role="alert" style="padding: 20px 22px; border: 1px solid rgba(248,113,113,.4); border-radius: 18px; background: rgba(248,113,113,.08); display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px;">
+          <span style="flex: 1 1 300px; min-width: 0; font-size: 14px; font-weight: 700; line-height: 1.5; color: #fff;">We couldn’t load your transactions. Please try again.</span>
+          <div style="display: flex; gap: 10px;">
+            <button onClick="{{ retryTx }}" style="height: 44px; padding: 0 20px; border: 0; border-radius: 12px; background: linear-gradient(180deg, #ffd766, #eb9c0d); color: #2c1400; font-family: Manrope, sans-serif; font-size: 13.5px; font-weight: 800; cursor: pointer;" style-hover="filter: brightness(1.05)">Retry</button>
+            <button onClick="{{ openSupport }}" data-help-trigger="1" style="height: 44px; padding: 0 18px; border: 1px solid rgba(167,139,250,.32); border-radius: 12px; background: rgba(255,255,255,.03); color: #fff; font-family: Manrope, sans-serif; font-size: 13px; font-weight: 700; cursor: pointer;" style-hover="background: rgba(255,255,255,.08)">24/7 Support</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ txEmptyAccount }}" hint-placeholder-val="{{ false }}">
+        <div style="padding: 34px 24px; border: 1px dashed rgba(167,139,250,.28); border-radius: 18px; background: rgba(255,255,255,.02); display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center;">
+          <span style="font-size: 15.5px; font-weight: 800; color: #fff;">No transactions yet</span>
+          <span style="font-size: 13px; font-weight: 500; line-height: 1.5; max-width: 420px; color: #a795c5; text-wrap: pretty;">Your deposits and withdrawals will appear here.</span>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ txNoMatch }}" hint-placeholder-val="{{ false }}">
+        <div style="padding: 28px 24px; border: 1px dashed rgba(167,139,250,.28); border-radius: 18px; background: rgba(255,255,255,.02); display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center;">
+          <span style="font-size: 14.5px; font-weight: 700; color: #fff;">No transactions match this filter.</span>
+          <button onClick="{{ clearFilter }}" style="height: 42px; padding: 0 20px; border: 1px solid rgba(167,139,250,.36); border-radius: 12px; background: rgba(255,255,255,.04); color: #fff; font-family: Manrope, sans-serif; font-size: 13.5px; font-weight: 700; cursor: pointer;" style-hover="background: rgba(255,255,255,.08)">Clear filter</button>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ txReady }}" hint-placeholder-val="{{ true }}">
+        <div ref="{{ txListRef }}" role="{{ listRole }}" aria-label="Recent transactions" style="display: flex; flex-direction: column; gap: 10px;">
+          <div aria-hidden="{{ headerHidden }}" style="display: {{ headerRowDisplay }}; grid-template-columns: minmax(0, 2.1fr) minmax(150px, 1.4fr) minmax(104px, 1fr) minmax(118px, 1fr) 116px; gap: 14px; padding: 0 18px; border: 1px solid transparent; border-block-width: 0;">
+            <sc-for list="{{ columns }}" as="c" hint-placeholder-count="5">
+              <span style="font-size: 10.5px; font-weight: 800; letter-spacing: 1.1px; color: #8f7aae; text-align: {{ c.align }};">{{ c.label }}</span>
+            </sc-for>
+          </div>
+
+          <sc-for list="{{ rows }}" as="t" hint-placeholder-count="5">
+            <sc-if value="{{ rowLayout }}" hint-placeholder-val="{{ true }}">
+            <div style="display: {{ t.rowDisplay }}; grid-template-columns: minmax(0, 2.1fr) minmax(150px, 1.4fr) minmax(104px, 1fr) minmax(118px, 1fr) 116px; flex-wrap: wrap; align-items: center; gap: 12px 14px; padding: 14px 18px; border: 1px solid rgba(167,139,250,.16); border-radius: 16px; background: rgba(255,255,255,.03); transition: border-color .18s ease, background .18s ease;" style-hover="border-color: rgba(167,139,250,.32); background: rgba(255,255,255,.05)">
+              <div style="flex: 1 1 180px; min-width: 0; display: flex; align-items: center; gap: 12px;">
+                <span style="width: 36px; height: 36px; flex: none; border-radius: 11px; border: 1px solid {{ t.iconBorder }}; background: {{ t.iconBg }}; color: {{ t.iconColor }}; font-size: 15px; font-weight: 800; display: flex; align-items: center; justify-content: center;">{{ t.glyph }}</span>
+                <span style="min-width: 0; display: flex; flex-direction: column; gap: 2px;">
+                  <span style="font-size: 14.5px; font-weight: 700; color: #fff;">{{ t.type }}</span>
+                  <span style="font-size: 12px; font-weight: 500; color: #8f7aae;">{{ t.method }}</span>
+                </span>
+              </div>
+              <span style="min-width: 0; font-size: 12.5px; font-weight: 500; line-height: 1.4; color: #a795c5;"><span style="white-space: nowrap;">{{ t.whenDate }}</span> · <span style="white-space: nowrap;">{{ t.whenTime }}</span></span>
+              <span style="font-size: 14.5px; font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; color: {{ t.amountColor }}; text-align: {{ t.amountAlign }};">{{ t.amount }}</span>
+              <span style="justify-self: {{ t.statusJustify }}; height: 26px; display: inline-flex; align-items: center; gap: 7px; padding: 0 11px; border-radius: 999px; border: 1px solid {{ t.statusBorder }}; background: {{ t.statusBg }}; font-size: 11px; font-weight: 800; letter-spacing: .6px; white-space: nowrap; color: {{ t.statusColor }};">
+                <span style="width: 7px; height: 7px; border-radius: 50%; background: {{ t.statusDot }};"></span>{{ t.status }}
+              </span>
+              <button onClick="{{ t.onClick }}" style="justify-self: end; min-height: 44px; padding: 0 14px; border: 1px solid rgba(167,139,250,.3); border-radius: 11px; background: rgba(255,255,255,.03); color: #fff; font-family: Manrope, sans-serif; font-size: 12.5px; font-weight: 700; white-space: nowrap; cursor: pointer;" style-hover="border-color: rgba(167,139,250,.6); background: rgba(255,255,255,.07)">View details</button>
+            </div>
+            </sc-if>
+            <sc-if value="{{ cardLayout }}" hint-placeholder-val="{{ false }}">
+            <div role="listitem" style="padding: 14px 16px; border: 1px solid rgba(167,139,250,.16); border-radius: 16px; background: rgba(255,255,255,.03); display: flex; flex-direction: column; gap: 10px;">
+              <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 6px 12px;">
+                <span style="flex: 1 1 auto; min-width: 0; display: flex; align-items: center; gap: 12px;">
+                  <span aria-hidden="true" style="width: 36px; height: 36px; flex: none; border-radius: 11px; border: 1px solid {{ t.iconBorder }}; background: {{ t.iconBg }}; color: {{ t.iconColor }}; font-size: 15px; font-weight: 800; display: flex; align-items: center; justify-content: center;">{{ t.glyph }}</span>
+                  <span style="min-width: 0; font-size: 15px; font-weight: 700; color: #fff; overflow-wrap: anywhere;">{{ t.type }}</span>
+                </span>
+                <span style="margin-left: auto; font-size: 15.5px; font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; color: {{ t.amountColor }};"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;">Amount: </span>{{ t.amount }}</span>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 3px;">
+                <span style="font-size: 13px; font-weight: 600; color: #cbb6e6; overflow-wrap: anywhere;"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;">Payment method: </span>{{ t.method }}</span>
+                <span style="font-size: 12.5px; font-weight: 500; color: #a795c5; overflow-wrap: anywhere;"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;">Date and time: </span>{{ t.whenFull }}</span>
+              </div>
+              <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px 12px;">
+                <span style="min-height: 26px; box-sizing: border-box; display: inline-flex; align-items: center; gap: 7px; padding: 4px 11px; border-radius: 999px; border: 1px solid {{ t.statusBorder }}; background: {{ t.statusBg }}; font-size: 11px; font-weight: 800; letter-spacing: .6px; line-height: 1.3; color: {{ t.statusColor }};">
+                  <span style="width: 7px; height: 7px; flex: none; border-radius: 50%; background: {{ t.statusDot }};"></span><span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;">Status: </span>{{ t.status }}
+                </span>
+                <button onClick="{{ t.onClick }}" style="min-height: 44px; padding: 0 16px; border: 1px solid rgba(167,139,250,.3); border-radius: 11px; background: rgba(255,255,255,.03); color: #fff; font-family: Manrope, sans-serif; font-size: 13px; font-weight: 700; cursor: pointer;" style-hover="border-color: rgba(167,139,250,.6); background: rgba(255,255,255,.07)">View details</button>
+              </div>
+            </div>
+            </sc-if>
+          </sc-for>
+
+          <sc-if value="{{ canExpand }}" hint-placeholder-val="{{ true }}">
+            <button onClick="{{ toggleAll }}" style="align-self: center; min-height: 46px; margin-top: 4px; padding: 0 22px; border: 1px solid rgba(167,139,250,.3); border-radius: 12px; background: rgba(255,255,255,.03); color: #fff; font-family: Manrope, sans-serif; font-size: 13.5px; font-weight: 700; cursor: pointer;" style-hover="border-color: rgba(167,139,250,.6); background: rgba(255,255,255,.07)">{{ expandLabel }}</button>
+          </sc-if>
+        </div>
+      </sc-if>
+    </section>
+
+    </sc-if>
+
+    <dc-import name="ChoCho Footer" hint-size="100%,120px"></dc-import>
+
+    <dc-import name="ChoCho Bottom Nav" active="wallet" hint-size="1px,1px"></dc-import>
+  </div>
+
+  <dc-import name="ChoCho Support" hint-size="1px,1px"></dc-import>
+
+  <sc-if value="{{ detailOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ backdropClick }}" style="position: fixed; inset: 0; z-index: 200; background: {{ scrimBg }}; display: flex; align-items: {{ scrimAlign }}; justify-content: center; padding: {{ scrimPad }}; overflow: hidden; animation: wFade .18s ease-out;">
+      <div role="dialog" aria-modal="true" aria-labelledby="tx-title" tabindex="-1" data-tx-dialog="1" onClick="{{ stop }}" style="position: relative; width: {{ sheetWidth }}; max-width: 100%; max-height: {{ sheetMaxHeight }}; overflow-y: auto; -webkit-overflow-scrolling: touch; box-sizing: border-box; padding: 0 26px 26px; border: {{ sheetBorder }}; border-radius: {{ sheetRadius }}; background: linear-gradient(170deg, #2a1049 0%, #1a0930 55%, #160726 100%); box-shadow: 0 30px 80px rgba(4,1,9,.7); display: flex; flex-direction: column; gap: 16px; animation: wRise .22s ease-out;">
+        <div style="position: sticky; top: 0; z-index: 2; margin: 0 -26px; padding: 22px 26px 14px; background: #2a1049; border-bottom: 1px solid rgba(167,139,250,.14); display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
+          <span style="min-width: 0; display: flex; flex-direction: column; gap: 4px;">
+            <span style="font-size: 10.5px; font-weight: 800; letter-spacing: 1.2px; color: #8f7aae;">TRANSACTION</span>
+            <span id="tx-title" style="font-size: 19px; font-weight: 800; letter-spacing: -.3px; color: #fff;">{{ detailType }}</span>
+          </span>
+          <button onClick="{{ closeDetail }}" aria-label="Close transaction details" style="width: 40px; height: 40px; flex: none; border: 1px solid rgba(167,139,250,.28); border-radius: 12px; background: rgba(255,255,255,.06); color: #cbb6e6; font-size: 15px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center;" style-hover="background: rgba(255,255,255,.14); color: #fff">✕</button>
+        </div>
+
+        <span style="font-size: 32px; font-weight: 800; letter-spacing: -.8px; font-variant-numeric: tabular-nums; color: {{ detailAmountColor }}; overflow-wrap: anywhere;">{{ detailAmount }}</span>
+
+        <span style="height: 28px; align-self: flex-start; display: inline-flex; align-items: center; gap: 7px; padding: 0 12px; border-radius: 999px; border: 1px solid {{ detailStatusBorder }}; background: {{ detailStatusBg }}; font-size: 11.5px; font-weight: 800; letter-spacing: .6px; color: {{ detailStatusColor }};">
+          <span style="width: 7px; height: 7px; border-radius: 50%; background: {{ detailStatusDot }};"></span>{{ detailStatus }}
+        </span>
+
+        <div style="display: flex; flex-direction: column; gap: 1px; border: 1px solid rgba(167,139,250,.16); border-radius: 16px; overflow: hidden;">
+          <sc-for list="{{ detailRows }}" as="d" hint-placeholder-count="3">
+            <div style="padding: 13px 16px; background: rgba(255,255,255,.03); display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px;">
+              <span style="flex: 1 1 120px; min-width: 0; font-size: 11.5px; font-weight: 800; letter-spacing: 1px; color: #8f7aae;">{{ d.label }}</span>
+              <span style="font-size: 13.5px; font-weight: 700; font-variant-numeric: tabular-nums; color: #e6ddf5; overflow-wrap: anywhere;">{{ d.value }}</span>
+              <sc-if value="{{ d.copyable }}" hint-placeholder-val="{{ false }}">
+                <button onClick="{{ d.onCopy }}" style="min-height: 36px; padding: 0 13px; border: 1px solid rgba(167,139,250,.3); border-radius: 10px; background: rgba(255,255,255,.04); color: #cbb6e6; font-family: Manrope, sans-serif; font-size: 12px; font-weight: 700; cursor: pointer;" style-hover="background: rgba(167,139,250,.16); color: #fff">{{ copyLabel }}</button>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+
+        <sc-if value="{{ detailExplanation }}" hint-placeholder-val="{{ false }}">
+          <span style="font-size: 13px; font-weight: 500; line-height: 1.6; color: #a795c5; text-wrap: pretty;">{{ detailExplanation }}</span>
+        </sc-if>
+
+        <button onClick="{{ openSupport }}" data-help-trigger="1" style="min-height: 46px; border: 1px solid rgba(167,139,250,.3); border-radius: 12px; background: rgba(255,255,255,.03); color: #a795c5; font-family: Manrope, sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;" style-hover="color: #fff; background: rgba(255,255,255,.07)">Need help? <span style="color: #ffc93c; font-weight: 800;">24/7 Support</span></button>
+      </div>
+    </div>
+  </sc-if>
+
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1024,&quot;height&quot;:1000},&quot;layout&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;auto&quot;,&quot;mobile&quot;],&quot;default&quot;:&quot;auto&quot;,&quot;tsType&quot;:&quot;\&quot;desktop\&quot; | \&quot;mobile\&quot;&quot;,&quot;section&quot;:&quot;Surface&quot;},&quot;previewSession&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;shared&quot;,&quot;guest&quot;,&quot;signed-in&quot;],&quot;default&quot;:&quot;shared&quot;,&quot;tsType&quot;:&quot;\&quot;signed-in\&quot; | \&quot;signed-out\&quot;&quot;,&quot;section&quot;:&quot;Preview context&quot;},&quot;dataState&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;loaded&quot;,&quot;loading&quot;,&quot;empty&quot;,&quot;error&quot;,&quot;partial&quot;],&quot;default&quot;:&quot;loaded&quot;,&quot;tsType&quot;:&quot;\&quot;loaded\&quot; | \&quot;loading\&quot; | \&quot;empty\&quot; | \&quot;error\&quot; | \&quot;partial\&quot;&quot;,&quot;section&quot;:&quot;Preview context&quot;},&quot;accountNotice&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;none&quot;,&quot;verification&quot;,&quot;restriction&quot;],&quot;default&quot;:&quot;none&quot;,&quot;tsType&quot;:&quot;\&quot;none\&quot; | \&quot;verification\&quot; | \&quot;restriction\&quot;&quot;,&quot;section&quot;:&quot;Preview context&quot;}}">
+const FIXTURES = [
+  { id: "t1", kind: "deposit", type: "Deposit", method: "GCash •••• 4821", amount: 2500, ts: "2026-09-10T19:42:00", status: "Completed", ref: "CHO-2026091019420001" },
+  { id: "t2", kind: "withdrawal", type: "Withdrawal", method: "Maya •••• 7310", amount: 1200, ts: "2026-09-09T14:05:00", status: "Pending", ref: "CHO-2026090914050042", note: "Your withdrawal is with our payments team. We’ll update this record once it’s processed." },
+  { id: "t3", kind: "deposit", type: "Deposit", method: "GCash •••• 4821", amount: 500, ts: "2026-09-08T21:18:00", status: "Completed", ref: "CHO-2026090821180017" },
+  { id: "t4", kind: "withdrawal", type: "Withdrawal", method: "Maya •••• 7310", amount: 3000, ts: "2026-09-06T10:33:00", status: "Failed", ref: "CHO-2026090610330008", note: "This withdrawal wasn’t completed and no funds left your wallet. Contact support if you’d like help retrying it." },
+  { id: "t5", kind: "deposit", type: "Deposit", method: "GCash •••• 4821", amount: 1000, ts: "2026-09-04T18:02:00", status: "Completed", ref: "CHO-2026090418020055" },
+  { id: "t6", kind: "deposit", type: "Deposit", method: "GCash •••• 4821", amount: 750, ts: "2026-09-02T09:47:00", status: "Cancelled", ref: "CHO-2026090209470031" },
+  { id: "t7", kind: "withdrawal", type: "Withdrawal", method: "Maya •••• 7310", amount: 900, ts: "2026-08-30T20:11:00", status: "Completed", ref: "CHO-2026083020110026" },
+  { id: "t8", kind: "deposit", type: "Deposit", method: "GCash •••• 4821", amount: 1500, ts: "2026-08-28T12:29:00", status: "Completed", ref: "CHO-2026082812290014" }
+];
+
+class Component extends DCLogic {
+  state = { authed: (() => { try { return localStorage.getItem("chocho:previewSession") === "signed-in"; } catch (e) { return false; } })(), hidden: false, menuOpen: false, accountOpen: false, support: false,
+    filter: "All", showAll: false, detail: null, copied: false,
+    actionNotice: "", noticeDismissed: false, retrying: false
+  };
+
+  constructor(props) {
+    super(props);
+    this.detailTrigger = null;
+    this.helpTrigger = null;
+  }
+
+  detailNode() { return document.querySelector("[data-tx-dialog]"); }
+  supportNode() { return document.querySelector("[data-support-dialog]"); }
+
+  _txList = React.createRef();
+
+  measureList() {
+    const el = this._txList.current;
+    if (!el) return;
+    if (this._ro && this._roEl !== el) { this._ro.disconnect(); this._ro.observe(el); this._roEl = el; }
+    const lw = Math.round(el.getBoundingClientRect().width);
+    if (lw && lw !== this.state.listW) this.setState({ listW: lw });
+  }
+
+  componentDidMount() {
+    this._onVw = () => {
+      if (window.innerWidth !== this.state.vw) this.setState({ vw: window.innerWidth });
+      this.measureList();
+    };
+    window.addEventListener("resize", this._onVw);
+    this._onVw();
+    // The five-column table is chosen from the list's own width, not the viewport:
+    // page padding (e.g. room for the support mascot) can make the column much narrower.
+    if (typeof ResizeObserver !== "undefined") {
+      this._ro = new ResizeObserver(() => this.measureList());
+    }
+    this._roPoll = setInterval(() => this.measureList(), 800);
+    this.connectSite();
+    // Header Deposit (Wallet#deposit) and #withdraw land on the matching Wallet action.
+    this._onHash = () => this.applyHash();
+    window.addEventListener("hashchange", this._onHash);
+    this.onKey = (e) => {
+      if (e.key === "Escape") {
+        if (this.state.support) { e.stopPropagation(); this.closeSupport(); return; }
+        if (this.state.detail) { e.stopPropagation(); this.closeDetail(); }
+        return;
+      }
+      if (e.key !== "Tab") return;
+      const root = this.state.support ? this.supportNode() : (this.state.detail ? this.detailNode() : null);
+      if (!root) return;
+      const f = Array.from(root.querySelectorAll('button:not([disabled]), a[href], input:not([disabled]), [tabindex]:not([tabindex="-1"])'))
+        .filter(el => el.offsetParent !== null);
+      if (!f.length) return;
+      const first = f[0], last = f[f.length - 1], active = document.activeElement;
+      if (!root.contains(active)) { e.preventDefault(); first.focus(); return; }
+      if (e.shiftKey && active === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && active === last) { e.preventDefault(); first.focus(); }
+    };
+    document.addEventListener("keydown", this.onKey, true);
+    this.connectBalanceSetting();
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("resize", this._onVw);
+    window.removeEventListener("hashchange", this._onHash);
+    if (this._unsubSite) this._unsubSite();
+    if (this._ro) this._ro.disconnect();
+    clearInterval(this._roPoll);
+    document.removeEventListener("keydown", this.onKey, true);
+    clearTimeout(this.copyTimer);
+    clearTimeout(this.retryTimer);
+    if (this._unsubBal) this._unsubBal();
+  }
+
+/* Guest vs signed-in follows the one shared preview session. A guest never
+     sees personal data: the page shows its sign-in gate instead. */
+  previewValue() {
+    const p = this.props.previewSession;
+    if (p !== undefined) return p;
+    const legacy = this.props.account;
+    return legacy === undefined ? undefined : (legacy === "signed-out" ? "guest" : "signed-in");
+  }
+
+  connectSite() {
+    const s = window.ChoChoSite;
+    if (!s) { window.addEventListener("chocho:site-ready", () => this.connectSite(), { once: true }); return; }
+    s.applyPreviewProp(this.previewValue());
+    this._unsubSite = s.subscribe(() => this.onSession(s.isAuthed()));
+    this.onSession(s.isAuthed());
+    // Direct entry as a guest: ask to sign in over this page, keeping it as the destination.
+    if (!s.isAuthed()) s.openAuth("signin", s.currentUrl());
+  }
+
+  onSession(authed) {
+    if (authed === this.state.authed) { if (authed) this.applyHash(); return; }
+    if (authed) this.setState({ authed: true }, () => this.applyHash());
+    else this.setState({ authed: false, detail: null, actionNotice: "", support: false });
+  }
+
+  applyHash() {
+    if (!this.state.authed) return;
+    const h = window.location.hash.toLowerCase();
+    const msg = h === "#deposit" ? "Deposits are currently unavailable. Please try again later."
+      : h === "#withdraw" ? "Withdrawals are currently unavailable. Please try again later." : "";
+    if (!msg || this._hashDone === h) return;
+    this._hashDone = h;
+    this.setState({ actionNotice: msg, noticeDismissed: false });
+  }
+
+  componentDidUpdate(prev) {
+    if ((prev.previewSession !== this.props.previewSession || prev.account !== this.props.account) && window.ChoChoSite) window.ChoChoSite.applyPreviewProp(this.previewValue());
+  }
+
+  /* The Show/Hide balance setting is shared with the header dropdown and
+     My Account -> Bonuses. */
+  connectBalanceSetting() {
+    const a = window.ChoChoAccount;
+    if (!a) { window.addEventListener("chocho:account-ready", () => this.connectBalanceSetting(), { once: true }); return; }
+    this.setState({ hidden: a.isHidden() });
+    this._unsubBal = a.subscribe(() => this.setState({ hidden: a.isHidden() }));
+  }
+
+  peso(n) {
+    return "₱" + Number(n).toLocaleString("en-PH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  when(ts) {
+    const d = new Date(ts);
+    const date = d.toLocaleDateString("en-PH", { day: "2-digit", month: "short", year: "numeric" });
+    const time = d.toLocaleTimeString("en-PH", { hour: "2-digit", minute: "2-digit", hour12: true });
+    return date + " · " + time;
+  }
+
+  statusStyle(s) {
+    if (s === "Completed") return { color: "#86efac", dot: "#4ade80", bg: "rgba(74,222,128,.1)", border: "rgba(74,222,128,.32)" };
+    if (s === "Pending") return { color: "#ffc93c", dot: "#ffc93c", bg: "rgba(255,201,60,.12)", border: "rgba(255,201,60,.42)" };
+    if (s === "Failed") return { color: "#fca5a5", dot: "#f87171", bg: "rgba(248,113,113,.1)", border: "rgba(248,113,113,.4)" };
+    return { color: "#c4b5fd", dot: "#a78bfa", bg: "rgba(167,139,250,.1)", border: "rgba(167,139,250,.34)" };
+  }
+
+  data() {
+    const state = this.props.dataState ?? "loaded";
+    const empty = state === "empty";
+    return {
+      state: state,
+      balance: empty ? 0 : 12480.5,
+      withdrawable: empty ? 0 : 9480.5,
+      bonus: empty ? 0 : 3000,
+      list: empty ? [] : FIXTURES
+    };
+  }
+
+  openDetail(t, ev) {
+    this.detailTrigger = ev && ev.currentTarget;
+    this.setState({ detail: t, copied: false }, () => { const r = this.detailNode(); if (r) r.focus(); });
+  }
+
+  closeDetail() {
+    const t = this.detailTrigger;
+    this.detailTrigger = null;
+    this.setState({ detail: null, copied: false }, () => { if (t && t.isConnected) { try { t.focus(); } catch (e) {} } });
+  }
+
+  openSupport(trigger) {
+    window.dispatchEvent(new CustomEvent("chocho:support"));
+    return;
+    /* legacy inline panel retired — shared support controller owns the panel */
+    this.setState({ support: true }, () => { const r = this.supportNode(); if (r) r.focus(); });
+  }
+
+  closeSupport() {
+    const t = this.helpTrigger;
+    this.helpTrigger = null;
+    this.setState({ support: false }, () => {
+      const live = (t && t.isConnected) ? t : document.querySelector("[data-help-trigger]");
+      if (live) { try { live.focus(); } catch (e) {} }
+    });
+  }
+
+  copyRef(ref) {
+    const done = () => {
+      this.setState({ copied: true });
+      clearTimeout(this.copyTimer);
+      this.copyTimer = setTimeout(() => this.setState({ copied: false }), 1800);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(ref).then(done, done);
+    else done();
+  }
+
+  icon(name, color) {
+    const paths = {
+      home: "M4 11.5 12 5l8 6.5V20a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z",
+      games: "M7 8h10a4 4 0 0 1 4 4v2a3 3 0 0 1-5.2 2L14 15h-4l-1.8 1A3 3 0 0 1 3 14v-2a4 4 0 0 1 4-4z",
+      wallet: "M3 8a2 2 0 0 1 2-2h13a1 1 0 0 1 1 1v2M3 8v9a2 2 0 0 0 2 2h14a1 1 0 0 0 1-1v-3m0-4v4m0-4h-4a2 2 0 0 0 0 4h4",
+      gift: "M4 11h16v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1zM3 7h18v4H3zM12 7v14M8 7a2 2 0 1 1 2-3c1.5 0 2 3 2 3M16 7a2 2 0 1 0-2-3c-1.5 0-2 3-2 3",
+      wheel: "M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zm0 0v9m0 0 7.8 4.5M12 12 4.2 16.5"
+    };
+    return React.createElement("svg", {
+      key: name, width: 22, height: 22, viewBox: "0 0 24 24", fill: "none",
+      stroke: color, strokeWidth: 1.8, strokeLinecap: "round", strokeLinejoin: "round"
+    }, React.createElement("path", { d: paths[name] }));
+  }
+
+  renderVals() {
+    const s = this.state;
+    const mobile = (this.props.layout ?? "auto") === "mobile" || (this.state.vw || 1024) < 600;
+    // Table needs ~700px of list width for single-line cells; below that each row becomes a card.
+    const cards = mobile || (this.state.listW ? this.state.listW < 700 : (this.state.vw || 1024) < 820);
+    const d = this.data();
+    const loading = d.state === "loading" || s.retrying;
+    const walletFailed = d.state === "error";
+    const txFailed = d.state === "error" || d.state === "partial";
+
+    const mask = "••••••";
+    const filtered = d.list.filter(t =>
+      s.filter === "All" ? true : s.filter === "Deposits" ? t.kind === "deposit" : t.kind === "withdrawal"
+    );
+    const visible = s.showAll ? filtered : filtered.slice(0, 5);
+    const det = s.detail;
+    const dStatus = det ? this.statusStyle(det.status) : this.statusStyle("Completed");
+
+    const notice = this.props.accountNotice ?? "none";
+
+    return {
+      accountOpen: s.accountOpen,
+      toggleAccount: () => this.setState(st => ({ accountOpen: !st.accountOpen, menuOpen: false })),
+      accountLinks: [
+        { label: "My Account", onClick: () => { window.location.href = "ChoCho My Account.dc.html"; } },
+        { label: "My Promotions", onClick: () => { window.location.href = "ChoCho Promotions.dc.html"; } },
+        { label: "Support", onClick: (e) => this.openSupport(e && e.currentTarget) },
+        { label: "Sign out", onClick: () => { window.location.href = "ChoCho Home.dc.html"; } }
+      ],
+      initials: "JR",
+
+      hidden: s.hidden ? "true" : "false",
+      balanceToggleLabel: s.hidden ? "Show balance" : "Hide balance",
+      balanceToggleGlyph: s.hidden ? "○" : "●",
+      toggleBalance: () => {
+        const a = window.ChoChoAccount;
+        if (a) a.toggleHidden();
+        this.setState(st => ({ hidden: !st.hidden }));
+      },
+      headerBalance: walletFailed || loading ? "—" : (s.hidden ? mask : this.peso(d.balance)),
+      balance: s.hidden ? mask : this.peso(d.balance),
+
+      hasSecondary: !s.hidden && !!d.withdrawable,
+      secondary: [
+        { label: "AVAILABLE TO WITHDRAW", value: this.peso(d.withdrawable) },
+        { label: "BONUS FUNDS", value: this.peso(d.bonus) }
+      ],
+
+      walletLoading: loading,
+      walletError: walletFailed && !loading,
+      walletReady: !loading && !walletFailed,
+      retry: () => {
+        this.setState({ retrying: true });
+        clearTimeout(this.retryTimer);
+        this.retryTimer = setTimeout(() => this.setState({ retrying: false }), 1200);
+      },
+      retryTx: () => {
+        this.setState({ retrying: true });
+        clearTimeout(this.retryTimer);
+        this.retryTimer = setTimeout(() => this.setState({ retrying: false }), 1200);
+      },
+
+      deposit: () => this.setState({ actionNotice: "Deposits are currently unavailable. Please try again later.", noticeDismissed: false }),
+      withdraw: () => this.setState({ actionNotice: "Withdrawals are currently unavailable. Please try again later.", noticeDismissed: false }),
+      actionNotice: s.noticeDismissed ? "" : s.actionNotice,
+      dismissNotice: () => this.setState({ noticeDismissed: true, actionNotice: "" }),
+
+      accountNotice: notice === "verification"
+        ? "Complete account verification to enable withdrawals."
+        : notice === "restriction"
+        ? "Withdrawals are on hold on this account. Our team can explain the next step."
+        : "",
+      noticeActionLabel: notice === "verification" ? "Start verification" : "Contact support",
+      noticeAction: (e) => this.openSupport(e && e.currentTarget),
+
+      filters: ["All", "Deposits", "Withdrawals"].map(f => {
+        const on = s.filter === f;
+        return {
+          label: f,
+          on: on ? "true" : "false",
+          bg: on ? "linear-gradient(180deg, #ffd766, #eb9c0d)" : "rgba(255,255,255,.03)",
+          color: on ? "#2c1400" : "#bfaed8",
+          border: on ? "rgba(255,201,60,.5)" : "rgba(167,139,250,.24)",
+          onClick: () => this.setState({ filter: f, showAll: false })
+        };
+      }),
+      clearFilter: () => this.setState({ filter: "All" }),
+
+      skeletons: [0, 1, 2, 3],
+      txLoading: loading,
+      txError: txFailed && !loading,
+      txEmptyAccount: !loading && !txFailed && d.list.length === 0,
+      txNoMatch: !loading && !txFailed && d.list.length > 0 && filtered.length === 0,
+      txReady: !loading && !txFailed && filtered.length > 0,
+
+      headerRowDisplay: cards ? "none" : "grid",
+      headerHidden: cards ? "true" : null,
+      txListRef: this._txList,
+      listRole: cards ? "list" : null,
+      cardLayout: cards,
+      rowLayout: !cards,
+      columns: [
+        { label: "TRANSACTION", align: "left" },
+        { label: "DATE & TIME", align: "left" },
+        { label: "AMOUNT", align: "left" },
+        { label: "STATUS", align: "left" },
+        { label: "", align: "right" }
+      ],
+
+      rows: visible.map(t => {
+        const st = this.statusStyle(t.status);
+        const dep = t.kind === "deposit";
+        return {
+          type: t.type,
+          method: t.method,
+          when: this.when(t.ts),
+          amount: (dep ? "+" : "−") + this.peso(t.amount),
+          amountColor: dep ? "#86efac" : "#e6ddf5",
+          amountAlign: "left",
+          glyph: dep ? "↓" : "↑",
+          iconColor: dep ? "#86efac" : "#c4b5fd",
+          iconBg: dep ? "rgba(74,222,128,.1)" : "rgba(167,139,250,.12)",
+          iconBorder: dep ? "rgba(74,222,128,.28)" : "rgba(167,139,250,.26)",
+          status: t.status.toUpperCase(),
+          statusColor: st.color, statusDot: st.dot, statusBg: st.bg, statusBorder: st.border,
+          statusJustify: mobile ? "start" : "start",
+          rowDisplay: "grid",
+          whenFull: this.when(t.ts),
+          whenDate: this.when(t.ts).split(" · ")[0],
+          whenTime: this.when(t.ts).split(" · ")[1] || "",
+          onClick: (ev) => this.openDetail(t, ev)
+        };
+      }),
+
+      canExpand: !loading && !txFailed && filtered.length > 5,
+      expandLabel: s.showAll ? "Show recent only" : "View all transactions",
+      toggleAll: () => this.setState(st => ({ showAll: !st.showAll })),
+
+
+      detailOpen: !!det && this.state.authed,
+      showPersonal: this.state.authed,
+      gated: !this.state.authed,
+      gateSignin: () => { if (window.ChoChoSite) window.ChoChoSite.openAuth("signin", window.ChoChoSite.currentUrl()); },
+      gateRegister: () => { if (window.ChoChoSite) window.ChoChoSite.openAuth("register", window.ChoChoSite.currentUrl()); },
+      detailType: det ? det.type : "",
+      detailAmount: det ? (det.kind === "deposit" ? "+" : "−") + this.peso(det.amount) : "",
+      detailAmountColor: det && det.kind === "deposit" ? "#86efac" : "#fff",
+      detailStatus: det ? det.status.toUpperCase() : "",
+      detailStatusColor: dStatus.color, detailStatusDot: dStatus.dot,
+      detailStatusBg: dStatus.bg, detailStatusBorder: dStatus.border,
+      detailExplanation: det && det.note ? det.note : "",
+      detailRows: det ? [
+        { label: "DATE & TIME", value: this.when(det.ts), copyable: false },
+        { label: "PAYMENT METHOD", value: det.method, copyable: false },
+        { label: "REFERENCE", value: det.ref, copyable: true, onCopy: () => this.copyRef(det.ref) }
+      ] : [],
+      copyLabel: s.copied ? "Copied" : "Copy",
+      closeDetail: () => this.closeDetail(),
+      backdropClick: mobile ? () => {} : (e) => { if (e.target === e.currentTarget) this.closeDetail(); },
+      stop: (e) => e.stopPropagation(),
+      scrimBg: mobile ? "#130124" : "rgba(6,2,12,.76)",
+      scrimPad: mobile ? "0" : "24px",
+      scrimAlign: mobile ? "stretch" : "center",
+      sheetWidth: mobile ? "100%" : "460px",
+      sheetMaxHeight: mobile ? "100vh" : "calc(100vh - 48px)",
+      sheetRadius: mobile ? "0" : "22px",
+      sheetBorder: mobile ? "0" : "1px solid rgba(167,139,250,.26)",
+
+      supportOpen: s.support,
+      openSupport: (e) => this.openSupport(e && e.currentTarget),
+      closeSupport: () => this.closeSupport()
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,2828 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Casino platform — player API (gateway)",
+    "version": "1.0.0",
+    "description": "Every player-facing route the gateway forwards, from identity (under /api/id), core, payments and bonus. Auth travels in httpOnly cookies by default; send `X-Auth-Transport: bearer` to receive tokens in the body instead. Edge errors are RFC 7807 problems with errorCode UNKNOWN_HOST, COUNTRY_BLOCKED (451), SKIN_MISMATCH (403), RATE_LIMITED (429) or UPSTREAM_UNAVAILABLE (502)."
+  },
+  "servers": [
+    {
+      "url": "/"
+    }
+  ],
+  "paths": {
+    "/api/id/auth/signup": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignUpRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Session established; tokens are in httpOnly cookies (or in the body with X-Auth-Transport: bearer).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CookieSessionResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/id/auth/signin": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignInRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Session established; tokens are in httpOnly cookies (or in the body with X-Auth-Transport: bearer).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CookieSessionResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/id/auth/refresh": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshRequest"
+              }
+            }
+          },
+          "required": false,
+          "description": "Omit in cookie mode — the gateway supplies the refresh token from the pl_refresh cookie."
+        },
+        "responses": {
+          "200": {
+            "description": "Session established; tokens are in httpOnly cookies (or in the body with X-Auth-Transport: bearer).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CookieSessionResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/id/auth/verify-email": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyEmailRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/id/auth/resend-verification": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResendVerificationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/id/auth/forgot-password": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForgotPasswordRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/id/auth/reset-password": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/id/auth/change-password": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "playerCookie": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/id/auth/google": {
+      "get": {
+        "tags": [
+          "Google"
+        ],
+        "parameters": [
+          {
+            "name": "callbackUrl",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/id/auth/google/callback": {
+      "get": {
+        "tags": [
+          "Google"
+        ],
+        "parameters": [
+          {
+            "name": "code",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [],
+        "description": "Google's return leg. The gateway sets the session cookies and redirects to the skin's callback URL with `#login=ok&expires_at=…&SessionId=…` — no token reaches the page. Navigate here from the url `GET /api/id/auth/google` answers."
+      }
+    },
+    "/api/id/auth/telegram": {
+      "post": {
+        "tags": [
+          "Telegram"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TelegramAuthRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Session established; tokens are in httpOnly cookies (or in the body with X-Auth-Transport: bearer).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CookieSessionResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/id/auth/telegram/link": {
+      "post": {
+        "tags": [
+          "Telegram"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TelegramAuthRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "playerCookie": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/id/sessions": {
+      "get": {
+        "tags": [
+          "Sessions"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "playerCookie": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/id/sessions/logout": {
+      "post": {
+        "tags": [
+          "Sessions"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "playerCookie": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "description": "Clears the session cookies whatever the upstream answers. Needs the session's credential (cookie or bearer) like any authenticated call; the edge itself lets an EXPIRED access token through so a stale browser session can still be ended."
+      }
+    },
+    "/api/id/sessions/{sessionId}/revoke": {
+      "post": {
+        "tags": [
+          "Sessions"
+        ],
+        "parameters": [
+          {
+            "name": "sessionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "playerCookie": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/id/sessions/logout-everywhere": {
+      "post": {
+        "tags": [
+          "Sessions"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "playerCookie": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "description": "Clears the session cookies whatever the upstream answers. Needs the session's credential (cookie or bearer) like any authenticated call; the edge itself lets an EXPIRED access token through so a stale browser session can still be ended."
+      }
+    },
+    "/api/id/totp/enroll": {
+      "post": {
+        "tags": [
+          "TOTP"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "playerCookie": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/id/totp/confirm": {
+      "post": {
+        "tags": [
+          "TOTP"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TotpCodeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "playerCookie": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/id/totp/disable": {
+      "post": {
+        "tags": [
+          "TOTP"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TotpCodeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "playerCookie": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/games/{id}/launch": {
+      "post": {
+        "tags": [
+          "Games (player)"
+        ],
+        "summary": "Open a game: demo or real, optionally bonus-funded. Answers the provider's HTML fragment.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LaunchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LaunchResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "playerCookie": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/payments/methods/deposit": {
+      "get": {
+        "tags": [
+          "Payment methods"
+        ],
+        "summary": "Deposit methods this skin offers, newest configuration first. Optional currency filter.",
+        "parameters": [
+          {
+            "name": "currency",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MethodResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "playerCookie": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/payments/methods/withdraw": {
+      "get": {
+        "tags": [
+          "Payment methods"
+        ],
+        "summary": "Withdrawal methods this skin offers. A method may take deposits without paying out, and vice versa.",
+        "parameters": [
+          {
+            "name": "currency",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MethodResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "playerCookie": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/payments/deposits": {
+      "post": {
+        "tags": [
+          "Deposits"
+        ],
+        "summary": "Start a deposit: returns where to pay. The money arrives when the provider calls back, not here.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDepositRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentsProblemDetails"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentsProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "playerCookie": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/payments/history": {
+      "get": {
+        "tags": [
+          "Deposits"
+        ],
+        "summary": "The player's own payment history, newest first. type = deposit | withdrawal | (both).",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PaymentResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "playerCookie": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/payments/withdrawals/quote": {
+      "post": {
+        "tags": [
+          "Withdrawals"
+        ],
+        "summary": "What this withdrawal would cost and forfeit, and whether the rules allow it. Writes nothing. forfeitNotice is always present and must be shown: the forfeit takes whatever bonus is active when the withdrawal is paid.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WithdrawalQuoteRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WithdrawalQuoteResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentsProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "playerCookie": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/payments/withdrawals": {
+      "post": {
+        "tags": [
+          "Withdrawals"
+        ],
+        "summary": "Request a withdrawal: the amount is held out of the balance and an operator decides. Refused with CONFLICT when an active bonus would be forfeited and acknowledgeBonusForfeit is not set. The bonus is forfeited only when the withdrawal is approved and paid, never on the request.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmitWithdrawalRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentsProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentsProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "playerCookie": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/bonus": {
+      "get": {
+        "tags": [
+          "Bonus (player)"
+        ],
+        "summary": "Open definitions of the skin, with the caller's pending activation / current step when authenticated.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BonusSummaryResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "playerCookie": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/bonus/{bonusId}": {
+      "get": {
+        "tags": [
+          "Bonus (player)"
+        ],
+        "parameters": [
+          {
+            "name": "bonusId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BonusSummaryResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "playerCookie": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/bonus/activate": {
+      "post": {
+        "tags": [
+          "Bonus (player)"
+        ],
+        "summary": "Opt in by id or promo code; a repeated opt-in answers the existing activation.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ActivateBonusRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActivationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "playerCookie": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/bonus/activations": {
+      "get": {
+        "tags": [
+          "Bonus (player)"
+        ],
+        "summary": "Pending (unconsumed) opt-ins.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ActivationResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "playerCookie": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/bonus/activations/{activationId}/cancel": {
+      "post": {
+        "tags": [
+          "Bonus (player)"
+        ],
+        "summary": "Withdraw a pending opt-in (a consumed one cannot be cancelled here — cancel the instance instead).",
+        "parameters": [
+          {
+            "name": "activationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActivationResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "playerCookie": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/bonus/active": {
+      "get": {
+        "tags": [
+          "Bonus (player)"
+        ],
+        "summary": "The player's instances (all statuses) plus pending opt-ins as zero rows — the old GetActivePlayerBonuses.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PlayerBonusResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "playerCookie": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/bonus/launch-eligibility": {
+      "get": {
+        "tags": [
+          "Bonus (player)"
+        ],
+        "summary": "Does an active bonus apply to this game? Drives the skin's 'play with your bonus balance?' prompt.",
+        "parameters": [
+          {
+            "name": "gameId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LaunchEligibilityResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "playerCookie": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/bonus/instances/{playerBonusId}/cancel": {
+      "post": {
+        "tags": [
+          "Bonus (player)"
+        ],
+        "summary": "Give up the active bonus: bonus + locked are forfeited through wallet. Idempotent.",
+        "parameters": [
+          {
+            "name": "playerBonusId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/CancelInstanceRequest"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlayerBonusInstanceResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "playerCookie": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/bonus/freebets": {
+      "get": {
+        "tags": [
+          "Bonus (player)"
+        ],
+        "summary": "Free rounds the player holds, any status.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PlayerFreeBetResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "playerCookie": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/bonus/freebets/claim": {
+      "post": {
+        "tags": [
+          "Bonus (player)"
+        ],
+        "summary": "Claim a free-rounds campaign; the rounds are assigned at the provider through core before the holding exists.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClaimFreeBetRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlayerFreeBetResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "playerCookie": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "SignUpRequest": {
+        "required": [
+          "email",
+          "password",
+          "username",
+          "verifyUrl"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "username": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "verifyUrl": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "SignInRequest": {
+        "required": [
+          "emailOrUsername",
+          "password",
+          "totpCode"
+        ],
+        "type": "object",
+        "properties": {
+          "emailOrUsername": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "totpCode": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "RefreshRequest": {
+        "required": [
+          "refreshToken"
+        ],
+        "type": "object",
+        "properties": {
+          "refreshToken": {
+            "type": "string"
+          }
+        }
+      },
+      "VerifyEmailRequest": {
+        "required": [
+          "email",
+          "token"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "token": {
+            "type": "string"
+          }
+        }
+      },
+      "ResendVerificationRequest": {
+        "required": [
+          "email",
+          "verifyUrl"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "verifyUrl": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "ForgotPasswordRequest": {
+        "required": [
+          "email"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          }
+        }
+      },
+      "ResetPasswordRequest": {
+        "required": [
+          "email",
+          "otp",
+          "newPassword"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "otp": {
+            "type": "string"
+          },
+          "newPassword": {
+            "type": "string"
+          }
+        }
+      },
+      "ChangePasswordRequest": {
+        "required": [
+          "currentPassword",
+          "newPassword"
+        ],
+        "type": "object",
+        "properties": {
+          "currentPassword": {
+            "type": "string"
+          },
+          "newPassword": {
+            "type": "string"
+          }
+        }
+      },
+      "TelegramAuthRequest": {
+        "required": [
+          "id",
+          "first_name",
+          "last_name",
+          "username",
+          "photo_url",
+          "auth_date",
+          "hash"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "first_name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "last_name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "username": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "photo_url": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "auth_date": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "hash": {
+            "type": "string"
+          }
+        }
+      },
+      "TotpCodeRequest": {
+        "required": [
+          "code"
+        ],
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          }
+        }
+      },
+      "LaunchRequest": {
+        "required": [
+          "mode",
+          "language",
+          "isMobile",
+          "currency",
+          "withBonus"
+        ],
+        "type": "object",
+        "properties": {
+          "mode": {
+            "type": "string"
+          },
+          "language": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "isMobile": {
+            "type": "boolean"
+          },
+          "currency": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "withBonus": {
+            "type": "boolean"
+          }
+        }
+      },
+      "LaunchResponse": {
+        "required": [
+          "launchId",
+          "gameId",
+          "gameCode",
+          "mode",
+          "funding",
+          "currency",
+          "language",
+          "playerBonusId",
+          "html"
+        ],
+        "type": "object",
+        "properties": {
+          "launchId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "gameId": {
+            "type": "string"
+          },
+          "gameCode": {
+            "type": "string"
+          },
+          "mode": {
+            "type": "string"
+          },
+          "funding": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "language": {
+            "type": "string"
+          },
+          "playerBonusId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "html": {
+            "type": "string"
+          }
+        }
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "detail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "instance": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "MethodResponse": {
+        "required": [
+          "methodId",
+          "name",
+          "currency",
+          "logoUrl",
+          "minAmountCents",
+          "maxAmountCents",
+          "feeType",
+          "fee",
+          "sortOrder"
+        ],
+        "type": "object",
+        "properties": {
+          "methodId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "logoUrl": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "minAmountCents": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "maxAmountCents": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "feeType": {
+            "type": "string"
+          },
+          "fee": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "sortOrder": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          }
+        }
+      },
+      "CreateDepositRequest": {
+        "required": [
+          "methodId",
+          "currency",
+          "amountCents"
+        ],
+        "type": "object",
+        "properties": {
+          "methodId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "amountCents": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          }
+        }
+      },
+      "PaymentResponse": {
+        "required": [
+          "id",
+          "type",
+          "status",
+          "currency",
+          "amountCents",
+          "playerFeeCents",
+          "methodId",
+          "provider",
+          "paymentUrl",
+          "paymentQr",
+          "receiver",
+          "failureCode",
+          "createdAt",
+          "completedAt"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "type": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "amountCents": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "playerFeeCents": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "methodId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "provider": {
+            "type": "string"
+          },
+          "paymentUrl": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "paymentQr": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "receiver": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "failureCode": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "completedAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          }
+        }
+      },
+      "PaymentsProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "detail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "instance": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "WithdrawalQuoteRequest": {
+        "required": [
+          "methodId",
+          "currency",
+          "amountCents"
+        ],
+        "type": "object",
+        "properties": {
+          "methodId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "amountCents": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          }
+        }
+      },
+      "WithdrawalQuoteResponse": {
+        "required": [
+          "allowed",
+          "refusalCode",
+          "refusalMessage",
+          "amountCents",
+          "feeCents",
+          "bonusForfeit",
+          "forfeitNotice"
+        ],
+        "type": "object",
+        "properties": {
+          "allowed": {
+            "type": "boolean"
+          },
+          "refusalCode": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "refusalMessage": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "amountCents": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "feeCents": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "bonusForfeit": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/BonusForfeitResponse"
+              }
+            ]
+          },
+          "forfeitNotice": {
+            "type": "string"
+          }
+        }
+      },
+      "SubmitWithdrawalRequest": {
+        "required": [
+          "methodId",
+          "currency",
+          "amountCents",
+          "receiver",
+          "acknowledgeBonusForfeit"
+        ],
+        "type": "object",
+        "properties": {
+          "methodId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "amountCents": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "receiver": {
+            "type": "string"
+          },
+          "acknowledgeBonusForfeit": {
+            "type": [
+              "null",
+              "boolean"
+            ]
+          }
+        }
+      },
+      "BonusForfeitResponse": {
+        "required": [
+          "playerBonusId",
+          "bonusCents",
+          "lockedCents",
+          "totalCents"
+        ],
+        "type": "object",
+        "properties": {
+          "playerBonusId": {
+            "type": "string"
+          },
+          "bonusCents": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "lockedCents": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "totalCents": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          }
+        }
+      },
+      "BonusSummaryResponse": {
+        "required": [
+          "bonus",
+          "hasPendingActivation",
+          "currentStepNumber"
+        ],
+        "type": "object",
+        "properties": {
+          "bonus": {
+            "$ref": "#/components/schemas/BonusDefinitionResponse"
+          },
+          "hasPendingActivation": {
+            "type": "boolean"
+          },
+          "currentStepNumber": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          }
+        }
+      },
+      "ActivateBonusRequest": {
+        "required": [
+          "bonusId",
+          "code"
+        ],
+        "type": "object",
+        "properties": {
+          "bonusId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "code": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "ActivationResponse": {
+        "required": [
+          "id",
+          "bonusId",
+          "activatedAt",
+          "consumedAt"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "bonusId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "activatedAt": {
+            "format": "date-time"
+          },
+          "consumedAt": {
+            "format": "date-time"
+          }
+        }
+      },
+      "PlayerBonusResponse": {
+        "required": [
+          "bonusId",
+          "bonusName",
+          "playerBonusId",
+          "status",
+          "isInUse",
+          "hasPendingActivation",
+          "currentStepNumber",
+          "totalSteps",
+          "currency",
+          "grantedCents",
+          "wageringRequiredCents",
+          "wageringCompletedCents",
+          "wageringRemainingCents",
+          "progressPercent",
+          "grantedAt",
+          "expiresAt",
+          "closedAt",
+          "closeReason"
+        ],
+        "type": "object",
+        "properties": {
+          "bonusId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "bonusName": {
+            "type": "string"
+          },
+          "playerBonusId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "status": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/PlayerBonusStatus"
+              }
+            ]
+          },
+          "isInUse": {
+            "type": "boolean"
+          },
+          "hasPendingActivation": {
+            "type": "boolean"
+          },
+          "currentStepNumber": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "totalSteps": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "currency": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "grantedCents": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "wageringRequiredCents": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "wageringCompletedCents": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "wageringRemainingCents": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "progressPercent": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "grantedAt": {
+            "format": "date-time"
+          },
+          "expiresAt": {
+            "format": "date-time"
+          },
+          "closedAt": {
+            "format": "date-time"
+          },
+          "closeReason": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "LaunchEligibilityResponse": {
+        "required": [
+          "hasActiveBonus",
+          "isGameEligible",
+          "playerBonusId",
+          "bonusId",
+          "bonusName",
+          "wageringRequiredCents",
+          "wageringCompletedCents",
+          "currentStepNumber",
+          "totalSteps"
+        ],
+        "type": "object",
+        "properties": {
+          "hasActiveBonus": {
+            "type": "boolean"
+          },
+          "isGameEligible": {
+            "type": "boolean"
+          },
+          "playerBonusId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "bonusId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "bonusName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "wageringRequiredCents": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "wageringCompletedCents": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "currentStepNumber": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "totalSteps": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "CancelInstanceRequest": {
+        "required": [
+          "reason"
+        ],
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "PlayerBonusInstanceResponse": {
+        "required": [
+          "id",
+          "skinId",
+          "playerId",
+          "bonusId",
+          "stepNumber",
+          "currency",
+          "status",
+          "grantedCents",
+          "wageringRequiredCents",
+          "wageringCompletedCents",
+          "wageringRemainingCents",
+          "progressPercent",
+          "expiresAt",
+          "createdAt",
+          "updatedAt",
+          "closedAt",
+          "closeReason"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "skinId": {
+            "type": "string"
+          },
+          "playerId": {
+            "type": "string"
+          },
+          "bonusId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "stepNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/PlayerBonusStatus"
+          },
+          "grantedCents": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "wageringRequiredCents": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "wageringCompletedCents": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "wageringRemainingCents": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "progressPercent": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "expiresAt": {
+            "format": "date-time"
+          },
+          "createdAt": {
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "format": "date-time"
+          },
+          "closedAt": {
+            "format": "date-time"
+          },
+          "closeReason": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "PlayerFreeBetResponse": {
+        "required": [
+          "playerFreeBetId",
+          "freeBetId",
+          "name",
+          "source",
+          "status",
+          "playerBonusId",
+          "totalCount",
+          "remainingCount",
+          "betLevel",
+          "assigned",
+          "assignmentOutcome",
+          "grantedAt",
+          "expiresAt",
+          "gameIds"
+        ],
+        "type": "object",
+        "properties": {
+          "playerFreeBetId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "freeBetId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "source": {
+            "$ref": "#/components/schemas/FreeBetSource"
+          },
+          "status": {
+            "$ref": "#/components/schemas/PlayerFreeBetStatus"
+          },
+          "playerBonusId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "remainingCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "betLevel": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "assigned": {
+            "type": "boolean"
+          },
+          "assignmentOutcome": {
+            "$ref": "#/components/schemas/FreeRoundsAssignmentOutcome"
+          },
+          "grantedAt": {
+            "format": "date-time"
+          },
+          "expiresAt": {
+            "format": "date-time"
+          },
+          "gameIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ClaimFreeBetRequest": {
+        "required": [
+          "freeBetId",
+          "currency"
+        ],
+        "type": "object",
+        "properties": {
+          "freeBetId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "currency": {
+            "type": "string"
+          }
+        }
+      },
+      "BonusDefinitionResponse": {
+        "required": [
+          "id",
+          "skinId",
+          "name",
+          "code",
+          "type",
+          "status",
+          "description",
+          "sticky",
+          "wageringMultiplier",
+          "startAt",
+          "endAt",
+          "maxUsesPerPlayer",
+          "totalSteps",
+          "steps",
+          "allowedGameIds",
+          "gameContributions",
+          "minQualifyingStakeCents",
+          "maxQualifyingStakeCents",
+          "createdAt",
+          "updatedAt"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "skinId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "code": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "type": {
+            "$ref": "#/components/schemas/BonusType"
+          },
+          "status": {
+            "$ref": "#/components/schemas/BonusStatus"
+          },
+          "description": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "sticky": {
+            "type": "boolean"
+          },
+          "wageringMultiplier": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "startAt": {
+            "format": "date-time"
+          },
+          "endAt": {
+            "format": "date-time"
+          },
+          "maxUsesPerPlayer": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalSteps": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "steps": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BonusStepResponse"
+            }
+          },
+          "allowedGameIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "gameContributions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GameContributionResponse"
+            }
+          },
+          "minQualifyingStakeCents": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int64"
+          },
+          "maxQualifyingStakeCents": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int64"
+          },
+          "createdAt": {
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "format": "date-time"
+          }
+        }
+      },
+      "PlayerBonusStatus": {
+        "enum": [
+          "active",
+          "completed",
+          "cancelled",
+          "expired",
+          "forfeited",
+          null
+        ]
+      },
+      "FreeBetSource": {
+        "enum": [
+          "direct",
+          "bonus",
+          "wheel"
+        ]
+      },
+      "PlayerFreeBetStatus": {
+        "enum": [
+          "active",
+          "fullyUsed",
+          "expired",
+          "cancelled"
+        ]
+      },
+      "FreeRoundsAssignmentOutcome": {
+        "enum": [
+          "assigned",
+          "refused",
+          "unknown"
+        ]
+      },
+      "BonusType": {
+        "enum": [
+          "welcome",
+          "reload",
+          "cashback",
+          "freeSpins"
+        ]
+      },
+      "BonusStatus": {
+        "enum": [
+          "active",
+          "disabled",
+          "scheduled",
+          "expired"
+        ]
+      },
+      "BonusStepResponse": {
+        "required": [
+          "id",
+          "stepNumber",
+          "currency",
+          "maxBonusAmountCents",
+          "freeSpins",
+          "wageringMultiplier",
+          "intervals",
+          "freeSpinGameIds"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "stepNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "maxBonusAmountCents": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int64"
+          },
+          "freeSpins": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "wageringMultiplier": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "intervals": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DepositIntervalResponse"
+            }
+          },
+          "freeSpinGameIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "GameContributionResponse": {
+        "required": [
+          "gameId",
+          "contributionPercent"
+        ],
+        "type": "object",
+        "properties": {
+          "gameId": {
+            "type": "string"
+          },
+          "contributionPercent": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "DepositIntervalResponse": {
+        "required": [
+          "minDepositCents",
+          "maxDepositCents",
+          "bonusPercent",
+          "maxBonusCents"
+        ],
+        "type": "object",
+        "properties": {
+          "minDepositCents": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "maxDepositCents": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int64"
+          },
+          "bonusPercent": {
+            "type": "number",
+            "format": "double"
+          },
+          "maxBonusCents": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int64"
+          }
+        }
+      },
+      "CookieSessionResponse": {
+        "type": "object",
+        "required": [
+          "expiresAt",
+          "sessionId"
+        ],
+        "properties": {
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "sessionId": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "playerCookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "pl_access"
+      },
+      "bearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "shell.brand": "ChoCho",
+  "shell.tagline": "Tuloy ang Good Vibes",
+  "nav.home": "Home",
+  "nav.games": "Mga Laro",
+  "nav.promotions": "Mga Promo",
+  "nav.vip": "VIP",
+  "nav.help": "Tulong",
+  "nav.wallet": "Wallet",
+  "nav.bonuses": "Mga Bonus",
+  "nav.luckyWheel": "Lucky Wheel",
+  "nav.myAccount": "Aking Account",
+  "nav.signIn": "Mag-sign in",
+  "nav.register": "Magrehistro",
+  "nav.signOut": "Mag-sign out",
+  "auth.signInTitle": "Maligayang pagbabalik sa ChoCho",
+  "auth.registerTitle": "Gumawa ng iyong ChoCho account",
+  "auth.submitSignIn": "Mag-sign in",
+  "auth.submitRegister": "Gumawa ng account",
+  "shell.playResponsibly": "Maglaro nang Responsable"
+}

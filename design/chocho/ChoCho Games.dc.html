@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Caveat:wght@600;700&amp;display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; background: #06030b; }
+  a { color: #ffc93c; text-decoration: none; }
+  a:hover { color: #ffe08a; }
+  @keyframes chochoWave { 0%,60%,100% { transform: rotate(0deg); } 70% { transform: rotate(-13deg); } 80% { transform: rotate(11deg); } 90% { transform: rotate(-7deg); } }
+</style>
+<script src="chocho-site.js"></script>
+</helmet>
+<div style="min-height: 100vh; background: radial-gradient(1100px 640px at 50% -8%, #3a0269 0%, #250143 42%, #130124 100%); font-family: Manrope, sans-serif; color: #fff; display: flex; justify-content: center;">
+  <div style="width: 100%; max-width: 1024px; min-width: 0; display: flex; flex-direction: column; gap: {{ pageGap }}; padding-bottom: 132px;">
+
+    <dc-import name="ChoCho Header" active="games" style="position: sticky; top: 0; z-index: 40;" hint-size="100%,76px"></dc-import>
+
+    <section style="margin: {{ heroMargin }}; position: relative; border: 1px solid rgba(167,139,250,.22); border-radius: 20px; overflow: hidden; background: #150726; box-shadow: 0 20px 50px rgba(6,3,11,.6), 0 0 0 1px rgba(255,255,255,.03) inset;">
+      <span style="position: absolute; inset: 0; background: radial-gradient(65% 100% at 88% 45%, rgba(167,139,250,.2) 0%, transparent 70%), radial-gradient(45% 75% at 4% 0%, rgba(124,58,237,.16) 0%, transparent 72%);"></span>
+      <div style="position: relative; padding: {{ heroPad }}; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;">
+        <div style="flex: 1 1 360px; min-width: 0; display: flex; flex-direction: column; gap: 12px;">
+          <span style="font-size: {{ titleSize }}; font-weight: 800; letter-spacing: -.8px; line-height: 1.1; color: #fff;">Find Your <span style="color: #ffc93c;">Game</span></span>
+          <span style="font-size: 14px; font-weight: 500; line-height: 1.5; color: #a795c5; text-wrap: pretty;">Slots, live casino, table games and more — all in one place.</span>
+          <div style="position: relative; max-width: 560px;">
+            <span style="position: absolute; left: {{ searchIconL }}; top: 50%; transform: translateY(-50%); display: flex; pointer-events: none;">
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#a795c5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16l4.5 4.5"></path></svg>
+            </span>
+            <input placeholder="Search games or providers..." value="{{ query }}" onChange="{{ onQuery }}" style="width: 100%; box-sizing: border-box; height: 52px; padding: {{ searchPad }}; font-size: {{ searchFont }}; border-radius: 14px; border: 1px solid rgba(167,139,250,.28); background: rgba(8,4,16,.6); color: #fff; font-family: Manrope, sans-serif; font-weight: 500; outline: none;" style-focus="border-color: rgba(255,201,60,.6); box-shadow: 0 0 0 3px rgba(255,201,60,.14)">
+          </div>
+        </div>
+        <div style="position: relative; flex: {{ artFlex }}; min-width: 0; margin-left: {{ artMl }}; display: flex; flex-direction: column; align-items: {{ artAlign }}; gap: 2px;">
+          <span style="display: {{ artDisplay }}; position: absolute; left: 50%; top: 44%; transform: translate(-50%, -50%); width: 260px; height: 260px; border-radius: 50%; pointer-events: none; background: radial-gradient(circle, rgba(167,139,250,.26) 0%, rgba(240,163,10,.14) 42%, transparent 70%); filter: blur(6px);"></span>
+          <img src="assets/chocho-logo-cut.png" alt="ChoCho" style="position: relative; width: 100%; max-width: 172px; object-fit: contain; display: {{ artDisplay }}; filter: drop-shadow(0 16px 30px rgba(0,0,0,.5));">
+          <span style="font-family: Caveat, cursive; font-size: 19px; font-weight: 700; color: #e9a832; white-space: nowrap;">Tuloy ang Good Vibes</span>
+        </div>
+      </div>
+    </section>
+
+    <section style="padding: {{ listPad }}; display: flex; flex-direction: column; gap: {{ listGap }};">
+      <div style="display: flex; gap: 10px; overflow-x: auto; overscroll-behavior-x: contain; padding: {{ chipPad }}; margin: {{ chipMargin }}; scrollbar-width: none;">
+        <sc-for list="{{ categories }}" as="c" hint-placeholder-count="8">
+          <button onClick="{{ c.onClick }}" style="height: 42px; flex: none; display: flex; align-items: center; gap: 8px; padding: 0 16px; border-radius: 12px; cursor: pointer; font-family: Manrope, sans-serif; font-size: 13.5px; font-weight: 700; white-space: nowrap; border: 1px solid {{ c.border }}; background: {{ c.bg }}; color: {{ c.color }}; box-shadow: {{ c.glow }}; transition: border-color .2s ease, background .2s ease;">
+            {{ c.icon }}{{ c.label }}
+          </button>
+        </sc-for>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 10px; flex-wrap: {{ filterWrap }}; overflow-x: {{ filterOverflow }}; overscroll-behavior-x: contain; padding: {{ chipPad }}; margin: {{ chipMargin }}; scrollbar-width: none;">
+        <sc-for list="{{ filters }}" as="f" hint-placeholder-count="4">
+          <button onClick="{{ f.onClick }}" style="height: 46px; flex: none; display: flex; align-items: center; gap: 9px; padding: 0 18px; border-radius: 12px; border: 1px solid rgba(167,139,250,.2); background: rgba(255,255,255,.035); color: #c5b5de; font-family: Manrope, sans-serif; font-size: 13.5px; font-weight: 600; white-space: nowrap; cursor: pointer;" style-hover="border-color: rgba(167,139,250,.38); color: #fff; background: rgba(255,255,255,.06)">
+            {{ f.label }}
+            <span style="font-size: 10px; color: #9c88bb;">▾</span>
+          </button>
+        </sc-for>
+        <span style="flex: 1; min-width: 8px; display: {{ filterSpacer }};"></span>
+        <button onClick="{{ toggleFavOnly }}" aria-pressed="{{ favPressed }}" style="height: 46px; flex: none; white-space: nowrap; display: flex; align-items: center; gap: 9px; padding: 0 20px; border-radius: 12px; cursor: pointer; font-family: Manrope, sans-serif; font-size: 13.5px; font-weight: 700; border: 1px solid {{ favBtn.border }}; background: {{ favBtn.bg }}; color: {{ favBtn.color }};">
+          <span style="font-size: 14px;">♥</span>Favorites
+        </button>
+      </div>
+    </section>
+
+    <section style="padding: 0 clamp(16px, 2.4vw, 22px); display: flex; flex-direction: column; gap: clamp(16px, 2.4vw, 22px);">
+      <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+        <span style="width: 4px; height: clamp(24px, 5.6vw, 28px); border-radius: 999px; background: linear-gradient(180deg, #ffd766, #e07f05); box-shadow: 0 0 12px rgba(240,150,10,.5); flex: none;"></span>
+        <span style="font-size: clamp(22px, 5.6vw, 28px); font-weight: 800; letter-spacing: -.6px; color: #fff;">Favourite Games</span>
+        <span style="flex: 1; min-width: 8px;"></span>
+        <a href="#" onClick="{{ viewAllFav }}" style="height: 44px; display: flex; align-items: center; padding: {{ viewAllPad }}; margin-right: {{ viewAllMr }}; border-radius: 12px; font-size: 14px; font-weight: 700; white-space: nowrap; color: #cbb6e6; text-decoration: none;" style-hover="color: #ffe08a; background: rgba(255,255,255,.05)">View all →</a>
+        <div style="display: {{ arrowDisplay }}; gap: 8px;">
+          <button onClick="{{ favPrev }}" aria-label="Previous Favourite Games" style="width: 44px; height: 44px; flex: none; border: 1px solid rgba(167,139,250,.3); border-radius: 50%; background: rgba(255,255,255,.055); color: #ddd0f2; font-size: 20px; font-weight: 700; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: border-color .2s ease, color .2s ease, background .2s ease;" style-hover="border-color: rgba(255,201,60,.6); color: #ffc93c; background: rgba(255,201,60,.1)">‹</button>
+          <button onClick="{{ favNext }}" aria-label="Next Favourite Games" style="width: 44px; height: 44px; flex: none; border: 1px solid rgba(167,139,250,.3); border-radius: 50%; background: rgba(255,255,255,.055); color: #ddd0f2; font-size: 20px; font-weight: 700; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: border-color .2s ease, color .2s ease, background .2s ease;" style-hover="border-color: rgba(255,201,60,.6); color: #ffc93c; background: rgba(255,201,60,.1)">›</button>
+        </div>
+      </div>
+
+      <sc-if value="{{ hasFavourites }}" hint-placeholder-val="{{ true }}">
+        <div ref="{{ favRail }}" style="display: flex; gap: 14px; overflow-x: auto; overscroll-behavior-x: contain; scroll-behavior: smooth; scroll-snap-type: {{ railSnap }}; scroll-padding-inline: {{ railScrollPad }}; padding: {{ railPad }}; margin: {{ railMargin }}; scrollbar-width: none;">
+          <sc-for list="{{ favGames }}" as="g" hint-placeholder-count="5">
+            <div style="position: relative; flex: 1 1 200px; min-width: 156px; max-width: 292px; scroll-snap-align: start; height: 176px; border-radius: 18px; overflow: hidden; border: 1px solid rgba(167,139,250,.2); background: #180a2c; box-shadow: 0 12px 30px rgba(0,0,0,.45); cursor: pointer; transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;" onClick="{{ g.onOpen }}" style-hover="transform: translateY(-4px); border-color: rgba(255,201,60,.55); box-shadow: 0 20px 40px rgba(0,0,0,.55), 0 0 26px rgba(167,139,250,.22)">
+              <div style="position: absolute; inset: 0; background: {{ g.art }}; transition: transform .4s ease;" style-hover="transform: scale(1.05)"></div>
+              <span style="position: absolute; inset: 0; background: {{ g.texture }};"></span>
+              <span style="position: absolute; inset: auto 0 0 0; height: 104px; background: linear-gradient(180deg, transparent, rgba(11,4,20,.72) 46%, rgba(9,3,16,.96));"></span>
+              <button onClick="{{ g.onFav }}" aria-label="Toggle favourite" style-before="content: ''; position: absolute; inset: -6px;" style="position: absolute; top: 10px; right: 10px; width: 32px; height: 32px; border-radius: 50%; border: 1px solid {{ g.heartBorder }}; background: rgba(10,4,18,.55); cursor: pointer; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); transition: border-color .2s ease;" style-hover="border-color: rgba(255,93,125,.75)">{{ g.heart }}</button>
+              <div style="position: absolute; inset: auto 0 0 0; padding: 10px; display: flex; align-items: flex-end; gap: 6px;">
+                <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px;">
+                  <span style="height: 51px; font-size: 14px; font-weight: 800; line-height: 17px; color: #fff; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">{{ g.name }}</span>
+                  <span style="display: block; height: 15px; font-size: 10.5px; font-weight: 600; line-height: 15px; color: #cdc0e4; white-space: nowrap; overflow: hidden;">{{ g.provider }}</span>
+                </span>
+                <span style="width: 34px; height: 34px; flex: none; border-radius: 50%; background: linear-gradient(180deg, #ffd766, #eb9c0d); color: #2c1400; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(224,140,5,.45); transition: transform .2s ease;" style-hover="transform: scale(1.08)">▶</span>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ noFavourites }}" hint-placeholder-val="{{ false }}">
+        <div style="padding: 34px 22px; border: 1px dashed rgba(167,139,250,.26); border-radius: 18px; background: rgba(255,255,255,.02); display: flex; flex-direction: column; align-items: center; gap: 8px;">
+          <span style="width: 48px; height: 48px; border-radius: 50%; border: 1px solid rgba(255,93,125,.35); background: rgba(255,93,125,.1); display: flex; align-items: center; justify-content: center; font-size: 19px; color: #ff8da3;">♡</span>
+          <span style="font-size: 17px; font-weight: 800; color: #fff;">No favourites yet</span>
+          <span style="font-size: 13px; font-weight: 500; color: #a795c5;">Tap ♡ on any game to save it here.</span>
+        </div>
+      </sc-if>
+    </section>
+
+    <section style="padding: 0 clamp(16px, 2.4vw, 22px); display: flex; flex-direction: column; gap: clamp(16px, 2.4vw, 22px);">
+      <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+        <span style="width: 4px; height: clamp(24px, 5.6vw, 28px); border-radius: 999px; background: linear-gradient(180deg, #ffd766, #e07f05); box-shadow: 0 0 12px rgba(240,150,10,.5); flex: none;"></span>
+        <span style="font-size: clamp(22px, 5.6vw, 28px); font-weight: 800; letter-spacing: -.6px; color: #fff;">Popular</span>
+        <span style="flex: 1; min-width: 8px;"></span>
+        <a href="#" onClick="{{ viewAllPop }}" style="height: 44px; display: flex; align-items: center; padding: {{ viewAllPad }}; margin-right: {{ viewAllMr }}; border-radius: 12px; font-size: 14px; font-weight: 700; white-space: nowrap; color: #cbb6e6; text-decoration: none;" style-hover="color: #ffe08a; background: rgba(255,255,255,.05)">View all →</a>
+        <div style="display: {{ arrowDisplay }}; gap: 8px;">
+          <button onClick="{{ popPrev }}" aria-label="Previous Popular" style="width: 44px; height: 44px; flex: none; border: 1px solid rgba(167,139,250,.3); border-radius: 50%; background: rgba(255,255,255,.055); color: #ddd0f2; font-size: 20px; font-weight: 700; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: border-color .2s ease, color .2s ease, background .2s ease;" style-hover="border-color: rgba(255,201,60,.6); color: #ffc93c; background: rgba(255,201,60,.1)">‹</button>
+          <button onClick="{{ popNext }}" aria-label="Next Popular" style="width: 44px; height: 44px; flex: none; border: 1px solid rgba(167,139,250,.3); border-radius: 50%; background: rgba(255,255,255,.055); color: #ddd0f2; font-size: 20px; font-weight: 700; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: border-color .2s ease, color .2s ease, background .2s ease;" style-hover="border-color: rgba(255,201,60,.6); color: #ffc93c; background: rgba(255,201,60,.1)">›</button>
+        </div>
+      </div>
+
+      <div ref="{{ popRail }}" style="display: flex; gap: 14px; overflow-x: auto; overscroll-behavior-x: contain; scroll-behavior: smooth; scroll-snap-type: {{ railSnap }}; scroll-padding-inline: {{ railScrollPad }}; padding: {{ railPad }}; margin: {{ railMargin }}; scrollbar-width: none;">
+        <sc-for list="{{ popGames }}" as="g" hint-placeholder-count="5">
+          <div style="position: relative; flex: 1 1 200px; min-width: 156px; max-width: 292px; scroll-snap-align: start; height: 176px; border-radius: 18px; overflow: hidden; border: 1px solid rgba(167,139,250,.2); background: #180a2c; box-shadow: 0 12px 30px rgba(0,0,0,.45); cursor: pointer; transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;" onClick="{{ g.onOpen }}" style-hover="transform: translateY(-4px); border-color: rgba(255,201,60,.55); box-shadow: 0 20px 40px rgba(0,0,0,.55), 0 0 26px rgba(167,139,250,.22)">
+            <div style="position: absolute; inset: 0; background: {{ g.art }}; transition: transform .4s ease;" style-hover="transform: scale(1.05)"></div>
+            <span style="position: absolute; inset: 0; background: {{ g.texture }};"></span>
+            <span style="position: absolute; inset: auto 0 0 0; height: 104px; background: linear-gradient(180deg, transparent, rgba(11,4,20,.72) 46%, rgba(9,3,16,.96));"></span>
+            <span style="position: absolute; top: 0; left: 0; height: 26px; display: flex; align-items: center; padding: 0 11px; border-radius: 0 0 12px 0; font-size: 10.5px; font-weight: 800; letter-spacing: 1.2px; color: #fff; background: linear-gradient(180deg, #ff4d6d, #d91e46); box-shadow: 0 4px 14px rgba(217,30,70,.45); opacity: {{ g.hot }};">HOT</span>
+            <button onClick="{{ g.onFav }}" aria-label="Toggle favourite" style-before="content: ''; position: absolute; inset: -6px;" style="position: absolute; top: 10px; right: 10px; width: 32px; height: 32px; border-radius: 50%; border: 1px solid {{ g.heartBorder }}; background: rgba(10,4,18,.55); cursor: pointer; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); transition: border-color .2s ease;" style-hover="border-color: rgba(255,93,125,.75)">{{ g.heart }}</button>
+            <div style="position: absolute; inset: auto 0 0 0; padding: 10px; display: flex; align-items: flex-end; gap: 6px;">
+              <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px;">
+                <span style="height: 51px; font-size: 14px; font-weight: 800; line-height: 17px; color: #fff; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">{{ g.name }}</span>
+                <span style="display: block; height: 15px; font-size: 10.5px; font-weight: 600; line-height: 15px; color: #cdc0e4; white-space: nowrap; overflow: hidden;">{{ g.provider }}</span>
+              </span>
+              <span style="width: 34px; height: 34px; flex: none; border-radius: 50%; background: linear-gradient(180deg, #ffd766, #eb9c0d); color: #2c1400; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(224,140,5,.45); transition: transform .2s ease;" style-hover="transform: scale(1.08)">▶</span>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section style="padding: 0 clamp(16px, 2.4vw, 22px); display: flex; flex-direction: column; gap: clamp(16px, 2.4vw, 22px);">
+      <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+        <span style="width: 4px; height: clamp(24px, 5.6vw, 28px); border-radius: 999px; background: linear-gradient(180deg, #ffd766, #e07f05); box-shadow: 0 0 12px rgba(240,150,10,.5); flex: none;"></span>
+        <span style="font-size: clamp(22px, 5.6vw, 28px); font-weight: 800; letter-spacing: -.6px; color: #fff;">Game Providers</span>
+        <span style="flex: 1; min-width: 8px;"></span>
+        <a href="#" onClick="{{ viewAllProv }}" style="height: 44px; display: flex; align-items: center; padding: {{ viewAllPad }}; margin-right: {{ viewAllMr }}; border-radius: 12px; font-size: 14px; font-weight: 700; white-space: nowrap; color: #cbb6e6; text-decoration: none;" style-hover="color: #ffe08a; background: rgba(255,255,255,.05)">View all →</a>
+        <div style="display: {{ arrowDisplay }}; gap: 8px;">
+          <button onClick="{{ provPrev }}" aria-label="Previous Game Providers" style="width: 44px; height: 44px; flex: none; border: 1px solid rgba(167,139,250,.3); border-radius: 50%; background: rgba(255,255,255,.055); color: #ddd0f2; font-size: 20px; font-weight: 700; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: border-color .2s ease, color .2s ease, background .2s ease;" style-hover="border-color: rgba(255,201,60,.6); color: #ffc93c; background: rgba(255,201,60,.1)">‹</button>
+          <button onClick="{{ provNext }}" aria-label="Next Game Providers" style="width: 44px; height: 44px; flex: none; border: 1px solid rgba(167,139,250,.3); border-radius: 50%; background: rgba(255,255,255,.055); color: #ddd0f2; font-size: 20px; font-weight: 700; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: border-color .2s ease, color .2s ease, background .2s ease;" style-hover="border-color: rgba(255,201,60,.6); color: #ffc93c; background: rgba(255,201,60,.1)">›</button>
+        </div>
+      </div>
+
+      <div ref="{{ provRail }}" style="display: flex; gap: 14px; overflow-x: auto; overscroll-behavior-x: contain; scroll-behavior: smooth; scroll-snap-type: {{ railSnap }}; scroll-padding-inline: {{ railScrollPad }}; padding: {{ railPad }}; margin: {{ railMargin }}; scrollbar-width: none;">
+        <sc-for list="{{ providers }}" as="p" hint-placeholder-count="6">
+          <button onClick="{{ p.onClick }}" style="flex: 1 1 176px; min-width: 176px; scroll-snap-align: start; height: 108px; box-sizing: border-box; padding: 14px 18px; border-radius: 18px; cursor: pointer; font-family: Manrope, sans-serif; border: 1px solid {{ p.border }}; background: {{ p.bg }}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px; transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;" style-hover="transform: translateY(-2px); border-color: rgba(167,139,250,.42); box-shadow: 0 12px 26px rgba(0,0,0,.4)">
+            <span style="width: 30px; height: 30px; flex: none; border-radius: 9px; border: 1px solid rgba(167,139,250,.22); background: rgba(255,255,255,.05); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; letter-spacing: .4px; color: #b7a5d3;">{{ p.mark }}</span>
+            <span style="font-size: 14.5px; font-weight: 800; letter-spacing: -.2px; line-height: 1.15; white-space: nowrap; color: {{ p.color }};">{{ p.name }}</span>
+          </button>
+        </sc-for>
+      </div>
+    </section>
+
+    <section style="padding: 0 clamp(16px, 2.4vw, 22px); display: flex; flex-direction: column; gap: clamp(16px, 2.4vw, 22px);">
+      <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+        <span style="width: 4px; height: clamp(24px, 5.6vw, 28px); border-radius: 999px; background: linear-gradient(180deg, #ffd766, #e07f05); box-shadow: 0 0 12px rgba(240,150,10,.5); flex: none;"></span>
+        <span ref="{{ gridRef }}" style="font-size: clamp(22px, 5.6vw, 28px); font-weight: 800; letter-spacing: -.6px; color: #fff; scroll-margin-top: 96px;">All Games</span>
+        <span style="font-size: 13px; font-weight: 600; color: #a795c5;">{{ totalGames }} games</span>
+        <span style="flex: 1; min-width: 8px;"></span>
+        <button onClick="{{ cycleSort }}" style="height: 46px; display: flex; align-items: center; gap: 9px; padding: 0 18px; border-radius: 12px; border: 1px solid rgba(167,139,250,.2); background: rgba(255,255,255,.035); color: #c5b5de; font-family: Manrope, sans-serif; font-size: 13.5px; font-weight: 600; white-space: nowrap; cursor: pointer;" style-hover="border-color: rgba(167,139,250,.38); color: #fff; background: rgba(255,255,255,.06)">
+          Sort by: <span style="font-weight: 800; color: #fff;">{{ sort }}</span>
+          <span style="font-size: 10px; color: #9c88bb;">▾</span>
+        </button>
+      </div>
+
+      <sc-if value="{{ gridNotice }}" hint-placeholder-val="{{ false }}">
+        <div role="status" style="padding: 15px 18px; border: 1px solid rgba(167,139,250,.28); border-radius: 16px; background: rgba(167,139,250,.09); display: flex; flex-wrap: wrap; align-items: center; gap: 12px;">
+          <span style="flex: 1 1 260px; min-width: 0; font-size: 13px; font-weight: 600; line-height: 1.5; color: #e6ddf5; text-wrap: pretty;">{{ gridNotice }}</span>
+          <sc-if value="{{ hasFilters }}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{ clearFilters }}" style="min-height: 44px; padding: 0 16px; border: 1px solid rgba(167,139,250,.3); border-radius: 11px; background: rgba(255,255,255,.03); color: #fff; font-family: Manrope, sans-serif; font-size: 13px; font-weight: 700; cursor: pointer;" style-hover="background: rgba(255,255,255,.08)">Clear filters</button>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, {{ gridMin }}), 1fr)); gap: {{ gridGap }};">
+        <sc-for list="{{ allGames }}" as="g" hint-placeholder-count="12">
+          <div style="position: relative; height: 176px; border-radius: 18px; overflow: hidden; border: 1px solid rgba(167,139,250,.2); background: #180a2c; box-shadow: 0 12px 30px rgba(0,0,0,.45); cursor: pointer; transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;" onClick="{{ g.onOpen }}" style-hover="transform: translateY(-4px); border-color: rgba(255,201,60,.55); box-shadow: 0 20px 40px rgba(0,0,0,.55), 0 0 26px rgba(167,139,250,.22)">
+            <div style="position: absolute; inset: 0; background: {{ g.art }}; transition: transform .4s ease;" style-hover="transform: scale(1.05)"></div>
+            <span style="position: absolute; inset: 0; background: {{ g.texture }};"></span>
+            <span style="position: absolute; inset: auto 0 0 0; height: 104px; background: linear-gradient(180deg, transparent, rgba(11,4,20,.72) 46%, rgba(9,3,16,.96));"></span>
+            <span style="position: absolute; top: 0; left: 0; height: 26px; display: flex; align-items: center; padding: 0 11px; border-radius: 0 0 12px 0; font-size: 10.5px; font-weight: 800; letter-spacing: 1.2px; color: #fff; background: {{ g.badgeBg }}; box-shadow: 0 4px 14px rgba(0,0,0,.35); opacity: {{ g.badgeShown }};">{{ g.badge }}</span>
+            <button onClick="{{ g.onFav }}" aria-label="Toggle favourite" style-before="content: ''; position: absolute; inset: -6px;" style="position: absolute; top: 10px; right: 10px; width: 32px; height: 32px; border-radius: 50%; border: 1px solid {{ g.heartBorder }}; background: rgba(10,4,18,.55); cursor: pointer; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); transition: border-color .2s ease;" style-hover="border-color: rgba(255,93,125,.75)">{{ g.heart }}</button>
+            <div style="position: absolute; inset: auto 0 0 0; padding: 10px; display: flex; align-items: flex-end; gap: 6px;">
+              <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px;">
+                <span style="height: 51px; font-size: 14px; font-weight: 800; line-height: 17px; color: #fff; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">{{ g.name }}</span>
+                <span style="display: block; height: 15px; font-size: 10.5px; font-weight: 600; line-height: 15px; color: #cdc0e4; white-space: nowrap; overflow: hidden;">{{ g.provider }}</span>
+              </span>
+              <span style="width: 34px; height: 34px; flex: none; border-radius: 50%; background: linear-gradient(180deg, #ffd766, #eb9c0d); color: #2c1400; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(224,140,5,.45); transition: transform .2s ease;" style-hover="transform: scale(1.08)">▶</span>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+
+      <sc-if value="{{ canLoadMore }}" hint-placeholder-val="{{ true }}">
+        <div style="display: flex; justify-content: center; padding-top: 4px;">
+          <button onClick="{{ loadMore }}" style="height: 50px; padding: 0 30px; border-radius: 14px; border: 1px solid rgba(167,139,250,.32); background: linear-gradient(180deg, #23103f 0%, #190a2c 100%); color: #fff; font-family: Manrope, sans-serif; font-size: 14.5px; font-weight: 700; white-space: nowrap; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;" style-hover="border-color: rgba(167,139,250,.6); background: rgba(255,255,255,.06); box-shadow: 0 0 26px rgba(139,92,246,.22)">
+            Load More Games
+            <span style="font-size: 13px; color: #c4b5fd;">↓</span>
+          </button>
+        </div>
+      </sc-if>
+    </section>
+
+    <section style="margin: -16px clamp(16px, 2.4vw, 22px) 0; padding: {{ trustSecPad }}; border: 1px solid rgba(167,139,250,.16); border-radius: 18px; background: linear-gradient(180deg, rgba(255,255,255,.045) 0%, rgba(255,255,255,.02) 100%); display: flex; align-items: center; flex-wrap: wrap; gap: 16px;">
+      <div style="flex: 1 1 min(100%, 700px); min-width: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr)); gap: {{ trustGap }};">
+        <sc-for list="{{ trustItems }}" as="t" hint-placeholder-count="4">
+          <div style="display: flex; align-items: center; gap: 11px; min-width: 0; padding: {{ trustPad }}; border-left: 1px solid {{ t.divider }};">
+            <span style="width: 34px; height: 34px; flex: none; border-radius: 10px; background: rgba(167,139,250,.12); border: 1px solid rgba(255,201,60,.2); display: flex; align-items: center; justify-content: center;">{{ t.icon }}</span>
+            <span style="display: flex; flex-direction: column; gap: 3px; min-width: 0;">
+              <span style="font-size: 14px; font-weight: 700; white-space: nowrap; color: #fff;">{{ t.title }}</span>
+              <span style="font-size: 12px; font-weight: 500; line-height: 1.35; white-space: nowrap; color: #a795c5;">{{ t.sub }}</span>
+            </span>
+          </div>
+        </sc-for>
+      </div>
+      <span style="flex: {{ tagFlex }}; margin-left: {{ tagMl }}; display: flex; align-items: center; gap: 8px; font-family: Caveat, cursive; font-size: 20px; font-weight: 700; color: #e9a832; white-space: nowrap;">Tuloy ang Good Vibes <span style="font-size: 15px; color: #ff5d7d;">♥</span></span>
+    </section>
+
+    <dc-import name="ChoCho Footer" hint-size="100%,120px"></dc-import>
+
+    <dc-import name="ChoCho Bottom Nav" active="games" hint-size="1px,1px"></dc-import>
+  </div>
+
+  <dc-import name="ChoCho Support" hint-size="1px,1px"></dc-import>
+
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1024,&quot;height&quot;:1180}}">
+const CATEGORIES = ["All Games", "Slots", "Live Casino", "Blackjack", "Roulette", "Crash", "Table Games", "New"];
+const PROVIDERS = ["Pragmatic Play", "Evolution", "PG Soft", "Hacksaw Gaming", "Play’n GO", "Spribe"];
+
+class Component extends DCLogic {
+  componentDidMount() {
+    this._onVw = () => { const p = window.innerWidth < 600; if (p !== this.state.phone) this.setState({ phone: p }); };
+    window.addEventListener("resize", this._onVw);
+    this._onVw();
+    // Browse context lives in the URL (?category=, ?q=, ?provider=) so Back from a game restores it.
+    const u = new URLSearchParams(window.location.search);
+    const cat = u.get("category"), q = u.get("q"), prov = u.get("provider");
+    const next = {};
+    if (cat && CATEGORIES.indexOf(cat) > -1) next.category = cat;
+    if (q) next.query = q.slice(0, 60);
+    if (prov && PROVIDERS.indexOf(prov) > -1) next.provider = prov;
+    if (Object.keys(next).length) this.setState(next);
+  }
+
+  componentDidUpdate() {
+    const s = this.state;
+    const sig = s.category + "|" + s.query + "|" + s.provider;
+    if (this._urlSig === undefined) { this._urlSig = sig; return; }
+    if (sig !== this._urlSig) {
+      this._urlSig = sig;
+      const u = new URLSearchParams();
+      if (s.category !== "All Games") u.set("category", s.category);
+      if (s.query.trim()) u.set("q", s.query.trim());
+      if (s.provider) u.set("provider", s.provider);
+      const qs = u.toString();
+      try { history.replaceState(history.state, "", window.location.pathname + (qs ? "?" + qs : "")); } catch (e) {}
+    }
+  }
+
+  _grid = React.createRef();
+
+  toGrid() {
+    const el = this._grid.current;
+    if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 96, behavior: "smooth" });
+  }
+
+  componentWillUnmount() { window.removeEventListener("resize", this._onVw); }
+
+  state = {
+    phone: typeof window !== "undefined" && window.innerWidth < 600,
+    query: "",
+    category: "All Games",
+    favOnly: false,
+    provider: null,
+    sort: "Popularity",
+    shown: 12,
+    favs: {
+      "Gates of Olympus": true,
+      "Sweet Bonanza": true,
+      "Lightning Roulette": true,
+      "Mahjong Ways 2": true,
+      "Buffalo King": true
+    }
+  };
+
+  _fav = React.createRef();
+  _pop = React.createRef();
+  _prov = React.createRef();
+
+  gridArt(i) {
+    const p = [
+      ["radial-gradient(88% 68% at 50% 24%, #fde68a 0%, #ca8a04 28%, #713f12 58%, #1c1206 100%)", "radial-gradient(34% 26% at 50% 26%, rgba(255,255,255,.26), transparent 70%)"],
+      ["radial-gradient(88% 68% at 50% 24%, #e9d5ff 0%, #a855f7 26%, #6b21a8 56%, #240a3a 100%)", "radial-gradient(26% 20% at 34% 26%, rgba(255,255,255,.4), transparent 70%), radial-gradient(20% 15% at 70% 22%, rgba(255,255,255,.3), transparent 70%)"],
+      ["radial-gradient(88% 68% at 50% 26%, #bbf7d0 0%, #10b981 28%, #065f46 58%, #052018 100%)", "linear-gradient(200deg, rgba(255,255,255,.2), transparent 45%)"],
+      ["radial-gradient(88% 68% at 50% 24%, #fecdd3 0%, #f43f5e 26%, #9f1239 56%, #2a0713 100%)", "radial-gradient(30% 22% at 50% 26%, rgba(255,255,255,.3), transparent 70%)"],
+      ["radial-gradient(88% 68% at 50% 26%, #fed7aa 0%, #ea580c 28%, #7c2d12 58%, #22100a 100%)", "linear-gradient(115deg, rgba(255,255,255,.2) 0 10%, transparent 10% 100%)"],
+      ["radial-gradient(88% 68% at 50% 24%, #bfdbfe 0%, #3b82f6 26%, #1e3a8a 56%, #0b1030 100%)", "radial-gradient(24% 18% at 30% 28%, rgba(255,255,255,.38), transparent 70%)"]
+    ];
+    const a = p[i % p.length];
+    return { art: a[0], texture: a[1] };
+  }
+
+  step(ref, dir) {
+    const n = ref.current;
+    if (!n) return;
+    const card = n.firstElementChild;
+    const w = card ? card.getBoundingClientRect().width + 14 : 186;
+    n.scrollBy({ left: dir * w, behavior: "smooth" });
+  }
+
+  icon(d, color, size) {
+    return React.createElement("svg", {
+      width: size || 16, height: size || 16, viewBox: "0 0 24 24", fill: "none",
+      stroke: color, strokeWidth: 1.9, strokeLinecap: "round", strokeLinejoin: "round"
+    }, React.createElement("path", { d: d }));
+  }
+
+  card(g) {
+    const on = !!this.state.favs[g.name];
+    return {
+      name: g.name,
+      provider: g.provider,
+      art: g.art,
+      texture: g.texture,
+      hot: g.hot ? 1 : 0,
+      badge: "",
+      badgeShown: 0,
+      badgeBg: "linear-gradient(180deg,#ff4d6d,#d91e46)",
+      heartBorder: on ? "rgba(255,93,125,.65)" : "rgba(255,255,255,.24)",
+      heart: React.createElement("svg", {
+        width: 15, height: 15, viewBox: "0 0 24 24",
+        fill: on ? "#ff5d7d" : "none",
+        stroke: on ? "#ff5d7d" : "rgba(255,255,255,.85)",
+        strokeWidth: on ? 1.4 : 1.9, strokeLinecap: "round", strokeLinejoin: "round"
+      }, React.createElement("path", { d: "M12 20s-7-4.4-7-9.2A4 4 0 0112 8.6a4 4 0 017 2.2C19 15.6 12 20 12 20z" })),
+      onOpen: () => {
+        const site = window.ChoChoSite;
+        if (!site) return;
+        if (g.name === "Sweet Bonanza") site.openGame("sweet-bonanza");
+        else site.notice(g.name + " doesn\u2019t have a game page in this preview yet.");
+      },
+      onFav: e => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.setState(s => {
+          const next = Object.assign({}, s.favs);
+          if (next[g.name]) delete next[g.name]; else next[g.name] = true;
+          return { favs: next };
+        });
+      }
+    };
+  }
+
+  renderVals() {
+    const phone = this.state.phone;
+    // Phones: the decorative logo is hidden (header logo carries the brand); desktop is unchanged.
+    const mobileHero = {
+      pageGap: phone ? "28px" : "46px",
+      arrowDisplay: phone ? "none" : "flex",
+      viewAllPad: phone ? "0 8px" : "0 15px",
+      viewAllMr: phone ? "-8px" : "0",
+      railSnap: phone ? "x mandatory" : "x proximity",
+      railScrollPad: phone ? "16px" : "0px",
+      railPad: phone ? "6px 16px 14px" : "6px 2px 14px",
+      railMargin: phone ? "-6px -16px -14px" : "-6px -2px -14px",
+      chipPad: phone ? "4px 16px" : "4px 2px",
+      chipMargin: phone ? "-4px -16px" : "-4px -2px",
+      filterWrap: phone ? "nowrap" : "wrap",
+      filterOverflow: phone ? "auto" : "visible",
+      filterSpacer: phone ? "none" : "block",
+      favPressed: this.state.favOnly ? "true" : "false",
+      gridMin: phone ? "132px" : "142px",
+      gridGap: phone ? "12px" : "14px",
+      searchPad: phone ? "0 12px 0 42px" : "0 16px 0 46px",
+      searchIconL: phone ? "14px" : "16px",
+      searchFont: phone ? "16px" : "14.5px",
+      trustSecPad: phone ? "14px 16px" : "20px 24px",
+      trustGap: phone ? "8px" : "6px",
+      trustPad: phone ? "2px 0" : "6px 10px",
+      tagFlex: phone ? "1 1 100%" : "0 0 auto",
+      tagMl: phone ? "0" : "auto",
+      heroMargin: phone ? "0 16px" : "0 22px",
+      heroPad: phone ? "18px 16px" : "24px 26px",
+      titleSize: phone ? "28px" : "34px",
+      artDisplay: phone ? "none" : "block",
+      artFlex: phone ? "1 1 100%" : "0 1 186px",
+      artMl: phone ? "0" : "-8px",
+      artAlign: phone ? "flex-start" : "center",
+      listPad: phone ? "0 16px 6px" : "0 22px 6px",
+      listGap: phone ? "14px" : "18px"
+    };
+    const art = {
+      olympus: {
+        art: "radial-gradient(90% 70% at 50% 22%, #bae6fd 0%, #60a5fa 30%, #3730a3 62%, #150a33 100%)",
+        texture: "radial-gradient(40% 30% at 22% 18%, rgba(255,255,255,.35), transparent 70%), linear-gradient(200deg, rgba(255,255,255,.12), transparent 45%)"
+      },
+      bonanza: {
+        art: "radial-gradient(90% 70% at 50% 24%, #fce7f3 0%, #f472b6 28%, #db2777 58%, #3b0d47 100%)",
+        texture: "radial-gradient(24% 18% at 30% 30%, rgba(255,255,255,.5), transparent 70%), radial-gradient(20% 14% at 68% 20%, rgba(255,255,255,.35), transparent 70%)"
+      },
+      lightning: {
+        art: "radial-gradient(80% 62% at 50% 26%, #fef3c7 0%, #f59e0b 26%, #b91c1c 58%, #1a0a18 100%)",
+        texture: "conic-gradient(from 210deg at 50% 34%, rgba(0,0,0,.35) 0deg, transparent 40deg, rgba(0,0,0,.3) 80deg, transparent 120deg, rgba(0,0,0,.35) 180deg, transparent 220deg, rgba(0,0,0,.3) 280deg, transparent 320deg)"
+      },
+      mahjong: {
+        art: "radial-gradient(85% 66% at 50% 26%, #d9f99d 0%, #22c55e 26%, #15803d 56%, #0b2418 100%)",
+        texture: "linear-gradient(115deg, rgba(255,255,255,.28) 0 12%, transparent 12% 26%, rgba(255,255,255,.22) 26% 38%, transparent 38% 100%)"
+      },
+      buffalo: {
+        art: "radial-gradient(88% 68% at 50% 26%, #fed7aa 0%, #fb923c 26%, #b45309 56%, #2b1008 100%)",
+        texture: "radial-gradient(46% 34% at 50% 26%, rgba(255,255,255,.28), transparent 70%), linear-gradient(190deg, transparent 40%, rgba(0,0,0,.25))"
+      },
+      sugar: {
+        art: "radial-gradient(88% 68% at 50% 24%, #fee2f5 0%, #f472b6 26%, #a21caf 58%, #2c0a38 100%)",
+        texture: "radial-gradient(22% 16% at 26% 26%, rgba(255,255,255,.45), transparent 70%), radial-gradient(18% 13% at 72% 22%, rgba(255,255,255,.4), transparent 70%)"
+      },
+      wanted: {
+        art: "radial-gradient(85% 66% at 50% 26%, #fde68a 0%, #d97706 28%, #7c2d12 58%, #1a0b0b 100%)",
+        texture: "linear-gradient(180deg, rgba(0,0,0,.18), transparent 40%), radial-gradient(30% 22% at 70% 30%, rgba(255,255,255,.22), transparent 70%)"
+      },
+      crazy: {
+        art: "conic-gradient(from 0deg at 50% 32%, #7c3aed 0deg 45deg, #f59e0b 45deg 90deg, #2563eb 90deg 135deg, #ec4899 135deg 180deg, #7c3aed 180deg 225deg, #f59e0b 225deg 270deg, #2563eb 270deg 315deg, #ec4899 315deg 360deg)",
+        texture: "radial-gradient(70% 60% at 50% 34%, transparent 30%, rgba(9,3,16,.65) 78%)"
+      },
+      tiger: {
+        art: "radial-gradient(88% 68% at 50% 26%, #fef08a 0%, #f97316 28%, #b91c1c 58%, #2a0a10 100%)",
+        texture: "radial-gradient(40% 30% at 50% 28%, rgba(255,255,255,.3), transparent 70%), linear-gradient(200deg, rgba(255,255,255,.12), transparent 45%)"
+      },
+      aviator: {
+        art: "radial-gradient(90% 70% at 50% 24%, #fecaca 0%, #ef4444 26%, #7f1d1d 56%, #140812 100%)",
+        texture: "linear-gradient(60deg, transparent 45%, rgba(255,255,255,.28) 48%, transparent 52%), radial-gradient(30% 22% at 30% 26%, rgba(255,255,255,.22), transparent 70%)"
+      }
+    };
+
+    const q = this.state.query.trim().toLowerCase();
+    const match = g => !q || (g.name + " " + g.provider).toLowerCase().indexOf(q) > -1;
+    const favList = [
+      Object.assign({ name: "Gates of Olympus", provider: "Pragmatic Play" }, art.olympus),
+      Object.assign({ name: "Sweet Bonanza", provider: "Pragmatic Play" }, art.bonanza),
+      Object.assign({ name: "Lightning Roulette", provider: "Evolution" }, art.lightning),
+      Object.assign({ name: "Mahjong Ways 2", provider: "PG Soft" }, art.mahjong),
+      Object.assign({ name: "Buffalo King", provider: "Pragmatic Play" }, art.buffalo)
+    ].filter(g => this.state.favs[g.name]).filter(match);
+
+    const popList = [
+      Object.assign({ name: "Sugar Rush 1000", provider: "Pragmatic Play", hot: true }, art.sugar),
+      Object.assign({ name: "Wanted Dead or a Wild", provider: "Hacksaw Gaming", hot: true }, art.wanted),
+      Object.assign({ name: "Crazy Time", provider: "Evolution" }, art.crazy),
+      Object.assign({ name: "Fortune Tiger", provider: "PG Soft" }, art.tiger),
+      Object.assign({ name: "Aviator", provider: "Spribe" }, art.aviator)
+    ].filter(match);
+
+    const catalog = [
+      { name: "Book of Fallen", provider: "Pragmatic Play", badge: "HOT" },
+      { name: "Starlight Princess", provider: "Pragmatic Play" },
+      { name: "Big Bass Bonanza", provider: "Pragmatic Play", badge: "HOT" },
+      { name: "Money Coming", provider: "JILI" },
+      { name: "Wild West Gold", provider: "Pragmatic Play" },
+      { name: "Fruit Party", provider: "Pragmatic Play" },
+      { name: "Gates of Olympus 1000", provider: "Pragmatic Play", badge: "NEW" },
+      { name: "Fortune Ox", provider: "PG Soft" },
+      { name: "Lucky Neko", provider: "PG Soft" },
+      { name: "Le Bandit", provider: "Hacksaw Gaming", badge: "NEW" },
+      { name: "Reactoonz", provider: "Play’n GO" },
+      { name: "Book of Dead", provider: "Play’n GO" },
+      { name: "Sweet Bonanza 1000", provider: "Pragmatic Play", badge: "NEW" },
+      { name: "Monopoly Live", provider: "Evolution" },
+      { name: "Lightning Dice", provider: "Evolution" },
+      { name: "Hand of Anubis", provider: "Hacksaw Gaming" },
+      { name: "Wild Bandito", provider: "PG Soft" },
+      { name: "Super Ace", provider: "JILI", badge: "HOT" },
+      { name: "Rise of Olympus", provider: "Play’n GO" },
+      { name: "Chicken Drop", provider: "Pragmatic Play" },
+      { name: "Dragon Hatch", provider: "PG Soft" },
+      { name: "Wanted Dead or a Wild", provider: "Hacksaw Gaming" },
+      { name: "Boat Bonanza", provider: "Play’n GO" },
+      { name: "Golden Empire", provider: "JILI" }
+    ];
+
+    // Only what the catalogue data supports: name/provider search, provider,
+    // favourites, the NEW badge and the sort orders. Other categories have no
+    // type data yet, so they are shown honestly instead of pretending to filter.
+    const st = this.state;
+    const catNote = st.category !== "All Games" && st.category !== "New";
+    let grid = catalog.filter(match);
+    if (st.category === "New") grid = grid.filter(x => x.badge === "NEW");
+    if (st.provider) grid = grid.filter(x => x.provider === st.provider);
+    if (st.favOnly) grid = grid.filter(x => st.favs[x.name]);
+    if (st.sort === "A–Z") grid = grid.slice().sort((a, b) => a.name.localeCompare(b.name));
+    else if (st.sort === "Provider") grid = grid.slice().sort((a, b) => a.provider.localeCompare(b.provider) || a.name.localeCompare(b.name));
+    else if (st.sort === "Newest") grid = grid.slice().sort((a, b) => (b.badge === "NEW") - (a.badge === "NEW"));
+    const filtered = !!(q || st.provider || st.favOnly || st.category !== "All Games");
+    const gridNotice = catNote
+      ? "\u201C" + st.category + "\u201D results aren\u2019t connected in this preview yet, so all matching games are shown."
+      : (grid.length === 0 ? (st.favOnly ? "None of the games below are in your favourites yet." : "No games match your search.") : "");
+
+    const cats = [
+      { label: "All Games", d: "M4 5h6v6H4zM14 5h6v6h-6zM4 13h6v6H4zM14 13h6v6h-6z" },
+      { label: "Slots", d: "M5 4h14v16H5zM9 8v8M15 8v8" },
+      { label: "Live Casino", d: "M4 6h12v9H4zM20 8v9M8 19h8" },
+      { label: "Blackjack", d: "M7 5h7l4 5-7 9-4-5z" },
+      { label: "Roulette", d: "M12 3a9 9 0 100 18 9 9 0 000-18zm0 6a3 3 0 100 6 3 3 0 000-6z" },
+      { label: "Crash", d: "M4 19l6-6 3 3 7-9" },
+      { label: "Table Games", d: "M4 8h16l-2 9H6zM9 8V5h6v3" },
+      { label: "New", d: "M12 4l2.2 4.6 5 .7-3.6 3.5.8 5-4.4-2.3-4.4 2.3.8-5L4.8 9.3l5-.7z" }
+    ].map(c => {
+      const on = this.state.category === c.label;
+      return {
+        label: c.label,
+        icon: this.icon(c.d, on ? "#2c1400" : "#c4b5fd"),
+        bg: on ? "linear-gradient(180deg,#ffd766,#eb9c0d)" : "rgba(255,255,255,.03)",
+        border: on ? "rgba(255,201,60,.6)" : "rgba(167,139,250,.2)",
+        color: on ? "#2c1400" : "#e9e0f5",
+        glow: on ? "0 8px 22px rgba(235,156,13,.32)" : "none",
+        onClick: () => this.setState({ category: c.label })
+      };
+    });
+
+    return {
+      ...mobileHero,
+      query: this.state.query,
+      onQuery: e => this.setState({ query: e.target.value }),
+      categories: cats,
+      filters: [
+        { label: "Providers", onClick: () => { const r = this._prov.current; if (r) window.scrollTo({ top: r.getBoundingClientRect().top + window.scrollY - 150, behavior: "smooth" }); } },
+        { label: "Game Type", onClick: () => { if (window.ChoChoSite) window.ChoChoSite.unavailable("Filtering by game type"); } },
+        { label: "Popularity", onClick: () => { this.setState({ sort: "Popularity" }); this.toGrid(); } },
+        { label: "Newest", onClick: () => { this.setState({ sort: "Newest" }); this.toGrid(); } }
+      ],
+      gridRef: this._grid,
+      viewAllFav: (e) => { e.preventDefault(); this.setState({ favOnly: true }); this.toGrid(); },
+      viewAllPop: (e) => { e.preventDefault(); this.setState({ sort: "Popularity", favOnly: false }); this.toGrid(); },
+      viewAllProv: (e) => { e.preventDefault(); if (window.ChoChoSite) window.ChoChoSite.unavailable("The full provider list"); },
+      favBtn: this.state.favOnly
+        ? { bg: "rgba(255,93,125,.16)", border: "rgba(255,93,125,.5)", color: "#ff8da3" }
+        : { bg: "rgba(255,255,255,.025)", border: "rgba(167,139,250,.16)", color: "#b7a5d3" },
+      toggleFavOnly: () => this.setState(s => ({ favOnly: !s.favOnly })),
+      favRail: this._fav,
+      favPrev: () => this.step(this._fav, -1),
+      favNext: () => this.step(this._fav, 1),
+      hasFavourites: favList.length > 0,
+      noFavourites: favList.length === 0,
+      favGames: favList.map(g => this.card(g)),
+      popRail: this._pop,
+      popPrev: () => this.step(this._pop, -1),
+      popNext: () => this.step(this._pop, 1),
+      popGames: popList.map(g => this.card(g)),
+
+      provRail: this._prov,
+      provPrev: () => this.step(this._prov, -1),
+      provNext: () => this.step(this._prov, 1),
+      providers: [
+        { name: "Pragmatic Play", count: 412 },
+        { name: "Evolution", count: 186 },
+        { name: "PG Soft", count: 148 },
+        { name: "Hacksaw Gaming", count: 96 },
+        { name: "Play’n GO", count: 231 },
+        { name: "Spribe", count: 12 }
+      ].map(p => {
+        const on = this.state.provider === p.name;
+        return {
+          name: p.name,
+          count: p.count.toLocaleString(),
+          mark: p.name.replace(/[^A-Za-z ]/g, "").split(" ").filter(Boolean).slice(0, 2).map(w => w[0].toUpperCase()).join(""),
+          bg: on ? "linear-gradient(180deg, #2b1350 0%, #1c0b33 100%)" : "linear-gradient(180deg, #23103f 0%, #180a2c 100%)",
+          border: on ? "rgba(255,201,60,.42)" : "rgba(167,139,250,.2)",
+          color: on ? "#ffe08a" : "#e9e0f5",
+          subColor: on ? "#d6bd8e" : "#a795c5",
+          onClick: () => this.setState(s => ({ provider: s.provider === p.name ? null : p.name }))
+        };
+      }),
+
+      totalGames: filtered || catNote ? grid.length.toLocaleString() + " matching" : "1,248",
+      sort: this.state.sort,
+      cycleSort: () => {
+        const order = ["Popularity", "Newest", "A–Z", "Provider"];
+        this.setState(s => ({ sort: order[(order.indexOf(s.sort) + 1) % order.length] }));
+      },
+      gridNotice: gridNotice,
+      hasFilters: filtered,
+      clearFilters: () => this.setState({ query: "", category: "All Games", provider: null, favOnly: false }),
+      allGames: grid.slice(0, this.state.shown).map((g, i) => {
+        const c = this.card(Object.assign({}, g, this.gridArt(i)));
+        c.badge = g.badge || "";
+        c.badgeShown = g.badge ? 1 : 0;
+        c.badgeBg = g.badge === "NEW"
+          ? "linear-gradient(180deg,#a78bfa,#7c3aed)"
+          : "linear-gradient(180deg,#ff4d6d,#d91e46)";
+        return c;
+      }),
+      canLoadMore: this.state.shown < grid.length,
+      loadMore: () => this.setState(s => ({ shown: Math.min(s.shown + 12, grid.length) })),
+
+      trustItems: [
+        { title: "Secure Payments", sub: "Local payment options", d: "M12 3l7 3v6c0 4.2-2.9 7.6-7 9-4.1-1.4-7-4.8-7-9V6l7-3z" },
+        { title: "Fast Withdrawals", sub: "Quick cashout", d: "M13 3L5 13.5h5L9.5 21 18 10h-5l1-7z" },
+        { title: "Play Anywhere", sub: "Mobile, tablet & desktop", d: "M3 5h12v10H3zM17 9h4v11h-4zM7 19h6" },
+        { title: "24/7 Support", sub: "Always here to help", d: "M4 13v-1a8 8 0 0116 0v1m-16 0v3a2 2 0 002 2h1v-6H6a2 2 0 00-2 2zm16 0v3a2 2 0 01-2 2h-1v-6h1a2 2 0 012 2z" }
+      ].map((t, i) => ({
+        title: t.title,
+        sub: t.sub,
+        divider: (i === 0 || phone) ? "transparent" : "rgba(167,139,250,.14)",
+        icon: this.icon(t.d, "#ffc93c", 18)
+      })),
+
+
+};
+  }
+}
+</script>
+</body>
+</html>

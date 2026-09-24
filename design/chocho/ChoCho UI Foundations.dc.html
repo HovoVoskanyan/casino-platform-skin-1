@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Caveat:wght@700&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; }
+  @keyframes chochoWave { 0%,60%,100% { transform: rotate(0deg); } 70% { transform: rotate(-13deg); } 80% { transform: rotate(11deg); } 90% { transform: rotate(-7deg); } }
+</style>
+</helmet>
+<div style="min-height: 100vh; background: radial-gradient(1100px 640px at 50% -8%, #3a0269 0%, #250143 42%, #130124 100%); font-family: Manrope, sans-serif; color: #fff; display: flex; justify-content: center;">
+  <div style="width: 100%; max-width: 1024px; display: flex; flex-direction: column; gap: 40px; padding: 40px 22px 80px; box-sizing: border-box;">
+
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      <span style="font-size: 12px; font-weight: 800; letter-spacing: 2px; color: #ffc93c;">CHOCHO · SHARED UI</span>
+      <span style="font-size: 38px; font-weight: 800; letter-spacing: -1px; line-height: 1.05; color: #fff;">Foundations</span>
+      <span style="font-size: 14.5px; font-weight: 500; line-height: 1.55; max-width: 680px; color: #b7a5d3; text-wrap: pretty;">Every repeated element from Home and Games, with its exact values. Build new pages from this list — don't re-derive spacing or colour by eye.</span>
+    </div>
+
+    <section style="display: flex; flex-direction: column; gap: 16px;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="width: 4px; height: 26px; border-radius: 999px; background: linear-gradient(180deg, #ffd766, #e07f05); box-shadow: 0 0 12px rgba(240,150,10,.5); flex: none;"></span>
+        <span style="font-size: 24px; font-weight: 800; letter-spacing: -.5px; color: #fff;">Colour</span>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px;">
+        <sc-for list="{{ swatches }}" as="s" hint-placeholder-count="8">
+          <div style="border: 1px solid rgba(167,139,250,.16); border-radius: 14px; overflow: hidden; background: rgba(255,255,255,.03);">
+            <div style="height: 62px; background: {{ s.value }};"></div>
+            <div style="padding: 10px 12px; display: flex; flex-direction: column; gap: 3px;">
+              <span style="font-size: 13px; font-weight: 700; color: #fff;">{{ s.name }}</span>
+              <span style="font-size: 11px; font-weight: 500; line-height: 1.4; color: #a795c5;">{{ s.value }}</span>
+              <span style="font-size: 11px; font-weight: 600; color: #8f7aae;">{{ s.use }}</span>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="padding: 14px 16px; border: 1px solid rgba(167,139,250,.16); border-radius: 14px; background: rgba(255,255,255,.03); font-size: 13px; font-weight: 500; line-height: 1.6; color: #cbb6e6;">Page canvas is one value on every page: <span style="font-weight: 800; color: #fff;">radial-gradient(1100px 640px at 50% -8%, #3a0269 0%, #250143 42%, #130124 100%)</span> on a <span style="font-weight: 700; color: #fff;">min-height: 100vh</span> flex-centre wrapper, content capped at <span style="font-weight: 700; color: #fff;">1024px</span>.</div>
+    </section>
+
+    <section style="display: flex; flex-direction: column; gap: 16px;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="width: 4px; height: 26px; border-radius: 999px; background: linear-gradient(180deg, #ffd766, #e07f05); box-shadow: 0 0 12px rgba(240,150,10,.5); flex: none;"></span>
+        <span style="font-size: 24px; font-weight: 800; letter-spacing: -.5px; color: #fff;">Typography</span>
+      </div>
+      <div style="border: 1px solid rgba(167,139,250,.16); border-radius: 16px; background: rgba(255,255,255,.03); overflow: hidden;">
+        <sc-for list="{{ typeScale }}" as="t" hint-placeholder-count="7">
+          <div style="display: flex; align-items: baseline; gap: 18px; flex-wrap: wrap; padding: 14px 18px; border-top: 1px solid {{ t.divider }};">
+            <span style="flex: 1 1 240px; min-width: 0; font-size: {{ t.size }}; font-weight: {{ t.weight }}; letter-spacing: {{ t.tracking }}; font-family: {{ t.family }}; color: {{ t.color }};">{{ t.sample }}</span>
+            <span style="flex: 0 0 auto; font-size: 12.5px; font-weight: 700; color: #cbb6e6;">{{ t.spec }}</span>
+            <span style="flex: 0 0 190px; font-size: 12px; font-weight: 500; color: #8f7aae;">{{ t.use }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section style="display: flex; flex-direction: column; gap: 16px;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="width: 4px; height: 26px; border-radius: 999px; background: linear-gradient(180deg, #ffd766, #e07f05); box-shadow: 0 0 12px rgba(240,150,10,.5); flex: none;"></span>
+        <span style="font-size: 24px; font-weight: 800; letter-spacing: -.5px; color: #fff;">Geometry &amp; rhythm</span>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px;">
+        <sc-for list="{{ metrics }}" as="m" hint-placeholder-count="8">
+          <div style="padding: 14px 16px; border: 1px solid rgba(167,139,250,.16); border-radius: 14px; background: rgba(255,255,255,.03); display: flex; flex-direction: column; gap: 5px;">
+            <span style="font-size: 12px; font-weight: 700; letter-spacing: .6px; color: #a795c5;">{{ m.label }}</span>
+            <span style="font-size: 19px; font-weight: 800; letter-spacing: -.3px; color: #ffc93c;">{{ m.value }}</span>
+            <span style="font-size: 12px; font-weight: 500; line-height: 1.45; color: #b7a5d3; text-wrap: pretty;">{{ m.note }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section style="display: flex; flex-direction: column; gap: 16px;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="width: 4px; height: 26px; border-radius: 999px; background: linear-gradient(180deg, #ffd766, #e07f05); box-shadow: 0 0 12px rgba(240,150,10,.5); flex: none;"></span>
+        <span style="font-size: 24px; font-weight: 800; letter-spacing: -.5px; color: #fff;">Header</span>
+        <span style="font-size: 12.5px; font-weight: 600; color: #8f7aae;">sticky · min-height 76px</span>
+      </div>
+      <div style="margin: 0 -23px; border-top: 1px solid rgba(167,139,250,.16); border-bottom: 1px solid rgba(167,139,250,.16); overflow: hidden;">
+        <div style="background: linear-gradient(180deg, rgba(29,12,53,.96) 0%, rgba(15,6,27,.96) 100%); border-bottom: 1px solid rgba(167,139,250,.16); min-height: 76px; box-sizing: border-box; padding: 12px 22px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+          <img src="assets/chocho-logo-cut.png" alt="ChoCho" style="flex: none; height: 68px; width: 96px; object-fit: contain; display: block; filter: drop-shadow(0 4px 12px rgba(0,0,0,.5)); transform: scale(1.28); transform-origin: left center; margin-right: 12px;">
+          <nav style="display: flex; align-items: center; gap: 2px; margin-left: 6px; min-width: 0;">
+            <sc-for list="{{ navLinks }}" as="l" hint-placeholder-count="4">
+              <a href="#" style="position: relative; height: 40px; display: flex; align-items: center; padding: 0 14px; border-radius: 10px; font-size: 15px; font-weight: 600; white-space: nowrap; text-decoration: none; color: {{ l.color }};" style-hover="color: #fff; background: rgba(255,255,255,.05)">
+                {{ l.label }}
+                <span style="position: absolute; left: 14px; right: 14px; bottom: 3px; height: 2.5px; border-radius: 999px; background: #f0a30a; box-shadow: 0 0 10px rgba(240,163,10,.7); opacity: {{ l.underline }};"></span>
+              </a>
+            </sc-for>
+          </nav>
+          <div style="flex: 1; min-width: 8px;"></div>
+          <a href="#" style="flex: none; box-sizing: border-box; display: flex; align-items: center; justify-content: center; gap: 7px; height: 40px; min-width: 108px; padding: 0 16px; border: 1px solid rgba(167,139,250,.26); border-radius: 10px; background: rgba(255,255,255,.02); color: #e9e0f5; font-size: 14px; font-weight: 600; white-space: nowrap; text-decoration: none;" style-hover="background: rgba(167,139,250,.12)">
+            <img src="assets/aviator-logo.webp" alt="" style="width: 18px; height: 18px; flex: none; object-fit: contain; display: block;">Aviator
+          </a>
+          <button style="flex: none; box-sizing: border-box; display: flex; align-items: center; justify-content: center; height: 40px; min-width: 108px; padding: 0 16px; border: 1px solid rgba(167,139,250,.26); border-radius: 10px; background: rgba(255,255,255,.02); color: #e9e0f5; font-family: Manrope, sans-serif; font-size: 14px; font-weight: 600; white-space: nowrap; cursor: pointer;" style-hover="background: rgba(167,139,250,.12)">Sign in</button>
+          <button style="height: 40px; padding: 0 24px; flex: none; border: 0; border-radius: 10px; background: linear-gradient(180deg, #ffd766, #eb9c0d); color: #2c1400; font-family: Manrope, sans-serif; font-size: 14.5px; font-weight: 800; white-space: nowrap; cursor: pointer; box-shadow: 0 8px 22px rgba(235,156,13,.34);" style-hover="filter: brightness(1.06)">DEPOSIT</button>
+          <button style="width: 40px; height: 40px; flex: none; border: 1px solid rgba(167,139,250,.22); border-radius: 10px; background: rgba(255,255,255,.04); color: #cbb6e6; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center;" style-hover="background: rgba(255,255,255,.08); color: #ffc93c">☰</button>
+        </div>
+        <div style="padding: 12px 22px; background: rgba(255,255,255,.02); font-size: 12.5px; font-weight: 500; line-height: 1.6; color: #a795c5;">Logo 96×68 scaled 1.28 from left, margin-right 12px · nav margin-left 6px, gap 2px, 40px links, active = white + gold underline · secondary buttons min-width 108px · one gold CTA only (page-dependent label) · burger 40×40. Nav set: Games | Promotions | VIP | Help.</div>
+      </div>
+    </section>
+
+    <section style="display: flex; flex-direction: column; gap: 16px;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="width: 4px; height: 26px; border-radius: 999px; background: linear-gradient(180deg, #ffd766, #e07f05); box-shadow: 0 0 12px rgba(240,150,10,.5); flex: none;"></span>
+        <span style="font-size: 24px; font-weight: 800; letter-spacing: -.5px; color: #fff;">Section heading &amp; controls</span>
+      </div>
+      <div style="padding: 18px; border: 1px solid rgba(167,139,250,.16); border-radius: 18px; background: rgba(255,255,255,.03); display: flex; flex-direction: column; gap: 14px;">
+        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+          <span style="width: 4px; height: 28px; border-radius: 999px; background: linear-gradient(180deg, #ffd766, #e07f05); box-shadow: 0 0 12px rgba(240,150,10,.5); flex: none;"></span>
+          <span style="font-size: 28px; font-weight: 800; letter-spacing: -.6px; color: #fff;">Section title</span>
+          <span style="flex: 1; min-width: 8px;"></span>
+          <a href="#" style="height: 44px; display: flex; align-items: center; padding: 0 15px; border-radius: 12px; font-size: 14px; font-weight: 700; white-space: nowrap; text-decoration: none; color: #cbb6e6;" style-hover="color: #ffe08a; background: rgba(255,255,255,.05)">View all →</a>
+          <div style="display: flex; gap: 8px;">
+            <button style="width: 44px; height: 44px; flex: none; border: 1px solid rgba(167,139,250,.3); border-radius: 50%; background: rgba(255,255,255,.055); color: #ddd0f2; font-size: 20px; font-weight: 700; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center;" style-hover="border-color: rgba(255,201,60,.6); color: #ffc93c; background: rgba(255,201,60,.1)">‹</button>
+            <button style="width: 44px; height: 44px; flex: none; border: 1px solid rgba(167,139,250,.3); border-radius: 50%; background: rgba(255,255,255,.055); color: #ddd0f2; font-size: 20px; font-weight: 700; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center;" style-hover="border-color: rgba(255,201,60,.6); color: #ffc93c; background: rgba(255,201,60,.1)">›</button>
+          </div>
+        </div>
+        <span style="font-size: 12.5px; font-weight: 500; line-height: 1.6; color: #a795c5;">4×28px gold bar + 28/800/-0.6px title, optional grey count, spacer, View all, arrow pair. Rail below at gap 14px, section inner gap 22px.</span>
+      </div>
+    </section>
+
+    <section style="display: flex; flex-direction: column; gap: 16px;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="width: 4px; height: 26px; border-radius: 999px; background: linear-gradient(180deg, #ffd766, #e07f05); box-shadow: 0 0 12px rgba(240,150,10,.5); flex: none;"></span>
+        <span style="font-size: 24px; font-weight: 800; letter-spacing: -.5px; color: #fff;">Buttons</span>
+      </div>
+      <div style="padding: 18px; border: 1px solid rgba(167,139,250,.16); border-radius: 18px; background: rgba(255,255,255,.03); display: flex; align-items: flex-start; gap: 14px; flex-wrap: wrap;">
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <button style="height: 40px; padding: 0 24px; border: 0; border-radius: 10px; background: linear-gradient(180deg, #ffd766, #eb9c0d); color: #2c1400; font-family: Manrope, sans-serif; font-size: 14.5px; font-weight: 800; cursor: pointer; box-shadow: 0 8px 22px rgba(235,156,13,.34);" style-hover="filter: brightness(1.06)">Primary</button>
+          <span style="font-size: 11.5px; font-weight: 500; color: #8f7aae;">gold · one per view</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <button style="height: 40px; min-width: 108px; padding: 0 16px; border: 1px solid rgba(167,139,250,.26); border-radius: 10px; background: rgba(255,255,255,.02); color: #e9e0f5; font-family: Manrope, sans-serif; font-size: 14px; font-weight: 600; cursor: pointer;" style-hover="background: rgba(167,139,250,.12)">Secondary</button>
+          <span style="font-size: 11.5px; font-weight: 500; color: #8f7aae;">header actions</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <button style="height: 50px; padding: 0 30px; border-radius: 14px; border: 1px solid rgba(167,139,250,.32); background: linear-gradient(180deg, #23103f 0%, #190a2c 100%); color: #fff; font-family: Manrope, sans-serif; font-size: 14.5px; font-weight: 700; white-space: nowrap; cursor: pointer; display: flex; align-items: center; gap: 10px;" style-hover="border-color: rgba(167,139,250,.6); box-shadow: 0 0 26px rgba(139,92,246,.22)">Load More Games <span style="font-size: 13px; color: #c4b5fd;">↓</span></button>
+          <span style="font-size: 11.5px; font-weight: 500; color: #8f7aae;">in-page load · never gold</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <button style="height: 46px; display: flex; align-items: center; gap: 9px; padding: 0 18px; border-radius: 12px; border: 1px solid rgba(167,139,250,.2); background: rgba(255,255,255,.035); color: #c5b5de; font-family: Manrope, sans-serif; font-size: 13.5px; font-weight: 600; cursor: pointer;" style-hover="border-color: rgba(167,139,250,.38); color: #fff; background: rgba(255,255,255,.06)">Filter <span style="font-size: 10px; color: #9c88bb;">▾</span></button>
+          <span style="font-size: 11.5px; font-weight: 500; color: #8f7aae;">filter / sort · 46px</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <button style="height: 42px; display: flex; align-items: center; gap: 8px; padding: 0 16px; border-radius: 12px; border: 1px solid rgba(255,201,60,.6); background: linear-gradient(180deg,#ffd766,#eb9c0d); color: #2c1400; font-family: Manrope, sans-serif; font-size: 13.5px; font-weight: 700; cursor: pointer; box-shadow: 0 8px 22px rgba(235,156,13,.32);">Category · on</button>
+          <span style="font-size: 11.5px; font-weight: 500; color: #8f7aae;">pill 42px · selected</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <button style="height: 42px; display: flex; align-items: center; gap: 8px; padding: 0 16px; border-radius: 12px; border: 1px solid rgba(167,139,250,.2); background: rgba(255,255,255,.03); color: #e9e0f5; font-family: Manrope, sans-serif; font-size: 13.5px; font-weight: 700; cursor: pointer;">Category · off</button>
+          <span style="font-size: 11.5px; font-weight: 500; color: #8f7aae;">pill 42px · rest</span>
+        </div>
+      </div>
+    </section>
+
+    <section style="display: flex; flex-direction: column; gap: 16px;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="width: 4px; height: 26px; border-radius: 999px; background: linear-gradient(180deg, #ffd766, #e07f05); box-shadow: 0 0 12px rgba(240,150,10,.5); flex: none;"></span>
+        <span style="font-size: 24px; font-weight: 800; letter-spacing: -.5px; color: #fff;">Trust strip</span>
+      </div>
+      <section style="padding: 20px 24px; border: 1px solid rgba(167,139,250,.16); border-radius: 18px; background: linear-gradient(180deg, rgba(255,255,255,.045) 0%, rgba(255,255,255,.02) 100%); display: flex; align-items: center; flex-wrap: wrap; gap: 16px;">
+        <div style="flex: 1 1 700px; min-width: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 6px;">
+          <sc-for list="{{ trustItems }}" as="t" hint-placeholder-count="4">
+            <div style="display: flex; align-items: center; gap: 11px; min-width: 0; padding: 6px 10px; border-left: 1px solid {{ t.divider }};">
+              <span style="width: 34px; height: 34px; flex: none; border-radius: 10px; background: rgba(167,139,250,.12); border: 1px solid rgba(255,201,60,.2); display: flex; align-items: center; justify-content: center;">{{ t.icon }}</span>
+              <span style="display: flex; flex-direction: column; gap: 3px; min-width: 0;">
+                <span style="font-size: 14px; font-weight: 700; white-space: nowrap; color: #fff;">{{ t.title }}</span>
+                <span style="font-size: 12px; font-weight: 500; line-height: 1.35; white-space: nowrap; color: #a795c5;">{{ t.sub }}</span>
+              </span>
+            </div>
+          </sc-for>
+        </div>
+        <span style="flex: 0 0 auto; margin-left: auto; display: flex; align-items: center; gap: 8px; font-family: Caveat, cursive; font-size: 20px; font-weight: 700; color: #e9a832; white-space: nowrap;">Tuloy ang Good Vibes <span style="font-size: 15px; color: #ff5d7d;">♥</span></span>
+      </section>
+    </section>
+
+    <section style="display: flex; flex-direction: column; gap: 16px;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="width: 4px; height: 26px; border-radius: 999px; background: linear-gradient(180deg, #ffd766, #e07f05); box-shadow: 0 0 12px rgba(240,150,10,.5); flex: none;"></span>
+        <span style="font-size: 24px; font-weight: 800; letter-spacing: -.5px; color: #fff;">Footer</span>
+      </div>
+      <footer style="padding: 20px 4px 4px; border-top: 1px solid rgba(167,139,250,.14); display: flex; align-items: center; flex-wrap: wrap; gap: 18px;">
+        <span style="width: 40px; height: 40px; flex: none; border-radius: 50%; border: 1px solid rgba(167,139,250,.28); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; color: #cbb6e6;">18+</span>
+        <span style="display: flex; flex-direction: column; gap: 3px;">
+          <span style="font-size: 13.5px; font-weight: 700; color: #e6ddf5;">Play Responsibly</span>
+          <span style="font-size: 12px; font-weight: 500; color: #8f7aae;">Gaming should be fun.</span>
+        </span>
+        <span style="flex: 1; min-width: 8px;"></span>
+        <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 6px 22px;">
+          <sc-for list="{{ footerLinks }}" as="f" hint-placeholder-count="5">
+            <a href="#" style="height: 32px; display: flex; align-items: center; font-size: 14px; font-weight: 600; letter-spacing: .1px; text-decoration: none; color: #b7a5d3;" style-hover="color: #fff">{{ f }}</a>
+          </sc-for>
+        </div>
+        <span style="display: flex; align-items: center; gap: 8px; margin-left: auto; font-family: Caveat, cursive; font-size: 19px; font-weight: 700; line-height: 1.15; color: #f4b83d; text-align: right;">A Brighter Play<br>for a Better Tomorrow <span style="font-size: 14px; color: #ff5d7d;">♥</span></span>
+      </footer>
+    </section>
+
+    <section style="display: flex; flex-direction: column; gap: 16px;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="width: 4px; height: 26px; border-radius: 999px; background: linear-gradient(180deg, #ffd766, #e07f05); box-shadow: 0 0 12px rgba(240,150,10,.5); flex: none;"></span>
+        <span style="font-size: 24px; font-weight: 800; letter-spacing: -.5px; color: #fff;">Bottom navigation</span>
+        <span style="font-size: 12.5px; font-weight: 600; color: #8f7aae;">82px · 5 items</span>
+      </div>
+      <nav style="height: 82px; border: 1px solid rgba(167,139,250,.2); border-radius: 18px; background: linear-gradient(180deg, #23103f 0%, #150726 100%); box-shadow: 0 12px 30px rgba(0,0,0,.4); display: grid; grid-template-columns: repeat(5, 1fr); align-items: center;">
+        <sc-for list="{{ bottomNav }}" as="n" hint-placeholder-count="5">
+          <button style="position: relative; height: 82px; min-width: 48px; border: 0; background: transparent; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px; font-family: Manrope, sans-serif;">
+            <span style="width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">{{ n.icon }}</span>
+            <span style="font-size: 12px; font-weight: 700; letter-spacing: .2px; color: {{ n.color }};">{{ n.label }}</span>
+          </button>
+        </sc-for>
+      </nav>
+      <span style="font-size: 12.5px; font-weight: 500; line-height: 1.6; color: #a795c5;">Order is fixed: Home · Games · Wallet · Bonuses · Lucky Wheel. Active item = gold icon, gold label, gold underline pip. Page wrapper needs padding-bottom 150px so the floating mascot clears the bar.</span>
+    </section>
+
+    <section style="display: flex; flex-direction: column; gap: 16px;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="width: 4px; height: 26px; border-radius: 999px; background: linear-gradient(180deg, #ffd766, #e07f05); box-shadow: 0 0 12px rgba(240,150,10,.5); flex: none;"></span>
+        <span style="font-size: 24px; font-weight: 800; letter-spacing: -.5px; color: #fff;">Cards &amp; floating support</span>
+      </div>
+      <div style="display: flex; gap: 18px; flex-wrap: wrap; align-items: flex-start;">
+        <div style="position: relative; width: 200px; height: 176px; border-radius: 18px; overflow: hidden; border: 1px solid rgba(167,139,250,.2); background: #180a2c; box-shadow: 0 12px 30px rgba(0,0,0,.45);">
+          <div style="position: absolute; inset: 0; background: radial-gradient(88% 68% at 50% 24%, #e9d5ff 0%, #a855f7 26%, #6b21a8 56%, #240a3a 100%);"></div>
+          <span style="position: absolute; inset: auto 0 0 0; height: 104px; background: linear-gradient(180deg, transparent, rgba(11,4,20,.72) 46%, rgba(9,3,16,.96));"></span>
+          <div style="position: absolute; inset: auto 0 0 0; padding: 10px; display: flex; align-items: flex-end; gap: 6px;">
+            <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px;">
+              <span style="font-size: 14px; font-weight: 800; line-height: 17px; color: #fff;">Game title</span>
+              <span style="display: block; font-size: 10.5px; font-weight: 600; line-height: 15px; color: #cdc0e4;">Provider</span>
+            </span>
+            <span style="width: 34px; height: 34px; flex: none; border-radius: 50%; background: linear-gradient(180deg, #ffd766, #eb9c0d); color: #2c1400; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(224,140,5,.45);">▶</span>
+          </div>
+        </div>
+        <div style="width: 176px; height: 108px; box-sizing: border-box; padding: 14px 18px; border-radius: 18px; border: 1px solid rgba(167,139,250,.2); background: linear-gradient(180deg, #23103f 0%, #180a2c 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px;">
+          <span style="width: 30px; height: 30px; border-radius: 9px; border: 1px solid rgba(167,139,250,.22); background: rgba(255,255,255,.05); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: #b7a5d3;">PP</span>
+          <span style="font-size: 14.5px; font-weight: 800; letter-spacing: -.2px; color: #e9e0f5;">Provider</span>
+        </div>
+        <div style="position: relative; width: 120px; height: 130px; flex: none;">
+          <img src="assets/chocho-logo-cut.png" alt="ChoCho support" style="position: absolute; left: 0; top: 0; width: 80px; height: 80px; object-fit: contain; transform-origin: 60% 90%; animation: chochoWave 2.8s ease-in-out infinite; filter: drop-shadow(0 10px 22px rgba(0,0,0,.6));">
+          <span style="position: absolute; left: 40px; top: 80px; transform: translateX(-50%); height: 22px; display: flex; align-items: center; padding: 0 11px; border-radius: 999px; background: linear-gradient(180deg, #ffd766, #eb9c0d); color: #2c1400; font-size: 11px; font-weight: 800; letter-spacing: .6px; box-shadow: 0 6px 18px rgba(224,140,5,.5);">24/7</span>
+          <span style="position: absolute; left: 64px; top: 6px; width: 12px; height: 12px; border-radius: 50%; background: #4ade80; border: 2px solid #150726;"></span>
+        </div>
+      </div>
+      <span style="font-size: 12.5px; font-weight: 500; line-height: 1.6; color: #a795c5;">Game card 176px tall, radius 18, 1px violet border, scrim to 96% at the base, 14/800 title (3-line clamp) over 10.5/600 provider, 34px gold play. Provider tile is the same radius and border but a flat dark-purple surface and no gold — always quieter than a game card. Support mascot: fixed right 20 / bottom 24, 80×88 hit area, gold 24/7 pill, green online dot, wave loop 2.8s.</span>
+    </section>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  icon(d, color, size) {
+    return React.createElement("svg", {
+      width: size || 16, height: size || 16, viewBox: "0 0 24 24", fill: "none",
+      stroke: color, strokeWidth: 1.9, strokeLinecap: "round", strokeLinejoin: "round"
+    }, React.createElement("path", { d: d }));
+  }
+
+  renderVals() {
+    return {
+      swatches: [
+        { name: "Canvas top", value: "#3a0269", use: "page gradient 0%" },
+        { name: "Canvas mid", value: "#250143", use: "page gradient 42%" },
+        { name: "Canvas base", value: "#130124", use: "page gradient 100%" },
+        { name: "Surface", value: "#150726", use: "hero, nav, panels" },
+        { name: "Surface raised", value: "#23103f", use: "nav / tile top stop" },
+        { name: "Card base", value: "#180a2c", use: "game + provider cards" },
+        { name: "Gold", value: "#ffc93c", use: "CTA, active state" },
+        { name: "Gold deep", value: "#eb9c0d", use: "CTA gradient end" },
+        { name: "Violet line", value: "rgba(167,139,250,.2)", use: "all borders" },
+        { name: "Ink", value: "#ffffff", use: "titles" },
+        { name: "Lavender", value: "#a795c5", use: "secondary text" },
+        { name: "Rose", value: "#ff5d7d", use: "favourite / 18+" }
+      ],
+      typeScale: [
+        { sample: "Page title", spec: "38 / 800 / -1px", use: "page h1", size: "38px", weight: 800, tracking: "-1px", family: "Manrope, sans-serif", color: "#fff" },
+        { sample: "Hero title", spec: "34 / 800 / -.8px", use: "hero h1", size: "34px", weight: 800, tracking: "-.8px", family: "Manrope, sans-serif", color: "#fff" },
+        { sample: "Section title", spec: "28 / 800 / -.6px", use: "rails, grids", size: "28px", weight: 800, tracking: "-.6px", family: "Manrope, sans-serif", color: "#fff" },
+        { sample: "Nav link", spec: "15 / 600", use: "header nav", size: "15px", weight: 600, tracking: "0", family: "Manrope, sans-serif", color: "#e9e0f5" },
+        { sample: "Body / label", spec: "14 / 500–700", use: "copy, buttons, cards", size: "14px", weight: 600, tracking: "0", family: "Manrope, sans-serif", color: "#e9e0f5" },
+        { sample: "Control text", spec: "13.5 / 600", use: "filters, sort, pills", size: "13.5px", weight: 600, tracking: "0", family: "Manrope, sans-serif", color: "#c5b5de" },
+        { sample: "Caption", spec: "12 / 500", use: "sub copy, counts", size: "12px", weight: 500, tracking: "0", family: "Manrope, sans-serif", color: "#a795c5" },
+        { sample: "Micro label", spec: "10.5–11 / 800 / 1.2px", use: "badges, provider", size: "11px", weight: 800, tracking: "1.2px", family: "Manrope, sans-serif", color: "#cdc0e4" },
+        { sample: "Tuloy ang Good Vibes", spec: "Caveat 19–20 / 700", use: "brand phrase only", size: "20px", weight: 700, tracking: "0", family: "Caveat, cursive", color: "#e9a832" }
+      ].map((t, i) => Object.assign({ divider: i === 0 ? "transparent" : "rgba(167,139,250,.12)" }, t)),
+      metrics: [
+        { label: "PAGE GUTTER", value: "22px", note: "every section, both pages" },
+        { label: "SECTION GAP", value: "46px", note: "one wrapper gap; no per-section margins" },
+        { label: "SECTION INNER GAP", value: "22px", note: "heading → rail / grid" },
+        { label: "CARD GAP", value: "14px", note: "rails and All Games grid" },
+        { label: "RADIUS", value: "18 / 14 / 12 / 10", note: "cards + panels / load-more / controls / header buttons" },
+        { label: "CARD HEIGHT", value: "176px", note: "all game cards, every section" },
+        { label: "GRID TRACK", value: "minmax(142px, 1fr)", note: "6 up desktop, 3–4 tablet, 2 mobile" },
+        { label: "TOUCH MIN", value: "44px", note: "arrows, View all, nav items ≥48px wide" }
+      ],
+      navLinks: [
+        { label: "Games", color: "#ffffff", underline: 1 },
+        { label: "Promotions", color: "#bfaed8", underline: 0 },
+        { label: "VIP", color: "#bfaed8", underline: 0 },
+        { label: "Help", color: "#bfaed8", underline: 0 }
+      ],
+      trustItems: [
+        { title: "Secure Payments", sub: "Local payment options", d: "M12 3l7 3v6c0 4.2-2.9 7.6-7 9-4.1-1.4-7-4.8-7-9V6l7-3z" },
+        { title: "Fast Withdrawals", sub: "Quick cashout", d: "M13 3L5 13.5h5L9.5 21 18 10h-5l1-7z" },
+        { title: "Play Anywhere", sub: "Mobile, tablet & desktop", d: "M3 5h12v10H3zM17 9h4v11h-4zM7 19h6" },
+        { title: "24/7 Support", sub: "Always here to help", d: "M4 13v-1a8 8 0 0116 0v1m-16 0v3a2 2 0 002 2h1v-6H6a2 2 0 00-2 2zm16 0v3a2 2 0 01-2 2h-1v-6h1a2 2 0 012 2z" }
+      ].map((t, i) => ({
+        title: t.title, sub: t.sub,
+        divider: i === 0 ? "transparent" : "rgba(167,139,250,.14)",
+        icon: this.icon(t.d, "#ffc93c", 18)
+      })),
+      footerLinks: ["Responsible Gaming", "FAQ", "Support", "Terms", "Privacy"],
+      bottomNav: [
+        { label: "Home", d: "M4 11l8-6.5 8 6.5v8a1.5 1.5 0 01-1.5 1.5h-13A1.5 1.5 0 014 19v-8z", active: true },
+        { label: "Games", d: "M7 8h10a4 4 0 014 4v1a4 4 0 01-4 4H7a4 4 0 01-4-4v-1a4 4 0 014-4zm2 4v3m-1.5-1.5h3M16 13h.01M18 15h.01" },
+        { label: "Wallet", d: "M3 8a2 2 0 012-2h12a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm13 3h4v4h-4a2 2 0 010-4z" },
+        { label: "Bonuses", d: "M4 9h16v10a2 2 0 01-2 2H6a2 2 0 01-2-2V9zm0 0V7h16v2M12 9v12M8.5 7a2.5 2.5 0 010-4c2 0 3.5 4 3.5 4m3.5 0a2.5 2.5 0 000-4c-2 0-3.5 4-3.5 4" },
+        { label: "Lucky Wheel", d: "M12 3a9 9 0 100 18 9 9 0 000-18zm0 0v9m0 0l7.8 4.5M12 12L4.2 16.5" }
+      ].map(n => ({
+        label: n.label,
+        icon: this.icon(n.d, n.active ? "#ffc93c" : "#b7a5d3", 24),
+        color: n.active ? "#ffc93c" : "#a795c5",
+        bar: n.active ? 1 : 0
+      }))
+    };
+  }
+}
+</script>
+</body>
+</html>

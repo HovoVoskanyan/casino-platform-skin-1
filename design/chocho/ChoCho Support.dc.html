@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+  @keyframes chochoTigerWave { 0%,70%,100% { transform: rotate(0deg); } 78% { transform: rotate(-9deg); } 86% { transform: rotate(7deg); } 93% { transform: rotate(-4deg); } }
+  @keyframes chochoRing { 0% { transform: scale(1); opacity: .8; } 100% { transform: scale(1.35); opacity: 0; } }
+  .chocho-sp button:focus-visible, .chocho-sp input:focus-visible { outline: 2px solid #ffc93c; outline-offset: 2px; }
+</style>
+<script src="chocho-site.js"></script>
+</helmet>
+<div class="chocho-sp" ref="{{ root }}" style="font-family: Manrope, sans-serif;">
+  <sc-if value="{{ open }}" hint-placeholder-val="{{ false }}">
+    <div role="dialog" aria-label="ChoCho support" style="position: fixed; right: {{ dRight }}; left: {{ dLeft }}; bottom: {{ dBottom }}; width: {{ dWidth }}; max-width: calc(100vw - 16px); max-height: {{ dMaxH }}; box-sizing: border-box; overflow: hidden; z-index: 320; padding: {{ dPad }}; border: 1px solid rgba(255,201,60,.32); border-radius: 20px; background: linear-gradient(160deg, #2c1050 0%, #170826 100%); display: flex; flex-direction: column; gap: 14px; box-shadow: 0 24px 60px rgba(0,0,0,.65);">
+      <button onClick="{{ close }}" aria-label="Close support" style="position: absolute; top: {{ closeTop }}; right: {{ closeTop }}; z-index: 2; width: {{ closeSize }}; height: {{ closeSize }}; border: 0; border-radius: 50%; background: rgba(255,255,255,.1); color: #cbb6e6; font-size: 14px; font-weight: 800; cursor: pointer;" style-hover="background: rgba(255,255,255,.2)">✕</button>
+      <div style="flex: none; display: flex; align-items: center; gap: 14px; padding-right: 40px;">
+        <div style="position: relative; width: 62px; height: 62px; flex: none;">
+          <span style="position: absolute; inset: -6px; border-radius: 50%; border: 2px solid rgba(255,201,60,.5); animation: chochoRing 2.4s ease-out infinite;"></span>
+          <div style="width: 62px; height: 62px; border-radius: 50%; overflow: hidden; border: 2px solid #ffc93c;">
+            <img src="assets/support-agent.jpg" alt="ChoCho support agent" style="width: 100%; height: 100%; object-fit: cover; object-position: 52% 20%; transform: scale(1.35); transform-origin: 52% 20%; display: block;">
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 3px; min-width: 0;">
+          <span style="font-size: 18px; font-weight: 800; color: #fff;">Chat with ChoCho</span>
+          <span style="font-size: 12.5px; font-weight: 600; color: #4ade80;">● Live support · replies in under a minute</span>
+        </div>
+      </div>
+
+      <div style="flex: 1 1 auto; min-height: {{ msgMinH }}; max-height: 240px; display: flex; flex-direction: column; gap: 10px; padding: 14px; border-radius: 14px; background: rgba(0,0,0,.32); border: 1px solid rgba(255,255,255,.07); overflow-y: auto;">
+        <sc-for list="{{ messages }}" as="m" hint-placeholder-count="2">
+          <div style="display: flex; justify-content: {{ m.align }};">
+            <span style="max-width: 78%; padding: 11px 14px; border-radius: 14px; font-size: 13.5px; font-weight: 500; line-height: 1.5; background: {{ m.bg }}; color: {{ m.color }};">{{ m.text }}</span>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="flex: none; display: flex; flex-wrap: wrap; gap: 8px;">
+        <sc-for list="{{ replies }}" as="r" hint-placeholder-count="4">
+          <button onClick="{{ r.onClick }}" style="height: {{ chipH }}; padding: 0 14px; border: 1px solid rgba(255,201,60,.32); border-radius: 999px; background: rgba(255,201,60,.07); color: #ffe08a; font-family: Manrope, sans-serif; font-size: 12.5px; font-weight: 600; cursor: pointer;" style-hover="background: rgba(255,201,60,.18)">{{ r.label }}</button>
+        </sc-for>
+      </div>
+
+      <div style="flex: none; display: flex; gap: 10px;">
+        <input placeholder="Type your message…" aria-label="Message" value="{{ draft }}" onChange="{{ onDraft }}" onKeyDown="{{ onKey }}" style="flex: 1; min-width: 0; height: 46px; padding: 0 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,.13); background: rgba(0,0,0,.4); color: #fff; font-family: Manrope, sans-serif; font-size: {{ inputFont }}; font-weight: 500; outline: none;" style-focus="border-color: rgba(255,201,60,.6)">
+        <button onClick="{{ send }}" style="flex: none; height: 46px; padding: 0 {{ sendPad }}; border: 0; border-radius: 12px; background: linear-gradient(180deg, #ffd766, #eb9c0d); color: #2c1400; font-family: Manrope, sans-serif; font-size: 14px; font-weight: 800; cursor: pointer;" style-hover="filter: brightness(1.06)">Send</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ showMascot }}" hint-placeholder-val="{{ true }}">
+    <button onClick="{{ toggle }}" data-support-mascot="1" aria-label="ChoCho 24/7 support" aria-expanded="{{ expanded }}" aria-hidden="{{ mAriaHidden }}" tabindex="{{ mTab }}" style="position: fixed; right: {{ mRight }}; bottom: {{ mBottom }}; z-index: 46; width: {{ mW }}; height: {{ mH }}; border: 0; background: transparent; padding: 0; cursor: pointer; opacity: {{ mOpacity }}; transform: {{ mShift }}; pointer-events: {{ mEvents }}; transition: opacity .22s ease, transform .22s ease;">
+      <img src="assets/support-tiger-glow.png" alt="" style="position: absolute; left: 0; top: 0; width: {{ mW }}; height: {{ tigerH }}; object-fit: contain; transform-origin: 42% 92%; animation: chochoTigerWave 5.6s ease-in-out infinite; filter: drop-shadow(0 10px 22px rgba(0,0,0,.6));">
+      <span style="position: absolute; left: 50%; bottom: 0; transform: translateX(-50%); height: {{ badgeH }}; display: flex; align-items: center; padding: 0 {{ badgePad }}; border-radius: 999px; background: linear-gradient(180deg, #ffd766, #eb9c0d); color: #2c1400; font-family: Manrope, sans-serif; font-size: {{ badgeFont }}; font-weight: 800; letter-spacing: .6px; box-shadow: 0 6px 18px rgba(224,140,5,.5);">24/7</span>
+      <span style="position: absolute; right: {{ dotR }}; top: {{ dotT }}; width: {{ dotS }}; height: {{ dotS }}; border-radius: 50%; background: #4ade80; border: 2px solid #150726;"></span>
+    </button>
+  </sc-if>
+  <sc-if value="{{ noticeText }}" hint-placeholder-val="{{ false }}">
+    <div role="status" style="position: fixed; left: 50%; bottom: {{ noticeBottom }}; transform: translateX(-50%); z-index: 260; width: min(560px, calc(100vw - 32px)); box-sizing: border-box; padding: 15px 18px; border: 1px solid rgba(167,139,250,.28); border-radius: 16px; background: linear-gradient(170deg, #2a1049 0%, #1a0930 100%); box-shadow: 0 20px 50px rgba(4,1,9,.7); font-family: Manrope, sans-serif; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; ">
+      <span style="flex: 1 1 240px; min-width: 0; font-size: 13px; font-weight: 600; line-height: 1.5; color: #e6ddf5; text-wrap: pretty;">{{ noticeText }}</span>
+      <button onClick="{{ dismissNotice }}" style="min-height: 44px; padding: 0 16px; border: 1px solid rgba(167,139,250,.3); border-radius: 11px; background: rgba(255,255,255,.03); color: #fff; font-family: Manrope, sans-serif; font-size: 13px; font-weight: 700; cursor: pointer;" style-hover="background: rgba(255,255,255,.08)">Dismiss</button>
+    </div>
+  </sc-if>
+
+  <dc-import name="ChoCho Registration" embedded="{{ true }}" hint-size="0px,0px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:460,&quot;height&quot;:520},&quot;mascot&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;on&quot;,&quot;off&quot;],&quot;default&quot;:&quot;on&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  _root = React.createRef();
+
+  state = {
+    open: false,
+    phone: typeof window !== "undefined" && window.innerWidth < 600,
+    compact: typeof window !== "undefined" && window.innerWidth < 900,
+    tucked: false,
+    draft: "",
+    messages: [{ from: "agent", text: "Hi! I'm ChoCho support — how can I help you today?" }]
+  };
+
+  componentDidMount() {
+    this._onResize = () => {
+      const p = window.innerWidth < 600, c = window.innerWidth < 900;
+      if (p !== this.state.phone || c !== this.state.compact) this.setState({ phone: p, compact: c });
+      this.scheduleCheck();
+    };
+    window.addEventListener("resize", this._onResize);
+    // On phones and tablets the mascot steps aside while the page moves and only
+    // returns when the spot it occupies holds nothing tappable.
+    this._onScroll = () => {
+      if (this.state.open) return;
+      if (this.state.compact && !this.state.tucked) this.setState({ tucked: true });
+      this.scheduleCheck();
+    };
+    window.addEventListener("scroll", this._onScroll, { passive: true });
+    this._onFocus = () => this.scheduleCheck(0);
+    document.addEventListener("focusin", this._onFocus);
+    document.addEventListener("focusout", this._onFocus);
+    this.scheduleCheck(600);
+    // Content can load or change under the mascot without a scroll (tabs, async data).
+    this._poll = setInterval(() => { if (!this.state.open) this.checkClear(); }, 1200);
+    this._onKey = e => { if (e.key === "Escape" && this.state.open) this.setState({ open: false }); };
+    document.addEventListener("keydown", this._onKey);
+    this._onOpen = () => {
+      const n = this._root.current;
+      // a nested page (e.g. the Home page behind the auth modal) must not answer for the top page
+      if (n && n.closest('[aria-hidden="true"]')) return;
+      this.openPanel();
+    };
+    window.addEventListener("chocho:support", this._onOpen);
+    // Neutral notices for destinations/services that aren't connected yet.
+    this._onNotice = (e) => {
+      clearTimeout(this._noticeT);
+      this.setState({ notice: (e.detail && e.detail.text) || "" });
+      this._noticeT = setTimeout(() => this.setState({ notice: "" }), 7000);
+    };
+    window.addEventListener("chocho:notice", this._onNotice);
+    this._onEsc = (e) => { if (e.key === "Escape" && this.state.open) { e.stopPropagation(); this.closePanel(); } };
+    document.addEventListener("keydown", this._onEsc, true);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("chocho:support", this._onOpen);
+    document.removeEventListener("keydown", this._onEsc, true);
+    window.removeEventListener("chocho:notice", this._onNotice);
+    clearTimeout(this._noticeT);
+    window.removeEventListener("resize", this._onResize);
+    window.removeEventListener("scroll", this._onScroll);
+    document.removeEventListener("focusin", this._onFocus);
+    document.removeEventListener("focusout", this._onFocus);
+    clearTimeout(this._chk);
+    clearInterval(this._poll);
+    document.removeEventListener("keydown", this._onKey);
+  }
+
+  scheduleCheck(ms) {
+    clearTimeout(this._chk);
+    this._chk = setTimeout(() => this.checkClear(), ms == null ? 650 : ms);
+  }
+
+  checkClear() {
+    const btn = document.querySelector("[data-support-mascot]");
+    if (!btn) return;
+    // Typing (mobile keyboard open): keep the field and its actions unobstructed.
+    const a = document.activeElement;
+    if (a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) && !(this._root.current && this._root.current.contains(a))) {
+      if (!this.state.tucked) this.setState({ tucked: true });
+      return;
+    }
+    const r = btn.getBoundingClientRect();
+    const prev = btn.style.pointerEvents;
+    btn.style.pointerEvents = "none";
+    let blocked = false;
+    for (let fx = 0.1; fx <= 0.91 && !blocked; fx += 0.4) {
+      for (let fy = 0.1; fy <= 0.91 && !blocked; fy += 0.4) {
+        const x = r.left + r.width * fx, y = r.top + r.height * fy;
+        for (const el of document.elementsFromPoint(x, y)) {
+          if (el === document.body || el === document.documentElement) break;
+          // Only real glyphs count — a wide text box with empty space under the mascot is fine.
+          const hasText = [...el.childNodes].some(n => {
+            if (n.nodeType !== 3 || !n.nodeValue.trim()) return false;
+            const rg = document.createRange(); rg.selectNodeContents(n);
+            return [...rg.getClientRects()].some(t => t.right > r.left && t.left < r.right && t.bottom > r.top && t.top < r.bottom);
+          });
+          // Cards (boxes bordered on all sides) count as content even where they are empty.
+          const cs = getComputedStyle(el);
+          const card = parseFloat(cs.borderTopWidth) > 0 && parseFloat(cs.borderBottomWidth) > 0 && parseFloat(cs.borderLeftWidth) > 0 && parseFloat(cs.borderRightWidth) > 0;
+          if (hasText || card || el.tagName === "IMG" || el.closest("a,button,input,select,textarea,[role=button],[tabindex]") || getComputedStyle(el).cursor === "pointer") { blocked = true; break; }
+        }
+      }
+    }
+    btn.style.pointerEvents = prev;
+    if (blocked !== this.state.tucked) this.setState({ tucked: blocked });
+  }
+
+  /* One panel for every entry point; focus returns to whatever opened it. */
+  openPanel() {
+    if (!this.state.open) this._trigger = document.activeElement && document.activeElement !== document.body ? document.activeElement : null;
+    this.setState({ open: true }, () => {
+      const d = document.querySelector('[aria-label="ChoCho support"][role="dialog"]');
+      if (d) { if (!d.hasAttribute("tabindex")) d.setAttribute("tabindex", "-1"); try { d.focus(); } catch (e) {} }
+    });
+  }
+
+  closePanel() {
+    const t = this._trigger; this._trigger = null;
+    this.setState({ open: false }, () => {
+      const live = t && t.isConnected ? t : document.querySelector("[data-support-mascot]");
+      if (live) { try { live.focus(); } catch (e) {} }
+    });
+  }
+
+  push(text) {
+    if (!text.trim()) return;
+    this.setState(s => ({
+      draft: "",
+      messages: s.messages.concat([{ from: "me", text: text.trim() }])
+    }));
+  }
+
+  renderVals() {
+    const p = this.state.phone, c = this.state.compact;
+    const hide = this.state.tucked && !this.state.open;
+    return {
+      mOpacity: hide ? 0 : 1,
+      mShift: hide ? "translateY(16px) scale(.85)" : "none",
+      mEvents: hide ? "none" : "auto",
+      mAriaHidden: hide ? "true" : null,
+      mTab: hide ? -1 : 0,
+      expanded: this.state.open ? "true" : "false",
+      dRight: p ? "8px" : "26px",
+      dLeft: p ? "8px" : "auto",
+      dBottom: p ? "max(8px, env(safe-area-inset-bottom))" : (c ? "188px" : "248px"),
+      dWidth: p ? "auto" : "380px",
+      dMaxH: p ? "calc(100dvh - 16px - env(safe-area-inset-top))" : (c ? "calc(100dvh - 208px)" : "calc(100vh - 268px)"),
+      dPad: p ? "16px" : "20px",
+      closeTop: p ? "8px" : "12px",
+      closeSize: p ? "44px" : "30px",
+      msgMinH: p ? "96px" : "120px",
+      chipH: p ? "40px" : "34px",
+      inputFont: p ? "16px" : "14px",
+      sendPad: p ? "16px" : "22px",
+      mRight: c ? "10px" : "20px",
+      mBottom: p ? "calc(82px + max(8px, env(safe-area-inset-bottom)))" : (c ? "108px" : "116px"),
+      mW: c ? "64px" : "116px",
+      mH: c ? "70px" : "118px",
+      tigerH: c ? "58px" : "105px",
+      badgeH: c ? "18px" : "24px",
+      badgePad: c ? "8px" : "12px",
+      badgeFont: c ? "10px" : "11.5px",
+      dotR: c ? "4px" : "6px",
+      dotT: c ? "4px" : "8px",
+      dotS: c ? "11px" : "14px",
+      root: this._root,
+      open: this.state.open,
+      showMascot: (this.props.mascot ?? "on") !== "off",
+      noticeText: this.state.notice || "",
+      noticeBottom: c ? "calc(96px + env(safe-area-inset-bottom, 0px))" : "118px",
+      dismissNotice: () => { clearTimeout(this._noticeT); this.setState({ notice: "" }); },
+      toggle: () => { if (this.state.open) this.closePanel(); else this.openPanel(); },
+      close: () => this.closePanel(),
+      draft: this.state.draft,
+      onDraft: e => this.setState({ draft: e.target.value }),
+      onKey: e => { if (e.key === "Enter") this.push(this.state.draft); },
+      send: () => this.push(this.state.draft),
+      messages: this.state.messages.map(m => ({
+        text: m.text,
+        align: m.from === "me" ? "flex-end" : "flex-start",
+        bg: m.from === "me" ? "linear-gradient(180deg, #ffd766, #eb9c0d)" : "rgba(255,255,255,.07)",
+        color: m.from === "me" ? "#2c1400" : "#e9e0f5"
+      })),
+      replies: ["Deposit help", "Withdrawal status", "Verify my account", "Bonus terms"].map(r => ({
+        label: r,
+        onClick: () => this.push(r)
+      }))
+    };
+  }
+}
+</script>
+</body>
+</html>

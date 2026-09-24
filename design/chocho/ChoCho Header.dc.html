@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Caveat:wght@600;700&amp;display=swap" rel="stylesheet">
+<script src="chocho-account.js"></script>
+<script src="chocho-site.js"></script>
+<style>
+  .chocho-hd a:focus-visible, .chocho-hd button:focus-visible { outline: 2px solid #ffc93c; outline-offset: 2px; }
+  @keyframes hdRise { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+  @keyframes hdFade { from { opacity: 0; } to { opacity: 1; } }
+</style>
+</helmet>
+<div style="display: contents;">
+<header class="chocho-hd" data-hd-id="{{ uid }}" style="background: linear-gradient(180deg, rgba(29,12,53,.96) 0%, rgba(15,6,27,.96) 100%); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid rgba(167,139,250,.16); box-shadow: 0 10px 30px rgba(6,3,11,.55); font-family: Manrope, sans-serif; position: relative;">
+  <div style="max-width: 1024px; margin: 0 auto; min-height: {{ barMinH }}; box-sizing: border-box; padding: {{ barPad }}; display: flex; align-items: center; gap: {{ barGap }}; flex-wrap: nowrap;">
+
+    <div style="flex: 0 1 auto; min-width: 0; display: flex; align-items: center; gap: 8px; flex-wrap: nowrap;">
+      <a href="ChoCho Home.dc.html" aria-label="ChoCho home" style="flex: none; display: block;">
+        <img src="assets/chocho-logo-cut.png" alt="ChoCho" style="height: {{ logoH }}; width: {{ logoW }}; object-fit: contain; display: block; filter: drop-shadow(0 4px 12px rgba(0,0,0,.5));">
+      </a>
+  
+      <nav data-hd-nav="1" style="display: {{ navDisplay }}; align-items: center; gap: 2px; min-width: 0; flex-wrap: nowrap;">
+        <sc-for list="{{ navLinks }}" as="l" hint-placeholder-count="4">
+          <a href="{{ l.href }}" onClick="{{ l.onClick }}" style="position: relative; height: 40px; display: flex; align-items: center; padding: 0 14px; border-radius: 10px; font-size: 15px; font-weight: 600; white-space: nowrap; text-decoration: none; color: {{ l.color }};" style-hover="color: #fff; background: rgba(255,255,255,.05)">
+            {{ l.label }}
+            <span style="position: absolute; left: 14px; right: 14px; bottom: 3px; height: 2.5px; border-radius: 999px; background: #f0a30a; box-shadow: 0 0 10px rgba(240,163,10,.7); opacity: {{ l.underline }};"></span>
+          </a>
+        </sc-for>
+      </nav>
+    </div>
+
+    <div style="flex: 1; min-width: 8px;"></div>
+
+    <a href="#" onClick="{{ aviator }}" style="flex: none; box-sizing: border-box; display: {{ aviatorDisplay }}; align-items: center; justify-content: center; gap: 7px; height: 40px; min-width: 108px; padding: 0 16px; border: 1px solid rgba(167,139,250,.26); border-radius: 10px; background: rgba(255,255,255,.02); color: #e9e0f5; font-size: 14px; font-weight: 600; letter-spacing: .1px; white-space: nowrap; text-decoration: none; cursor: pointer;" style-hover="background: rgba(167,139,250,.12)">
+      <img src="assets/aviator-logo.webp" alt="" style="width: 18px; height: 18px; flex: none; object-fit: contain; display: block;">Aviator
+    </a>
+
+    <sc-if value="{{ guestCompact }}" hint-placeholder-val="{{ false }}">
+      <button onClick="{{ goSignin }}" style="flex: none; box-sizing: border-box; display: flex; align-items: center; justify-content: center; height: 40px; padding: 0 {{ signPad }}; border: 1px solid rgba(167,139,250,.26); border-radius: 10px; background: rgba(255,255,255,.02); color: #e9e0f5; font-family: Manrope, sans-serif; font-size: 13.5px; font-weight: 600; white-space: nowrap; cursor: pointer;">Sign in</button>
+      <button onClick="{{ goRegister }}" style="height: 40px; padding: 0 {{ regPad }}; flex: none; border: 0; border-radius: 10px; background: linear-gradient(180deg, #ffd766, #eb9c0d); color: #2c1400; font-family: Manrope, sans-serif; font-size: 13.5px; font-weight: 800; white-space: nowrap; cursor: pointer; box-shadow: 0 8px 22px rgba(235,156,13,.34);">Register</button>
+    </sc-if>
+
+    <sc-if value="{{ authedCompact }}" hint-placeholder-val="{{ false }}">
+      <span style="flex: none; display: flex; align-items: center; height: 40px; border: 1px solid rgba(167,139,250,.26); border-radius: 10px; background: rgba(255,255,255,.02); overflow: hidden;">
+        <a href="ChoCho Wallet.dc.html" style="display: flex; align-items: center; height: 100%; padding: 0 {{ balPad }}; color: #e9e0f5; font-size: 13.5px; font-weight: 700; white-space: nowrap; text-decoration: none;">{{ balanceText }}</a>
+        <button onClick="{{ toggleBalancePanel }}" aria-label="Show balance details" aria-expanded="{{ panelExpanded }}" aria-haspopup="dialog" data-balance-trigger="1" style="width: {{ chevW }}; height: 100%; border: 0; border-left: 1px solid rgba(167,139,250,.2); background: rgba(255,255,255,.03); color: #cbb6e6; font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center;" style-hover="background: rgba(167,139,250,.16); color: #fff">{{ chevron }}</button>
+      </span>
+      <a href="ChoCho My Account.dc.html" aria-label="My Account" style="width: 40px; height: 40px; flex: none; border: 1px solid rgba(167,139,250,.26); border-radius: 10px; background: rgba(255,255,255,.04); color: #e9e0f5; font-size: 13px; font-weight: 800; display: flex; align-items: center; justify-content: center; text-decoration: none;">{{ initials }}</a>
+    </sc-if>
+
+    <sc-if value="{{ guestFull }}" hint-placeholder-val="{{ true }}">
+      <button onClick="{{ goSignin }}" style="flex: none; box-sizing: border-box; display: flex; align-items: center; justify-content: center; height: 40px; min-width: 108px; padding: 0 16px; border: 1px solid rgba(167,139,250,.26); border-radius: 10px; background: rgba(255,255,255,.02); color: #e9e0f5; font-family: Manrope, sans-serif; font-size: 14px; font-weight: 600; letter-spacing: .1px; white-space: nowrap; cursor: pointer;" style-hover="background: rgba(167,139,250,.12)">Sign in</button>
+      <button onClick="{{ goRegister }}" style="height: 40px; padding: 0 24px; flex: none; border: 0; border-radius: 10px; background: linear-gradient(180deg, #ffd766, #eb9c0d); color: #2c1400; font-family: Manrope, sans-serif; font-size: 14.5px; font-weight: 800; white-space: nowrap; cursor: pointer; box-shadow: 0 8px 22px rgba(235,156,13,.34);" style-hover="filter: brightness(1.06)">Register</button>
+    </sc-if>
+
+    <sc-if value="{{ authedFull }}" hint-placeholder-val="{{ false }}">
+      <span style="flex: none; display: flex; align-items: center; height: 40px; border: 1px solid rgba(167,139,250,.26); border-radius: 10px; background: rgba(255,255,255,.02); overflow: hidden;">
+        <a href="ChoCho Wallet.dc.html" style="display: flex; align-items: center; gap: 9px; height: 100%; padding: 0 14px; color: #e9e0f5; font-size: 14px; font-weight: 700; white-space: nowrap; text-decoration: none;" style-hover="background: rgba(167,139,250,.12)">
+          <span style="font-size: 12px; font-weight: 600; color: #a795c5;">Balance</span>{{ balanceText }}
+        </a>
+        <button onClick="{{ toggleBalancePanel }}" aria-label="Show balance details" aria-expanded="{{ panelExpanded }}" aria-haspopup="dialog" data-balance-trigger="1" style="width: 34px; height: 100%; border: 0; border-left: 1px solid rgba(167,139,250,.2); background: rgba(255,255,255,.03); color: #cbb6e6; font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center;" style-hover="background: rgba(167,139,250,.16); color: #fff">{{ chevron }}</button>
+      </span>
+      <a href="ChoCho Wallet.dc.html#deposit" style="height: 40px; padding: 0 22px; flex: none; display: flex; align-items: center; border-radius: 10px; background: linear-gradient(180deg, #ffd766, #eb9c0d); color: #2c1400; font-size: 14.5px; font-weight: 800; white-space: nowrap; text-decoration: none; cursor: pointer; box-shadow: 0 8px 22px rgba(235,156,13,.34);" style-hover="filter: brightness(1.06)">Deposit</a>
+      <a href="ChoCho My Account.dc.html" aria-label="My Account" style="width: 40px; height: 40px; flex: none; border: 1px solid rgba(167,139,250,.26); border-radius: 10px; background: rgba(255,255,255,.04); color: #e9e0f5; font-size: 13px; font-weight: 800; display: flex; align-items: center; justify-content: center; text-decoration: none;" style-hover="background: rgba(167,139,250,.12)">{{ initials }}</a>
+    </sc-if>
+
+    <button onClick="{{ toggleMenu }}" aria-label="Menu" aria-expanded="{{ menuExpanded }}" style="width: 40px; height: 40px; flex: none; border: 1px solid rgba(167,139,250,.22); border-radius: 10px; background: rgba(255,255,255,.04); color: #cbb6e6; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;" style-hover="background: rgba(255,255,255,.08)">
+      <span style="width: 16px; height: 2px; border-radius: 2px; background: currentColor; display: block;"></span>
+      <span style="width: 16px; height: 2px; border-radius: 2px; background: currentColor; display: block;"></span>
+      <span style="width: 16px; height: 2px; border-radius: 2px; background: currentColor; display: block;"></span>
+    </button>
+  </div>
+
+  <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+    <nav aria-label="Menu" style="max-width: 1024px; margin: 0 auto; box-sizing: border-box; max-height: calc(100dvh - 80px); overflow-y: auto; padding: {{ menuPad }}; display: {{ menuDisplay }}; grid-template-columns: repeat(auto-fill, minmax(min(100%, 120px), 1fr)); flex-wrap: wrap; gap: 8px; border-top: 1px solid rgba(255,255,255,.06);">
+      <sc-for list="{{ menuLinks }}" as="l" hint-placeholder-count="5">
+        <a href="{{ l.href }}" onClick="{{ l.onClick }}" style="height: 44px; box-sizing: border-box; display: flex; align-items: center; padding: 0 16px; border-radius: 10px; background: rgba(255,255,255,.04); border: 1px solid rgba(167,139,250,.18); font-size: 14px; font-weight: 600; color: #e9e0f5; text-decoration: none;" style-hover="background: rgba(167,139,250,.16); color: #fff">{{ l.label }}</a>
+      </sc-for>
+    </nav>
+  </sc-if>
+
+  <sc-if value="{{ balancePanelOpen }}" hint-placeholder-val="{{ false }}">
+    <div role="dialog" aria-label="Balance details" data-balance-panel="1" tabindex="-1" style="position: {{ pPos }}; top: {{ pTop }}; right: {{ pRight }}; left: {{ pLeft }}; bottom: {{ pBottom }}; z-index: 120; width: {{ pWidth }}; max-width: 100%; max-height: {{ pMaxH }}; overflow-y: auto; box-sizing: border-box; padding: 16px; border: 1px solid rgba(167,139,250,.28); border-radius: {{ pRadius }}; background: linear-gradient(170deg, #2a1049 0%, #1a0930 100%); box-shadow: 0 24px 60px rgba(4,1,9,.7); display: flex; flex-direction: column; gap: 12px; animation: hdRise .16s ease-out;">
+      <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
+        <span style="font-size: 11px; font-weight: 800; letter-spacing: 1.1px; color: #8f7aae;">BALANCE DETAILS</span>
+        <button onClick="{{ closeBalancePanel }}" aria-label="Close balance details" style="width: 30px; height: 30px; flex: none; margin: -4px -4px 0 0; border: 1px solid rgba(167,139,250,.26); border-radius: 9px; background: rgba(255,255,255,.05); color: #cbb6e6; font-size: 12px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center;" style-hover="background: rgba(255,255,255,.12); color: #fff">✕</button>
+      </div>
+
+      <sc-if value="{{ panelLoading }}" hint-placeholder-val="{{ false }}">
+        <span aria-busy="true" style="height: 76px; border-radius: 12px; border: 1px solid rgba(167,139,250,.14); background: rgba(255,255,255,.03); display: block;"></span>
+      </sc-if>
+
+      <sc-if value="{{ panelReady }}" hint-placeholder-val="{{ true }}">
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <sc-for list="{{ panelRows }}" as="r" hint-placeholder-count="2">
+            <div style="padding: 11px 13px; border: 1px solid {{ r.border }}; border-radius: 12px; background: {{ r.bg }}; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+              <span style="font-size: 12px; font-weight: 700; letter-spacing: .3px; color: {{ r.labelColor }};">{{ r.label }}</span>
+              <span style="font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; color: {{ r.valueColor }};">{{ r.value }}</span>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="display: flex; gap: 8px;">
+          <sc-for list="{{ panelCounts }}" as="c" hint-placeholder-count="2">
+            <span style="flex: 1; min-width: 0; padding: 9px 11px; border: 1px solid rgba(167,139,250,.18); border-radius: 11px; background: rgba(255,255,255,.03); display: flex; flex-direction: column; gap: 3px;">
+              <span style="font-size: 17px; font-weight: 800; color: #fff;">{{ c.value }}</span>
+              <span style="font-size: 11px; font-weight: 600; line-height: 1.35; color: #a795c5;">{{ c.label }}</span>
+            </span>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ panelError }}" hint-placeholder-val="{{ false }}">
+        <span role="alert" style="padding: 11px 13px; border: 1px solid rgba(248,113,113,.4); border-radius: 12px; background: rgba(248,113,113,.08); font-size: 12.5px; font-weight: 600; line-height: 1.5; color: #fca5a5; text-wrap: pretty;">We couldn’t load your bonuses. Please try again.</span>
+      </sc-if>
+
+      <button onClick="{{ openBonuses }}" style="min-height: 46px; border: 0; border-radius: 12px; background: linear-gradient(180deg, #ffd766, #eb9c0d); color: #2c1400; font-family: Manrope, sans-serif; font-size: 14px; font-weight: 800; cursor: pointer; box-shadow: 0 8px 20px rgba(235,156,13,.3);" style-hover="filter: brightness(1.05)">View my bonuses</button>
+    </div>
+  </sc-if>
+
+</header>
+
+  <sc-if value="{{ bonusDrawerOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ drawerBackdrop }}" style="position: fixed; inset: 0; z-index: 300; background: rgba(6,2,12,.76); backdrop-filter: blur(5px); display: flex; align-items: {{ dAlign }}; justify-content: {{ dJustify }}; padding: {{ dPad }}; animation: hdFade .16s ease-out;">
+      <div role="dialog" aria-modal="true" aria-labelledby="hd-bonus-title" tabindex="-1" data-bonus-drawer="1" onClick="{{ stop }}" style="width: {{ dWidth }}; max-width: 100%; max-height: {{ dMaxH }}; box-sizing: border-box; display: flex; flex-direction: column; border: {{ dBorder }}; border-radius: {{ dRadius }}; background: linear-gradient(170deg, #2a1049 0%, #1a0930 45%, #160726 100%); box-shadow: 0 30px 80px rgba(4,1,9,.75); overflow: hidden; animation: hdRise .2s ease-out;">
+        <div style="flex: none; padding: 18px 20px 14px; border-bottom: 1px solid rgba(167,139,250,.14); display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
+          <span style="min-width: 0; display: flex; flex-direction: column; gap: 3px;">
+            <span style="font-size: 10.5px; font-weight: 800; letter-spacing: 1.2px; color: #8f7aae;">BONUSES</span>
+            <span id="hd-bonus-title" style="font-size: 19px; font-weight: 800; letter-spacing: -.3px; color: #fff;">My bonuses</span>
+          </span>
+          <button onClick="{{ closeBonuses }}" aria-label="Close" style="width: 40px; height: 40px; flex: none; border: 1px solid rgba(167,139,250,.28); border-radius: 12px; background: rgba(255,255,255,.06); color: #cbb6e6; font-size: 15px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center;" style-hover="background: rgba(255,255,255,.14); color: #fff">✕</button>
+        </div>
+        <div style="flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 18px 20px 24px;">
+          <dc-import name="ChoCho Bonuses" variant="panel" hint-size="100%,420px"></dc-import>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1024,&quot;height&quot;:140},&quot;active&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;none&quot;,&quot;games&quot;,&quot;promotions&quot;,&quot;vip&quot;,&quot;help&quot;],&quot;default&quot;:&quot;none&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;session&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;shared&quot;,&quot;guest&quot;,&quot;auth&quot;],&quot;default&quot;:&quot;shared&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;balance&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;₱ 2,480.00&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;initials&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  state = {
+    menuOpen: false, tiny: false, narrow: typeof window !== "undefined" && window.innerWidth < 760,
+    balancePanel: false, drawer: false,
+    bonusStatus: "idle", bonusData: null, hidden: false,
+    authed: (() => { try { return localStorage.getItem("chocho:previewSession") === "signed-in"; } catch (e) { return false; } })()
+  };
+  uid = "hd" + Math.random().toString(36).slice(2, 8);
+
+  el() { return document.querySelector('[data-hd-id="' + this.uid + '"]'); }
+
+  /* Switches to the compact header wherever the full navigation genuinely
+     cannot fit — measured from the real row, not a guessed breakpoint, so
+     the account controls can never push the nav into an overlap. */
+  measure() {
+    const el = this.el();
+    const w = (el ? el.getBoundingClientRect().width : 0) || window.innerWidth;
+    const tiny = w < 360;
+    if (tiny !== this.state.tiny) this.setState({ tiny: tiny });
+    if (w < 760) { if (!this.state.narrow) this.setState({ narrow: true }); return; }
+
+    if (!this.state.narrow) {
+      const bar = el && el.firstElementChild;
+      const nav = el && el.querySelector("[data-hd-nav]");
+      if (!bar || !nav) return;
+      const overflow =
+        bar.scrollWidth > bar.clientWidth + 1 ||
+        nav.scrollWidth > nav.clientWidth + 1 ||
+        nav.parentElement.scrollWidth > nav.parentElement.clientWidth + 1;
+      if (overflow) { this._fullMin = w + 48; this.setState({ narrow: true }); }
+      return;
+    }
+    // Restore the full header only once there is comfortably room again.
+    if (!this._fullMin || w >= this._fullMin) this.setState({ narrow: false });
+  }
+
+  componentDidMount() {
+    this._onResize = () => this.measure();
+    window.addEventListener("resize", this._onResize);
+    const el = this.el();
+    if (typeof ResizeObserver !== "undefined" && el) {
+      this._ro = new ResizeObserver(this._onResize);
+      this._ro.observe(el);
+    }
+    this._poll = setInterval(this._onResize, 300);
+    this.measure();
+
+    this._mounted = true;
+    this.connectAccount();
+    this.connectSite();
+
+    this._onDocDown = (e) => {
+      if (!this.state.balancePanel) return;
+      const panel = document.querySelector("[data-balance-panel]");
+      const trigger = document.querySelector("[data-balance-trigger]");
+      if (panel && panel.contains(e.target)) return;
+      if (trigger && trigger.contains(e.target)) return;
+      this.closeBalancePanel();
+    };
+    this._onKey = (e) => {
+      if (e.key !== "Escape") return;
+      if (this.state.drawer) { e.stopPropagation(); this.closeBonuses(); return; }
+      if (this.state.balancePanel) { e.stopPropagation(); this.closeBalancePanel(); }
+    };
+    document.addEventListener("mousedown", this._onDocDown, true);
+    document.addEventListener("keydown", this._onKey, true);
+  }
+
+  connectAccount() {
+    const a = window.ChoChoAccount;
+    if (!a) { window.addEventListener("chocho:account-ready", () => this.connectAccount(), { once: true }); return; }
+    this.setState({ hidden: a.isHidden() });
+    this._unsub = a.subscribe(() => { if (this._mounted) this.setState({ hidden: a.isHidden() }); });
+  }
+
+  /* Guest vs signed-in comes from the one shared preview session. */
+  connectSite() {
+    const s = window.ChoChoSite;
+    if (!s) { window.addEventListener("chocho:site-ready", () => this.connectSite(), { once: true }); return; }
+    s.applyPreviewProp(this.props.session);
+    const sync = () => {
+      if (!this._mounted) return;
+      const authed = s.isAuthed();
+      if (authed === this.state.authed && (this.state.bonusStatus !== "idle" || !authed)) return;
+      if (authed) { this.setState({ authed: true }); this.loadBonuses(); }
+      else this.setState({ authed: false, balancePanel: false, drawer: false, bonusData: null, bonusStatus: "idle", menuOpen: false });
+    };
+    this._unsubSite = s.subscribe(sync);
+    sync();
+  }
+
+  componentDidUpdate(prev) {
+    if (prev.session !== this.props.session && window.ChoChoSite) window.ChoChoSite.applyPreviewProp(this.props.session);
+  }
+
+  loadBonuses() {
+    const a = window.ChoChoAccount;
+    if (!a) { setTimeout(() => this.loadBonuses(), 120); return; }
+    this.setState({ bonusStatus: "loading" });
+    a.load("loaded").then(
+      d => { if (this._mounted) this.setState({ bonusStatus: "ready", bonusData: d }); },
+      () => { if (this._mounted) this.setState({ bonusStatus: "error" }); }
+    );
+  }
+
+  openBalancePanel() {
+    this._balTrigger = document.activeElement;
+    this.setState({ balancePanel: true, menuOpen: false }, () => {
+      const p = document.querySelector("[data-balance-panel]");
+      if (p) { try { p.focus(); } catch (e) {} }
+    });
+    if (this.state.bonusStatus === "idle" || this.state.bonusStatus === "error") this.loadBonuses();
+  }
+
+  retryBonuses() {
+    this.loadBonuses();
+  }
+
+  closeBalancePanel(keepFocus) {
+    const t = this._balTrigger;
+    this.setState({ balancePanel: false }, () => {
+      if (keepFocus) return;
+      const live = (t && t.isConnected) ? t : document.querySelector("[data-balance-trigger]");
+      if (live) { try { live.focus(); } catch (e) {} }
+    });
+  }
+
+  openBonuses() {
+    // The small dropdown closes first; the page, URL and scroll stay put.
+    this.closeBalancePanel(true);
+    this.setState({ drawer: true }, () => {
+      const d = document.querySelector("[data-bonus-drawer]");
+      if (d) { try { d.focus(); } catch (e) {} }
+    });
+  }
+
+  closeBonuses() {
+    const t = this._balTrigger;
+    this.setState({ drawer: false }, () => {
+      const live = (t && t.isConnected) ? t : document.querySelector("[data-balance-trigger]");
+      if (live) { try { live.focus(); } catch (e) {} }
+    });
+  }
+
+  componentWillUnmount() {
+    this._mounted = false;
+    window.removeEventListener("resize", this._onResize);
+    clearInterval(this._poll);
+    if (this._ro) this._ro.disconnect();
+    if (this._unsub) this._unsub();
+    if (this._unsubSite) this._unsubSite();
+    document.removeEventListener("mousedown", this._onDocDown, true);
+    document.removeEventListener("keydown", this._onKey, true);
+    // Personal balance data never outlives the mounted session.
+    this.setState({ bonusData: null, bonusStatus: "idle" });
+  }
+
+  support(e) {
+    if (e) e.preventDefault();
+    window.dispatchEvent(new CustomEvent("chocho:support"));
+    this.setState({ menuOpen: false });
+  }
+
+  renderVals() {
+    const active = this.props.active ?? "none";
+    const guest = !this.state.authed;
+    const site = window.ChoChoSite;
+    const P = site ? site.PAGES : {};
+    const links = [
+      { key: "games", label: "Games", href: P.games || "ChoCho Games.dc.html" },
+      { key: "promotions", label: "Promotions", href: P.promotions || "ChoCho Promotions.dc.html" },
+      { key: "vip", label: "VIP", href: P.vip || "ChoCho VIP.dc.html" },
+      { key: "help", label: "Help", href: "#", support: true }
+    ];
+    const menu = [
+      { label: "Games", href: P.games || "ChoCho Games.dc.html" },
+      ...(guest ? [] : [{ label: "My Bonuses", href: "#", bonuses: true }]),
+      { label: "Promotions", href: P.promotions || "ChoCho Promotions.dc.html" },
+      { label: "VIP", href: P.vip || "ChoCho VIP.dc.html" },
+      { label: "Wallet", href: P.wallet || "ChoCho Wallet.dc.html", dest: "wallet" },
+      { label: "My Account", href: P.account || "ChoCho My Account.dc.html", dest: "account" },
+      { label: "Aviator", href: "#", aviator: true },
+      { label: "Help", href: "#", support: true }
+    ];
+    const gate = (dest) => (e) => {
+      // Guests are asked to sign in over the current page; the destination is kept.
+      if (!guest || !site) return;
+      e.preventDefault();
+      this.setState({ menuOpen: false });
+      site.openAuth("signin", dest);
+    };
+    const aviator = (e) => {
+      e.preventDefault();
+      this.setState({ menuOpen: false });
+      if (site) site.unavailable("Aviator");
+    };
+
+    const narrow = this.state.narrow;
+    const s = this.state;
+    const a = window.ChoChoAccount;
+    const peso = a ? a.peso : (n => "\u20B1" + n);
+    const mask = a ? a.mask : "\u2022\u2022\u2022\u2022\u2022\u2022";
+    const bd = s.bonusData;
+    const ready = s.bonusStatus === "ready" && !!bd;
+    const propBalance = this.props.balance ?? "\u20B1 2,480.00";
+    const totalText = ready ? peso(bd.balances.total) : propBalance;
+
+    const rows = [];
+    if (ready && bd.balances.cash !== undefined && bd.balances.cash !== null) {
+      rows.push({
+        label: "Cash balance", value: s.hidden ? mask : peso(bd.balances.cash),
+        border: "rgba(167,139,250,.18)", bg: "rgba(255,255,255,.03)",
+        labelColor: "#a795c5", valueColor: "#fff"
+      });
+    }
+    if (ready) {
+      rows.push({
+        label: "Bonus balance", value: s.hidden ? mask : peso(bd.balances.bonus),
+        border: "rgba(255,201,60,.32)", bg: "rgba(255,201,60,.08)",
+        labelColor: "#f3e6c7", valueColor: "#ffd98a"
+      });
+    }
+
+    const counts = ready ? [
+      { value: bd.available.length, label: "Available to claim" },
+      { value: bd.active.length, label: "Active bonuses" }
+    ] : [];
+
+    return {
+      uid: this.uid,
+      balanceText: s.hidden ? mask : totalText,
+      chevron: s.balancePanel ? "▲" : "▼",
+      panelExpanded: s.balancePanel ? "true" : "false",
+      toggleBalancePanel: () => { if (this.state.balancePanel) this.closeBalancePanel(); else this.openBalancePanel(); },
+      closeBalancePanel: () => this.closeBalancePanel(),
+      balancePanelOpen: s.balancePanel,
+      panelLoading: s.bonusStatus === "loading",
+      panelReady: ready,
+      panelError: s.bonusStatus === "error",
+      panelRows: rows,
+      panelCounts: counts,
+      pPos: "absolute",
+      pTop: "calc(100% + 6px)",
+      pRight: narrow ? "10px" : "22px",
+      pLeft: narrow ? "10px" : "auto",
+      pBottom: "auto",
+      pWidth: narrow ? "auto" : "296px",
+      pMaxH: narrow ? "calc(100vh - 120px)" : "min(420px, calc(100vh - 120px))",
+      pRadius: narrow ? "18px" : "14px",
+      openBonuses: () => this.openBonuses(),
+      closeBonuses: () => this.closeBonuses(),
+      bonusDrawerOpen: s.drawer,
+      drawerBackdrop: (e) => { if (e.target === e.currentTarget) this.closeBonuses(); },
+      stop: (e) => e.stopPropagation(),
+      dAlign: narrow ? "flex-end" : "center",
+      dJustify: "center",
+      dPad: narrow ? "0" : "24px",
+      dWidth: narrow ? "100%" : "620px",
+      dMaxH: narrow ? "88vh" : "calc(100vh - 48px)",
+      dRadius: narrow ? "20px 20px 0 0" : "20px",
+      dBorder: narrow ? "0" : "1px solid rgba(167,139,250,.26)",
+      barMinH: narrow ? "66px" : "76px",
+      barGap: s.tiny ? "6px" : "8px",
+      signPad: s.tiny ? "10px" : "12px",
+      regPad: s.tiny ? "12px" : "14px",
+      menuPad: narrow ? "10px 16px 16px" : "4px 22px 16px",
+      menuDisplay: narrow ? "grid" : "flex",
+      menuExpanded: this.state.menuOpen ? "true" : "false",
+      barPad: narrow ? (s.tiny && !guest ? "10px 12px" : "10px 16px") : "12px 22px",
+      balPad: s.tiny ? "8px" : "10px",
+      chevW: s.tiny ? "28px" : "32px",
+      logoH: narrow ? "40px" : "50px",
+      logoW: narrow ? "58px" : "72px",
+      navDisplay: narrow ? "none" : "flex",
+      aviatorDisplay: narrow ? "none" : "flex",
+      guestFull: guest && !narrow,
+      guestCompact: guest && narrow,
+      authedFull: !guest && !narrow,
+      authedCompact: !guest && narrow,
+      balance: this.props.balance ?? "₱ 2,480.00",
+      initials: this.props.initials ?? ((a && a.identity && a.identity.initials) || ""),
+      aviator: aviator,
+
+      navLinks: links.map(l => ({
+        label: l.label,
+        href: l.href,
+        color: active === l.key ? "#ffffff" : "#bfaed8",
+        underline: active === l.key ? 1 : 0,
+        onClick: l.support ? (e => this.support(e)) : (() => {})
+      })),
+      menuLinks: menu.map(l => ({
+        label: l.label,
+        href: l.href,
+        onClick: l.support
+          ? (e => this.support(e))
+          : l.aviator
+            ? aviator
+          : l.dest
+            ? gate(l.dest)
+          : l.bonuses
+            ? (e => { e.preventDefault(); this._balTrigger = e.currentTarget; this.setState({ menuOpen: false, drawer: true }, () => { const d = document.querySelector("[data-bonus-drawer]"); if (d) { try { d.focus(); } catch (err) {} } }); })
+            : (() => {})
+      })),
+      menuOpen: this.state.menuOpen,
+      toggleMenu: () => this.setState(s => ({ menuOpen: !s.menuOpen })),
+      goSignin: () => { this.setState({ menuOpen: false }); if (site) site.openAuth("signin", site.currentUrl()); },
+      goRegister: () => { this.setState({ menuOpen: false }); if (site) site.openAuth("register", site.currentUrl()); }
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Caveat:wght@600;700&amp;display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; background: #130124; }
+  a { color: #ffc93c; text-decoration: none; }
+  a:hover { color: #ffe08a; }
+  @keyframes chochoWave { 0%,60%,100% { transform: rotate(0deg); } 70% { transform: rotate(-13deg); } 80% { transform: rotate(11deg); } 90% { transform: rotate(-7deg); } }
+  @keyframes chochoTigerWave { 0% { transform: translateY(0) rotate(0deg); } 4% { transform: translateY(1.5px) rotate(.6deg); } 8% { transform: translateY(0) rotate(0deg); } 12% { transform: translateY(1.5px) rotate(-.6deg); } 16% { transform: translateY(0) rotate(0deg); } 20% { transform: translateY(1.5px) rotate(.6deg); } 24% { transform: translateY(0) rotate(0deg); } 28% { transform: translateY(1.5px) rotate(-.6deg); } 32% { transform: translateY(0) rotate(0deg); } 36% { transform: translateY(1.5px) rotate(.6deg); } 40% { transform: translateY(0) rotate(0deg); } 48% { transform: translateY(-4px) rotate(-2deg); } 56% { transform: translateY(-5px) rotate(-9deg); } 64% { transform: translateY(-5px) rotate(7deg); } 72% { transform: translateY(-5px) rotate(-7deg); } 80% { transform: translateY(-5px) rotate(6deg); } 88% { transform: translateY(-3px) rotate(-2deg); } 100% { transform: translateY(0) rotate(0deg); } }
+  @keyframes chochoRing { 0% { transform: scale(1); opacity: .55; } 100% { transform: scale(1.7); opacity: 0; } }
+  @keyframes chochoBlink { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
+</style>
+<script src="chocho-site.js"></script>
+</helmet>
+<div style="min-height: 100vh; background: radial-gradient(1100px 640px at 50% -8%, #3a0269 0%, #250143 42%, #130124 100%); font-family: Manrope, sans-serif; color: #fff; display: flex; justify-content: center; padding: 0 0 {{ padB }}; overflow-x: clip;">
+  <div style="width: 100%; max-width: 1024px; min-width: 0; display: flex; flex-direction: column; gap: clamp(26px, 4vw, 30px); padding-bottom: 20px;">
+
+    <dc-import name="ChoCho Header" active="none" style="position: sticky; top: 0; z-index: 40;" hint-size="100%,76px"></dc-import>
+
+    <section onTouchStart="{{ heroTouchStart }}" onTouchEnd="{{ heroTouchEnd }}" aria-roledescription="carousel" aria-label="Promotions" style="margin: -12px clamp(16px, 2.4vw, 22px) 0; touch-action: pan-y; container-type: inline-size; aspect-ratio: 321 / 136; position: relative; border: 1px solid rgba(167,139,250,.22); border-radius: clamp(14px, 2.2vw, 20px); overflow: hidden; background: #150726; box-shadow: 0 20px 50px rgba(6,3,11,.6), 0 0 0 1px rgba(255,255,255,.03) inset;">
+
+      <div style="{{ slide0 }}">
+        <img src="assets/banner-welcome.png" alt="100% Welcome Bonus up to ₱5,000" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+        <div style="position: absolute; left: 7.6%; top: 50.6%; width: 43.2%; height: 17.6%; box-sizing: border-box; border-radius: 3.4cqw; border: 0.24cqw solid #f5b62a; background: linear-gradient(180deg, #331363 0%, #1d0838 100%); box-shadow: 0 0 2.4cqw rgba(255,201,60,.35), 0 0 0 0.2cqw rgba(0,0,0,.35) inset; display: flex; align-items: center; justify-content: center; gap: 1.4cqw;">
+          <span style="font-size: 2.5cqw; font-weight: 800; letter-spacing: .06em; color: #fff; text-shadow: 0 0.2cqw 0.5cqw rgba(0,0,0,.6);">UP TO</span>
+          <span style="font-size: 4.4cqw; font-weight: 800; letter-spacing: -.01em; color: #ffcf3f; text-shadow: 0 0.25cqw 0 #a35c00, 0 0.5cqw 1.2cqw rgba(0,0,0,.55);">₱5,000</span>
+        </div>
+        <button onClick="{{ openPromo }}" data-promo="welcome" aria-label="Welcome Bonus: view offer" style="position: absolute; left: 9.5%; bottom: 8%; width: 41%; height: 13%; border: 0; border-radius: 12px; background: transparent; cursor: pointer;" style-hover="background: rgba(255,255,255,.1)"></button>
+      </div>
+
+      <sc-for list="{{ heroSlots }}" as="s" hint-placeholder-count="3">
+        <div style="{{ s.style }}">
+          <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: clamp(6px, 1.4cqw, 12px); padding: 0 12px; text-align: center; background: linear-gradient(120deg, #2a1046 0%, #150726 100%);">
+            <span style="height: 30px; display: flex; align-items: center; padding: 0 16px; border: 1px dashed rgba(255,201,60,.5); border-radius: 999px; font-size: 11px; font-weight: 800; letter-spacing: 1.6px; color: #ffc93c;">{{ s.label }}</span>
+            <span style="font-size: clamp(15px, 2.8cqw, 24px); font-weight: 800; color: #6d5686;">Banner artwork goes here</span>
+            <span style="font-size: clamp(11px, 1.5cqw, 13px); font-weight: 600; color: #56426e;">promo, tournament or game launch</span>
+          </div>
+        </div>
+      </sc-for>
+
+    </section>
+
+    <div role="group" aria-label="Banner controls" style="margin: -22px 16px -14px; display: flex; align-items: center; justify-content: center; gap: 4px;">
+      <sc-if value="{{ heroArrows }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ heroPrev }}" aria-label="Previous banner" style="width: 36px; height: 36px; flex: none; padding: 0; border: 1px solid rgba(167,139,250,.28); border-radius: 50%; background: rgba(255,255,255,.04); color: #ffe08a; font-family: Manrope, sans-serif; font-size: 16px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; margin-right: 6px;" style-hover="background: rgba(255,201,60,.18); color: #fff">‹</button>
+      </sc-if>
+      <sc-for list="{{ heroDots }}" as="d" hint-placeholder-count="4">
+        <button onClick="{{ d.onClick }}" aria-label="{{ d.label }}" aria-current="{{ d.current }}" style="padding: 14px 3px; border: 0; background: transparent; cursor: pointer; display: flex; align-items: center;">
+          <span style="width: {{ d.w }}; height: 8px; border-radius: 999px; background: {{ d.bg }}; box-shadow: {{ d.glow }}; display: block; transition: width .25s ease;"></span>
+        </button>
+      </sc-for>
+      <sc-if value="{{ heroArrows }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ heroNext }}" aria-label="Next banner" style="width: 36px; height: 36px; flex: none; padding: 0; border: 1px solid rgba(167,139,250,.28); border-radius: 50%; background: rgba(255,255,255,.04); color: #ffe08a; font-family: Manrope, sans-serif; font-size: 16px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; margin-left: 6px;" style-hover="background: rgba(255,201,60,.18); color: #fff">›</button>
+      </sc-if>
+      <button onClick="{{ heroPause }}" aria-label="{{ heroPauseLabel }}" aria-pressed="{{ heroPaused }}" style="width: 36px; height: 36px; flex: none; padding: 0; border: 1px solid rgba(167,139,250,.28); border-radius: 50%; background: rgba(255,255,255,.04); color: #ffe08a; font-family: Manrope, sans-serif; font-size: 16px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; margin-left: 6px; font-size: 12px; letter-spacing: -1px;" style-hover="background: rgba(255,201,60,.18); color: #fff">{{ heroPauseGlyph }}</button>
+    </div>
+
+    <section style="padding: 0 clamp(16px, 2.4vw, 22px); display: flex; flex-direction: column; gap: 16px;">
+      <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+        <span style="width: 4px; height: clamp(24px, 5.6vw, 28px); border-radius: 999px; background: linear-gradient(180deg, #ffd766, #e07f05); box-shadow: 0 0 12px rgba(240,150,10,.5); flex: none;"></span>
+        <span style="font-size: clamp(22px, 5.6vw, 28px); font-weight: 800; letter-spacing: -.6px; color: #fff;">Hot Games</span>
+        <span style="flex: 1; min-width: 8px;"></span>
+        
+        
+        <sc-if value="{{ hotArrows }}" hint-placeholder-val="{{ true }}">
+        <div style="display: flex; gap: {{ arrowGap }};">
+          <button onClick="{{ hotPrev }}" disabled="{{ hotPrevDis }}" aria-label="Previous Hot Games" style="width: {{ arrowSize }}; height: {{ arrowSize }}; padding: 0; border: 0; background: transparent; cursor: {{ hotPrevCur }}; opacity: {{ hotPrevOp }}; transition: opacity .2s ease; display: flex; align-items: center; justify-content: center;"><span style="width: {{ arrowVis }}; height: {{ arrowVis }}; box-sizing: border-box; border: 1px solid rgba(167,139,250,.26); border-radius: 50%; background: rgba(255,255,255,.04); color: #cbb6e6; font-family: Manrope, sans-serif; font-size: {{ arrowFont }}; font-weight: 700; display: flex; align-items: center; justify-content: center;" style-hover="border-color: rgba(255,201,60,.55); color: #ffc93c">‹</span></button>
+          <button onClick="{{ hotNext }}" disabled="{{ hotNextDis }}" aria-label="Next Hot Games" style="width: {{ arrowSize }}; height: {{ arrowSize }}; padding: 0; border: 0; background: transparent; cursor: {{ hotNextCur }}; opacity: {{ hotNextOp }}; transition: opacity .2s ease; display: flex; align-items: center; justify-content: center;"><span style="width: {{ arrowVis }}; height: {{ arrowVis }}; box-sizing: border-box; border: 1px solid rgba(167,139,250,.26); border-radius: 50%; background: rgba(255,255,255,.04); color: #cbb6e6; font-family: Manrope, sans-serif; font-size: {{ arrowFont }}; font-weight: 700; display: flex; align-items: center; justify-content: center;" style-hover="border-color: rgba(255,201,60,.55); color: #ffc93c">›</span></button>
+        </div>
+        </sc-if>
+      </div>
+
+      <div ref="{{ hotRail }}" onScroll="{{ hotScroll }}" style="display: flex; gap: {{ railGap }}; overflow-x: auto; overscroll-behavior-x: contain; scroll-behavior: smooth; scroll-snap-type: {{ railSnap }}; scroll-padding-inline: {{ railScrollPad }}; padding: {{ railPad }}; margin: {{ railMargin }}; scrollbar-width: none;">
+        <sc-for list="{{ hotGames }}" as="g" hint-placeholder-count="5">
+          <div onClick="{{ openGame }}" onKeyDown="{{ keyActivate }}" data-game="{{ g.name }}" role="button" tabindex="0" aria-label="{{ g.name }}, {{ g.provider }}" style="position: relative; flex: 1 0 {{ cardW }}; min-width: {{ cardW }}; max-width: 260px; scroll-snap-align: start; height: {{ cardH }}; border-radius: 18px; overflow: hidden; border: 1px solid rgba(167,139,250,.2); background: #180a2c; box-shadow: 0 12px 30px rgba(0,0,0,.45); cursor: pointer; transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;" style-hover="transform: translateY(-6px); border-color: rgba(255,201,60,.55); box-shadow: 0 20px 40px rgba(0,0,0,.55), 0 0 26px rgba(167,139,250,.22)">
+            <div style="position: absolute; inset: 0; background: {{ g.art }}; transition: transform .4s ease;" style-hover="transform: scale(1.07)">
+              {{ g.photo }}
+            </div>
+            <span style="position: absolute; inset: 0; background: {{ g.texture }};"></span>
+            <span style="position: absolute; inset: auto 0 0 0; height: 132px; background: linear-gradient(180deg, transparent, rgba(11,4,20,.72) 46%, rgba(9,3,16,.96));"></span>
+            <span style="position: absolute; top: 0; right: 0; height: 26px; display: flex; align-items: center; padding: 0 11px; border-radius: 0 0 0 12px; font-size: 10.5px; font-weight: 800; letter-spacing: 1.2px; color: #fff; background: linear-gradient(180deg, #ff4d6d, #d91e46); box-shadow: 0 4px 14px rgba(217,30,70,.45);">HOT</span>
+            <div style="position: absolute; inset: auto 0 0 0; padding: clamp(11px, 3vw, 14px); display: flex; align-items: flex-end; gap: clamp(8px, 2.4vw, 10px);">
+              <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px;">
+                <span style="font-size: 15px; font-weight: 800; line-height: 1.2; color: #fff; letter-spacing: -.1px;">{{ g.name }}</span>
+                <span style="font-size: 12px; font-weight: 500; color: #b3a0d1;">{{ g.provider }}</span>
+              </span>
+              <span style="width: clamp(32px, 9vw, 38px); height: clamp(32px, 9vw, 38px); flex: none; border-radius: 50%; background: linear-gradient(180deg, #ffd766, #eb9c0d); color: #2c1400; font-size: 13px; font-weight: 800; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(224,140,5,.45);">▶</span>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    
+
+    <section style="padding: 0 clamp(16px, 2.4vw, 22px); display: flex; flex-direction: column; gap: 16px;">
+      <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+        <span style="width: 4px; height: clamp(24px, 5.6vw, 28px); border-radius: 999px; background: linear-gradient(180deg, #ffd766, #e07f05); box-shadow: 0 0 12px rgba(240,150,10,.5); flex: none;"></span>
+        <span style="font-size: clamp(22px, 5.6vw, 28px); font-weight: 800; letter-spacing: -.6px; color: #fff;">Quick Play</span>
+        <span style="flex: 1; min-width: 8px;"></span>
+        <span style="font-size: 13px; font-weight: 500; color: #a795c5;"></span>
+        <sc-if value="{{ qpArrows }}" hint-placeholder-val="{{ true }}">
+        <div style="display: flex; gap: {{ arrowGap }};">
+          <button onClick="{{ qpPrev }}" disabled="{{ qpPrevDis }}" aria-label="Previous Quick Play" style="width: {{ arrowSize }}; height: {{ arrowSize }}; padding: 0; border: 0; background: transparent; cursor: {{ qpPrevCur }}; opacity: {{ qpPrevOp }}; transition: opacity .2s ease; display: flex; align-items: center; justify-content: center;"><span style="width: {{ arrowVis }}; height: {{ arrowVis }}; box-sizing: border-box; border: 1px solid rgba(167,139,250,.26); border-radius: 50%; background: rgba(255,255,255,.04); color: #cbb6e6; font-family: Manrope, sans-serif; font-size: {{ arrowFont }}; font-weight: 700; display: flex; align-items: center; justify-content: center;" style-hover="border-color: rgba(255,201,60,.55); color: #ffc93c">‹</span></button>
+          <button onClick="{{ qpNext }}" disabled="{{ qpNextDis }}" aria-label="Next Quick Play" style="width: {{ arrowSize }}; height: {{ arrowSize }}; padding: 0; border: 0; background: transparent; cursor: {{ qpNextCur }}; opacity: {{ qpNextOp }}; transition: opacity .2s ease; display: flex; align-items: center; justify-content: center;"><span style="width: {{ arrowVis }}; height: {{ arrowVis }}; box-sizing: border-box; border: 1px solid rgba(167,139,250,.26); border-radius: 50%; background: rgba(255,255,255,.04); color: #cbb6e6; font-family: Manrope, sans-serif; font-size: {{ arrowFont }}; font-weight: 700; display: flex; align-items: center; justify-content: center;" style-hover="border-color: rgba(255,201,60,.55); color: #ffc93c">›</span></button>
+        </div>
+        </sc-if>
+      </div>
+
+      <div ref="{{ qpRail }}" onScroll="{{ qpScroll }}" style="display: flex; gap: {{ railGap }}; overflow-x: auto; overscroll-behavior-x: contain; scroll-behavior: smooth; scroll-snap-type: {{ railSnap }}; scroll-padding-inline: {{ railScrollPad }}; padding: {{ railPad }}; margin: {{ railMargin }}; scrollbar-width: none;">
+
+        <div onClick="{{ openCategory }}" onKeyDown="{{ keyActivate }}" data-cat="Slots" role="link" tabindex="0" aria-label="Slots" style="position: relative; flex: 1 0 {{ cardW }}; min-width: {{ cardW }}; scroll-snap-align: start; height: {{ cardH }}; border-radius: 18px; overflow: hidden; border: 1px solid rgba(167,139,250,.2); background: #1b0a1f; box-shadow: 0 12px 30px rgba(0,0,0,.45); cursor: pointer; transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;" style-hover="transform: translateY(-6px); border-color: rgba(255,201,60,.55); box-shadow: 0 20px 40px rgba(0,0,0,.55), 0 0 26px rgba(240,150,10,.22)">
+          <div style="position: absolute; inset: 0; transition: transform .4s ease;" style-hover="transform: scale(1.06)">
+            <img src="assets/qp-slots.png" alt="Slots" style="position: absolute; inset: 0; width: 100%; height: 121.7%; object-fit: cover; object-position: 50% 0%; display: block;">
+          </div>
+          <span style="position: absolute; inset: auto 0 0 0; height: 118px; background: linear-gradient(180deg, transparent, rgba(11,4,20,.72) 46%, rgba(9,3,16,.96));"></span>
+          <div style="position: absolute; inset: auto 0 0 0; padding: clamp(11px, 3vw, 14px); display: flex; align-items: flex-end; gap: clamp(8px, 2.4vw, 10px);">
+            <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px;">
+              <span style="font-size: clamp(15px, 4vw, 16px); font-weight: 800; line-height: 1.2; color: #fff;">Slots</span>
+              <span style="font-size: 12px; font-weight: 500; color: #b3a0d1;">1,240+ games</span>
+            </span>
+            <span style="width: clamp(32px, 9vw, 38px); height: clamp(32px, 9vw, 38px); flex: none; border-radius: 50%; background: linear-gradient(180deg, #ffd766, #eb9c0d); color: #2c1400; font-size: 13px; font-weight: 800; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(224,140,5,.45);">▶</span>
+          </div>
+        </div>
+
+        <div onClick="{{ openCategory }}" onKeyDown="{{ keyActivate }}" data-cat="Blackjack" role="link" tabindex="0" aria-label="Blackjack" style="position: relative; flex: 1 0 {{ cardW }}; min-width: {{ cardW }}; scroll-snap-align: start; height: {{ cardH }}; border-radius: 18px; overflow: hidden; border: 1px solid rgba(167,139,250,.2); background: #170a29; box-shadow: 0 12px 30px rgba(0,0,0,.45); cursor: pointer; transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;" style-hover="transform: translateY(-6px); border-color: rgba(255,201,60,.55); box-shadow: 0 20px 40px rgba(0,0,0,.55), 0 0 26px rgba(167,139,250,.24)">
+          <div style="position: absolute; inset: 0; transition: transform .4s ease;" style-hover="transform: scale(1.06)">
+            <img src="assets/qp-blackjack.png" alt="Blackjack" style="position: absolute; inset: 0; width: 110%; height: 129.25%; object-fit: cover; object-position: 50% 0%; display: block; left: -6.4%; top: 0;">
+          </div>
+          <span style="position: absolute; inset: auto 0 0 0; height: 118px; background: linear-gradient(180deg, transparent, rgba(11,4,20,.72) 46%, rgba(9,3,16,.96));"></span>
+          <div style="position: absolute; inset: auto 0 0 0; padding: clamp(11px, 3vw, 14px); display: flex; align-items: flex-end; gap: clamp(8px, 2.4vw, 10px);">
+            <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px;">
+              <span style="font-size: clamp(15px, 4vw, 16px); font-weight: 800; line-height: 1.2; color: #fff;">Blackjack</span>
+              <span style="font-size: 12px; font-weight: 500; color: #b3a0d1;">38 tables</span>
+            </span>
+            <span style="width: clamp(32px, 9vw, 38px); height: clamp(32px, 9vw, 38px); flex: none; border-radius: 50%; background: linear-gradient(180deg, #ffd766, #eb9c0d); color: #2c1400; font-size: 13px; font-weight: 800; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(224,140,5,.45);">▶</span>
+          </div>
+        </div>
+
+        <div onClick="{{ openCategory }}" onKeyDown="{{ keyActivate }}" data-cat="Roulette" role="link" tabindex="0" aria-label="Roulette" style="position: relative; flex: 1 0 {{ cardW }}; min-width: {{ cardW }}; scroll-snap-align: start; height: {{ cardH }}; border-radius: 18px; overflow: hidden; border: 1px solid rgba(167,139,250,.2); background: #170a29; box-shadow: 0 12px 30px rgba(0,0,0,.45); cursor: pointer; transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;" style-hover="transform: translateY(-6px); border-color: rgba(255,201,60,.55); box-shadow: 0 20px 40px rgba(0,0,0,.55), 0 0 26px rgba(225,29,72,.24)">
+          <div style="position: absolute; inset: 0; transition: transform .4s ease;" style-hover="transform: scale(1.06)">
+            <img src="assets/qp-roulette.png" alt="Roulette" style="position: absolute; inset: 0; width: 110%; height: 129.25%; object-fit: cover; object-position: 50% 0%; display: block; left: -7%; top: 0;">
+          </div>
+          <span style="position: absolute; inset: auto 0 0 0; height: 118px; background: linear-gradient(180deg, transparent, rgba(11,4,20,.72) 46%, rgba(9,3,16,.96));"></span>
+          <div style="position: absolute; inset: auto 0 0 0; padding: clamp(11px, 3vw, 14px); display: flex; align-items: flex-end; gap: clamp(8px, 2.4vw, 10px);">
+            <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px;">
+              <span style="font-size: clamp(15px, 4vw, 16px); font-weight: 800; line-height: 1.2; color: #fff;">Roulette</span>
+              <span style="font-size: 12px; font-weight: 500; color: #b3a0d1;">24 wheels</span>
+            </span>
+            <span style="width: clamp(32px, 9vw, 38px); height: clamp(32px, 9vw, 38px); flex: none; border-radius: 50%; background: linear-gradient(180deg, #ffd766, #eb9c0d); color: #2c1400; font-size: 13px; font-weight: 800; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(224,140,5,.45);">▶</span>
+          </div>
+        </div>
+
+        <div onClick="{{ openCategory }}" onKeyDown="{{ keyActivate }}" data-cat="Live Casino" role="link" tabindex="0" aria-label="Live Casino" style="position: relative; flex: 1 0 {{ cardW }}; min-width: {{ cardW }}; scroll-snap-align: start; height: {{ cardH }}; border-radius: 18px; overflow: hidden; border: 1px solid rgba(167,139,250,.2); background: #0f3b33; box-shadow: 0 12px 30px rgba(0,0,0,.45); cursor: pointer; transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;" style-hover="transform: translateY(-6px); border-color: rgba(255,201,60,.55); box-shadow: 0 20px 40px rgba(0,0,0,.55), 0 0 26px rgba(45,212,191,.22)">
+          <div style="position: absolute; inset: 0; transition: transform .4s ease;" style-hover="transform: scale(1.06)">
+            <img src="assets/qp-live-casino.png" alt="Live Casino" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 56% 14%; display: block;">
+          </div>
+          <span style="position: absolute; inset: auto 0 0 0; height: 118px; background: linear-gradient(180deg, transparent, rgba(11,4,20,.72) 46%, rgba(9,3,16,.96));"></span>
+          <span style="position: absolute; top: 10px; left: 10px; height: 24px; display: flex; align-items: center; gap: 5px; padding: 0 9px; border-radius: 8px; background: #e11d48; font-size: 10.5px; font-weight: 800; letter-spacing: 1.1px; color: #fff; box-shadow: 0 4px 14px rgba(225,29,72,.45);"><span style="width: 5px; height: 5px; border-radius: 50%; background: #fff; animation: chochoBlink 1.6s ease-in-out infinite;"></span>LIVE</span>
+          <div style="position: absolute; inset: auto 0 0 0; padding: clamp(11px, 3vw, 14px); display: flex; align-items: flex-end; gap: clamp(8px, 2.4vw, 10px);">
+            <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px;">
+              <span style="font-size: clamp(15px, 4vw, 16px); font-weight: 800; line-height: 1.2; color: #fff;">Live Casino</span>
+              <span style="font-size: 12px; font-weight: 500; color: #b3a0d1;">Live dealers</span>
+            </span>
+            <span style="width: clamp(32px, 9vw, 38px); height: clamp(32px, 9vw, 38px); flex: none; border-radius: 50%; background: linear-gradient(180deg, #ffd766, #eb9c0d); color: #2c1400; font-size: 13px; font-weight: 800; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(224,140,5,.45);">▶</span>
+          </div>
+        </div>
+
+        <div onClick="{{ openCategory }}" onKeyDown="{{ keyActivate }}" data-cat="All Games" role="link" tabindex="0" aria-label="All Games" style="position: relative; flex: 1 0 {{ cardW }}; min-width: {{ cardW }}; scroll-snap-align: start; height: {{ cardH }}; border-radius: 18px; overflow: hidden; border: 1px solid rgba(167,139,250,.2); background: #16215c; box-shadow: 0 12px 30px rgba(0,0,0,.45); cursor: pointer; transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;" style-hover="transform: translateY(-6px); border-color: rgba(255,201,60,.55); box-shadow: 0 20px 40px rgba(0,0,0,.55), 0 0 26px rgba(96,165,250,.24)">
+          <div style="position: absolute; inset: 0; transition: transform .4s ease;" style-hover="transform: scale(1.06)">
+            <img src="assets/qp-all-games.png" alt="All Games" style="position: absolute; inset: 0; width: 110%; height: 129.25%; object-fit: cover; object-position: 50% 0%; display: block; left: -14%; top: 1px;">
+            <span style="position: absolute; inset: 0; background: radial-gradient(56% 44% at 50% 56%, transparent 42%, rgba(8,4,20,.5) 100%);"></span>
+          </div>
+          <span style="position: absolute; inset: auto 0 0 0; height: 118px; background: linear-gradient(180deg, transparent, rgba(11,4,20,.72) 46%, rgba(9,3,16,.96));"></span>
+          <div style="position: absolute; inset: auto 0 0 0; padding: clamp(11px, 3vw, 14px); display: flex; align-items: flex-end; gap: clamp(8px, 2.4vw, 10px);">
+            <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px;">
+              <span style="font-size: clamp(15px, 4vw, 16px); font-weight: 800; line-height: 1.2; color: #fff;">All Games</span>
+              <span style="font-size: 12px; font-weight: 500; color: #b3a0d1;">Browse lobby</span>
+            </span>
+            <span style="width: clamp(32px, 9vw, 38px); height: clamp(32px, 9vw, 38px); flex: none; border-radius: 50%; background: linear-gradient(180deg, #ffd766, #eb9c0d); color: #2c1400; font-size: 13px; font-weight: 800; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(224,140,5,.45);">▶</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    
+
+    <section style="padding: 0 clamp(16px, 2.4vw, 22px); display: flex; flex-direction: column; gap: 16px;">
+      <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+        <span style="width: 4px; height: clamp(24px, 5.6vw, 28px); border-radius: 999px; background: linear-gradient(180deg, #ffd766, #e07f05); box-shadow: 0 0 12px rgba(240,150,10,.5); flex: none;"></span>
+        <span style="font-size: clamp(22px, 5.6vw, 28px); font-weight: 800; letter-spacing: -.6px; color: #fff;">Bonuses</span>
+        <span style="flex: 1; min-width: 8px;"></span>
+        <sc-if value="{{ bonusArrows }}" hint-placeholder-val="{{ true }}">
+        <div style="display: flex; gap: {{ arrowGap }};">
+          <button onClick="{{ bonusPrev }}" disabled="{{ bonusPrevDis }}" aria-label="Previous Bonuses" style="width: {{ arrowSize }}; height: {{ arrowSize }}; padding: 0; border: 0; background: transparent; cursor: {{ bonusPrevCur }}; opacity: {{ bonusPrevOp }}; transition: opacity .2s ease; display: flex; align-items: center; justify-content: center;"><span style="width: {{ arrowVis }}; height: {{ arrowVis }}; box-sizing: border-box; border: 1px solid rgba(167,139,250,.26); border-radius: 50%; background: rgba(255,255,255,.04); color: #cbb6e6; font-family: Manrope, sans-serif; font-size: {{ arrowFont }}; font-weight: 700; display: flex; align-items: center; justify-content: center;" style-hover="border-color: rgba(255,201,60,.55); color: #ffc93c">‹</span></button>
+          <button onClick="{{ bonusNext }}" disabled="{{ bonusNextDis }}" aria-label="Next Bonuses" style="width: {{ arrowSize }}; height: {{ arrowSize }}; padding: 0; border: 0; background: transparent; cursor: {{ bonusNextCur }}; opacity: {{ bonusNextOp }}; transition: opacity .2s ease; display: flex; align-items: center; justify-content: center;"><span style="width: {{ arrowVis }}; height: {{ arrowVis }}; box-sizing: border-box; border: 1px solid rgba(167,139,250,.26); border-radius: 50%; background: rgba(255,255,255,.04); color: #cbb6e6; font-family: Manrope, sans-serif; font-size: {{ arrowFont }}; font-weight: 700; display: flex; align-items: center; justify-content: center;" style-hover="border-color: rgba(255,201,60,.55); color: #ffc93c">›</span></button>
+        </div>
+        </sc-if>
+      </div>
+      <div ref="{{ bonusRail }}" onScroll="{{ bonusScroll }}" style="display: {{ bDisplay }}; grid-template-columns: {{ bCols }}; gap: {{ railGap }}; overflow-x: {{ bOverflow }}; scroll-behavior: smooth; scroll-snap-type: x proximity; padding: 4px 2px 12px; margin: -4px -2px -12px; scrollbar-width: none;">
+
+        <div onClick="{{ openPromo }}" onKeyDown="{{ keyActivate }}" data-promo="welcome" role="link" tabindex="0" aria-label="Welcome Bonus: view in Promotions" style="cursor: pointer; flex: 1 1 200px; min-width: {{ bMinW }}; scroll-snap-align: start; box-sizing: border-box; padding: {{ bPad }}; border: 1px solid rgba(167,139,250,.22); border-radius: 18px; background: linear-gradient(160deg, rgba(124,58,237,.26) 0%, rgba(22,9,38,.96) 58%); display: flex; flex-direction: column; gap: {{ bGap }}; transition: transform .2s ease, box-shadow .2s ease;" style-hover="transform: translateY(-4px); box-shadow: 0 18px 38px rgba(0,0,0,.5), 0 0 24px rgba(139,92,246,.22)">
+          <div style="min-height: {{ bHdrH }}; display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px;">
+            <span style="width: 44px; height: 44px; flex: none; display: flex; align-items: center; justify-content: center;">
+              <img src="assets/icon-gift.png" alt="Welcome bonus" style="width: 40px; height: 40px; object-fit: contain; display: block; filter: drop-shadow(0 4px 8px rgba(0,0,0,.85)) drop-shadow(0 0 14px rgba(0,0,0,.6));" />
+            </span>
+            <span style="flex: 1 1 100px; display: flex; flex-direction: column; gap: 3px; min-width: 0;">
+              <span style="font-size: 12.5px; font-weight: 800; line-height: 1.3; letter-spacing: 1px; color: #fff;">WELCOME BONUS</span>
+              <span style="font-size: 12.5px; font-weight: 500; line-height: 1.35; min-height: {{ subMinH }}; color: #a795c5;">100% up to</span>
+            </span>
+          </div>
+          <span style="font-size: clamp(28px, 8vw, 32px); font-weight: 800; line-height: 1.15; letter-spacing: -1px; color: #ffc93c; text-shadow: 0 0 22px rgba(255,201,60,.3);">₱5,000</span>
+          <div style="margin-top: auto; padding-top: 2px; min-height: {{ bActH }}; display: flex; align-items: center; gap: 10px;">
+            <span style="width: 28px; height: 28px; flex: none; border-radius: 50%; border: 1px solid rgba(167,139,250,.3); background: rgba(255,255,255,.06); color: #e2d6f7; font-size: 12px; display: flex; align-items: center; justify-content: center;">›</span>
+            <span style="font-size: 12.5px; font-weight: 500; color: #a795c5;">Start your winning journey</span>
+          </div>
+        </div>
+
+        <div onClick="{{ openPromo }}" onKeyDown="{{ keyActivate }}" data-promo="reload" role="link" tabindex="0" aria-label="Reload Bonus: view in Promotions" style="cursor: pointer; flex: 1 1 200px; min-width: {{ bMinW }}; scroll-snap-align: start; box-sizing: border-box; padding: {{ bPad }}; border: 1px solid rgba(235,156,13,.22); border-radius: 18px; background: linear-gradient(160deg, rgba(235,156,13,.22) 0%, rgba(26,11,26,.96) 58%); display: flex; flex-direction: column; gap: {{ bGap }}; transition: transform .2s ease, box-shadow .2s ease;" style-hover="transform: translateY(-4px); box-shadow: 0 18px 38px rgba(0,0,0,.5), 0 0 24px rgba(235,156,13,.22)">
+          <div style="min-height: {{ bHdrH }}; display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px;">
+            <span style="width: 44px; height: 44px; flex: none; display: flex; align-items: center; justify-content: center;">
+              <img src="assets/icon-coins.png" alt="Reload bonus" style="width: 40px; height: 40px; object-fit: contain; display: block; filter: drop-shadow(0 4px 8px rgba(0,0,0,.85)) drop-shadow(0 0 14px rgba(0,0,0,.6));" />
+            </span>
+            <span style="flex: 1 1 100px; display: flex; flex-direction: column; gap: 3px; min-width: 0;">
+              <span style="font-size: 12.5px; font-weight: 800; line-height: 1.3; letter-spacing: 1px; color: #fff;">RELOAD BONUS</span>
+              <span style="font-size: 12.5px; font-weight: 500; line-height: 1.35; min-height: {{ subMinH }}; color: #c4ab8e;">50% up to</span>
+            </span>
+          </div>
+          <span style="font-size: clamp(28px, 8vw, 32px); font-weight: 800; line-height: 1.15; letter-spacing: -1px; color: #ffc93c; text-shadow: 0 0 22px rgba(255,201,60,.3);">₱3,000</span>
+          <div style="margin-top: auto; padding-top: 2px; min-height: {{ bActH }}; display: flex; align-items: center; gap: 10px;">
+            <span style="width: 28px; height: 28px; flex: none; border-radius: 50%; border: 1px solid rgba(255,201,60,.3); background: rgba(255,255,255,.06); color: #ffe08a; font-size: 12px; display: flex; align-items: center; justify-content: center;">›</span>
+            <span style="font-size: 12.5px; font-weight: 500; color: #c4ab8e;">Play more, get more</span>
+          </div>
+        </div>
+
+        <div onClick="{{ openPromo }}" onKeyDown="{{ keyActivate }}" data-promo="cashback" role="link" tabindex="0" aria-label="Cashback: view in Promotions" style="cursor: pointer; flex: 1 1 200px; min-width: {{ bMinW }}; scroll-snap-align: start; box-sizing: border-box; padding: {{ bPad }}; border: 1px solid rgba(167,139,250,.22); border-radius: 18px; background: linear-gradient(160deg, rgba(76,29,149,.3) 0%, rgba(18,8,32,.96) 58%); display: flex; flex-direction: column; gap: {{ bGap }}; transition: transform .2s ease, box-shadow .2s ease;" style-hover="transform: translateY(-4px); box-shadow: 0 18px 38px rgba(0,0,0,.5), 0 0 24px rgba(139,92,246,.2)">
+          <div style="min-height: {{ bHdrH }}; display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px;">
+            <span style="width: 44px; height: 44px; flex: none; display: flex; align-items: center; justify-content: center;">
+              <img src="assets/icon-percent.png" alt="Cashback" style="width: 40px; height: 40px; object-fit: contain; display: block; filter: drop-shadow(0 4px 8px rgba(0,0,0,.85)) drop-shadow(0 0 14px rgba(0,0,0,.6));" />
+            </span>
+            <span style="flex: 1 1 100px; display: flex; flex-direction: column; gap: 3px; min-width: 0;">
+              <span style="font-size: 12.5px; font-weight: 800; line-height: 1.3; letter-spacing: 1px; color: #fff;">CASHBACK</span>
+              <span style="font-size: 12.5px; font-weight: 500; line-height: 1.35; min-height: {{ subMinH }}; color: #a795c5;">Every week, up to</span>
+            </span>
+          </div>
+          <span style="font-size: clamp(28px, 8vw, 32px); font-weight: 800; line-height: 1.15; letter-spacing: -1px; color: #ffc93c; text-shadow: 0 0 22px rgba(255,201,60,.3);">10%</span>
+          <div style="margin-top: auto; padding-top: 2px; min-height: {{ bActH }}; display: flex; align-items: center; gap: 10px;">
+            <span style="width: 28px; height: 28px; flex: none; border-radius: 50%; border: 1px solid rgba(167,139,250,.3); background: rgba(255,255,255,.06); color: #e2d6f7; font-size: 12px; display: flex; align-items: center; justify-content: center;">›</span>
+            <span style="font-size: 12.5px; font-weight: 500; color: #a795c5;">We got your back</span>
+          </div>
+        </div>
+
+        <div onClick="{{ openPromo }}" onKeyDown="{{ keyActivate }}" data-promo="boost" role="link" tabindex="0" aria-label="Cash Boost: view in Promotions" style="cursor: pointer; flex: 1 1 200px; min-width: {{ bMinW }}; scroll-snap-align: start; box-sizing: border-box; padding: {{ bPad }}; border: 1px solid rgba(56,189,248,.22); border-radius: 18px; background: linear-gradient(160deg, rgba(14,116,190,.26) 0%, rgba(13,10,34,.96) 58%); display: flex; flex-direction: column; gap: {{ bGap }}; transition: transform .2s ease, box-shadow .2s ease;" style-hover="transform: translateY(-4px); box-shadow: 0 18px 38px rgba(0,0,0,.5), 0 0 24px rgba(56,189,248,.2)">
+          <div style="min-height: {{ bHdrH }}; display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px;">
+            <span style="width: 44px; height: 44px; flex: none; display: flex; align-items: center; justify-content: center;">
+              <img src="assets/icon-bolt.png" alt="Cash boost" style="width: 40px; height: 40px; object-fit: contain; display: block; filter: drop-shadow(0 4px 8px rgba(0,0,0,.85)) drop-shadow(0 0 14px rgba(0,0,0,.6));" />
+            </span>
+            <span style="flex: 1 1 100px; display: flex; flex-direction: column; gap: 3px; min-width: 0;">
+              <span style="font-size: 12.5px; font-weight: 800; line-height: 1.3; letter-spacing: 1px; color: #fff;">CASH BOOST</span>
+              <span style="font-size: 12.5px; font-weight: 500; line-height: 1.35; min-height: {{ subMinH }}; color: #94a9c4;">Extra on GCash deposits</span>
+            </span>
+          </div>
+          <span style="font-size: clamp(28px, 8vw, 32px); font-weight: 800; line-height: 1.15; letter-spacing: -1px; color: #ffc93c; text-shadow: 0 0 22px rgba(255,201,60,.3);">+5%</span>
+          <div style="margin-top: auto; padding-top: 2px; min-height: {{ bActH }}; display: flex; align-items: center; gap: 10px;">
+            <span style="width: 28px; height: 28px; flex: none; border-radius: 50%; border: 1px solid rgba(56,189,248,.3); background: rgba(255,255,255,.06); color: #cfe6fb; font-size: 12px; display: flex; align-items: center; justify-content: center;">›</span>
+            <span style="font-size: 12.5px; font-weight: 500; color: #94a9c4;">More play, more rewards</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+<section style="padding: 0 clamp(16px, 2.4vw, 22px); display: flex; flex-direction: column; gap: 16px;">
+      <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+        <span style="width: 4px; height: clamp(24px, 5.6vw, 28px); border-radius: 999px; background: linear-gradient(180deg, #ffd766, #e07f05); box-shadow: 0 0 12px rgba(240,150,10,.5); flex: none;"></span>
+        <span style="font-size: clamp(22px, 5.6vw, 28px); font-weight: 800; letter-spacing: -.6px; color: #fff;">Payments</span>
+        
+        <span style="flex: 1; min-width: 8px;"></span>
+        
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 12px;">
+
+        <div style="padding: 10px; border: 1px solid rgba(56,189,248,.3); border-radius: 14px; background: linear-gradient(150deg, rgba(0,125,240,.22) 0%, rgba(11,6,26,.95) 70%); display: flex; align-items: center; gap: 12px;">
+          <div style="width: 96px; height: 58px; flex: none; border-radius: 10px; background: linear-gradient(150deg, #0a8ef5, #0059c2); display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 6px 16px rgba(0,90,200,.32);">
+            <img src="assets/gcash.jpg" alt="GCash" style="width: 100%; height: 100%; object-fit: contain; display: block;">
+          </div>
+          <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px;">
+            <sc-for list="{{ gcashPoints }}" as="p" hint-placeholder-count="3">
+              <span style="display: flex; align-items: center; gap: 7px; font-size: 12.5px; font-weight: 600; color: #e6ddf5;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" style="flex: none;"><path d="M4 12.5l5 5L20 6.5"></path></svg>
+                {{ p }}
+              </span>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="padding: 10px; border: 1px solid rgba(52,211,153,.28); border-radius: 14px; background: linear-gradient(150deg, rgba(16,185,129,.18) 0%, rgba(11,6,26,.95) 70%); display: flex; align-items: center; gap: 12px;">
+          <div style="width: 96px; height: 58px; flex: none; border-radius: 10px; background: #000; border: 1px solid rgba(52,211,153,.25); display: flex; align-items: center; justify-content: center; overflow: hidden;">
+            <img src="assets/maya.jpg" alt="Maya" style="width: 100%; height: 100%; object-fit: contain; display: block;">
+          </div>
+          <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px;">
+            <sc-for list="{{ mayaPoints }}" as="p" hint-placeholder-count="3">
+              <span style="display: flex; align-items: center; gap: 7px; font-size: 12.5px; font-weight: 600; color: #e6ddf5;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" style="flex: none;"><path d="M4 12.5l5 5L20 6.5"></path></svg>
+                {{ p }}
+              </span>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section style="margin: 0 clamp(16px, 2.4vw, 22px); padding: {{ trustSecPad }}; border: 1px solid rgba(167,139,250,.16); border-radius: 18px; background: linear-gradient(180deg, rgba(255,255,255,.045) 0%, rgba(255,255,255,.02) 100%); display: flex; align-items: center; flex-wrap: wrap; gap: {{ trustSecGap }};">
+      <div style="flex: 1 1 min(100%, 480px); min-width: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, {{ trustMin }}), 1fr)); gap: {{ trustGap }};">
+        <sc-for list="{{ trustItems }}" as="t" hint-placeholder-count="3">
+          <div style="display: flex; align-items: center; gap: 11px; min-width: 0; padding: {{ trustPad }}; border-left: 1px solid {{ t.divider }};">
+            <span style="width: 40px; height: 40px; flex: none; display: flex; align-items: center; justify-content: center;">{{ t.icon }}</span>
+            <span style="display: flex; flex-direction: column; gap: 3px; min-width: 0;">
+              <span style="font-size: 14px; font-weight: 700; color: #fff;">{{ t.title }}</span>
+              <span style="font-size: 12px; font-weight: 500; line-height: 1.35; color: #a795c5; text-wrap: pretty;">{{ t.sub }}</span>
+            </span>
+          </div>
+        </sc-for>
+      </div>
+      <span style="flex: {{ tagFlex }}; margin-left: {{ tagMl }}; display: flex; align-items: center; gap: 8px; font-family: Caveat, cursive; font-size: 22px; font-weight: 700; color: #e9a832; white-space: nowrap;">Tuloy ang Good Vibes <span style="font-size: 15px; color: #ff5d7d;">♥</span></span>
+    </section>
+
+    <dc-import name="ChoCho Footer" hint-size="100%,120px"></dc-import>
+
+    <dc-import name="ChoCho Bottom Nav" active="home" compact="{{ true }}" hint-size="1px,1px"></dc-import>
+  </div>
+
+  <dc-import name="ChoCho Support" hint-size="1px,1px"></dc-import>
+
+  <sc-if value="{{ wheelOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeWheel }}" style="position: fixed; inset: 0; background: rgba(5,2,10,.84); display: flex; align-items: center; justify-content: center; z-index: 250; padding: 20px;">
+      <div role="dialog" aria-modal="true" aria-labelledby="home-wheel-title" style="position: relative; width: 440px; max-width: 100%; max-height: calc(100dvh - 40px); overflow-y: auto; box-sizing: border-box; padding: 28px; border-radius: 22px; border: 1px solid rgba(255,201,60,.4); background: linear-gradient(160deg, #2c1050, #150726); display: flex; flex-direction: column; align-items: center; gap: 18px;">
+        <button onClick="{{ closeWheelBtn }}" aria-label="Close Lucky Wheel" style="position: absolute; top: 12px; right: 12px; width: 44px; height: 44px; border: 1px solid rgba(167,139,250,.28); border-radius: 12px; background: rgba(255,255,255,.06); color: #cbb6e6; font-family: Manrope, sans-serif; font-size: 15px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center;" style-hover="background: rgba(255,255,255,.14); color: #fff">✕</button>
+        <div id="home-wheel-title" style="font-size: 24px; font-weight: 800; letter-spacing: -.4px; color: #fff;">Lucky Wheel</div>
+        <div style="position: relative; width: min(280px, 64vw); height: min(280px, 64vw);">
+          <div style="position: absolute; top: -6px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent; border-top: 20px solid #ffc93c; z-index: 2;"></div>
+          <div style="{{ wheelStyle }}; position: absolute; inset: 0; border-radius: 50%; border: 8px solid #ffc93c; background: conic-gradient(#6d28a8 0deg 45deg, #f0a30a 45deg 90deg, #4c1d95 90deg 135deg, #ffd766 135deg 180deg, #6d28a8 180deg 225deg, #f0a30a 225deg 270deg, #4c1d95 270deg 315deg, #ffd766 315deg 360deg);"></div>
+          <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80px; height: 80px; border-radius: 50%; overflow: hidden; border: 3px solid #ffc93c; z-index: 2;">
+            <img src="assets/chocho-logo.jpg" alt="ChoCho" style="width: 300%; height: 300%; margin-left: -95%; margin-top: -30%; display: block;">
+          </div>
+        </div>
+        <div style="font-size: 14px; font-weight: 600; color: #cbb6e6; min-height: 22px; text-align: center;">{{ wheelMsg }}</div>
+        <button onClick="{{ spin }}" style="height: 52px; padding: 0 40px; border: 0; border-radius: 14px; background: linear-gradient(180deg, #ffd766, #eb9c0d); color: #2c1400; font-family: Manrope, sans-serif; font-size: 17px; font-weight: 800; cursor: pointer;" style-hover="filter: brightness(1.06)">Spin</button>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1024,&quot;height&quot;:1900},&quot;previewSession&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;shared&quot;,&quot;guest&quot;,&quot;signed-in&quot;],&quot;default&quot;:&quot;shared&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Internal review&quot;}}">
+class Component extends DCLogic {
+  state = {
+    hero: 0,
+    draft: "",
+    msgs: [
+      { me: false, text: "Hey there! I'm ChoCho \u2014 waving at you from the jungle. Need a hand with anything?" },
+      { me: false, text: "Deposits, withdrawals, bonuses: ask away and I'll sort it out." }
+    ],
+    wheelOpen: false,
+    spinDeg: 0,
+    wheelMsg: "One free spin a day. Tap Spin to try your luck."
+  };
+
+  bubble(m) {
+    return {
+      text: m.text,
+      align: m.me ? "flex-end" : "flex-start",
+      bg: m.me ? "linear-gradient(180deg,#ffd766,#e6a013)" : "rgba(255,255,255,.08)",
+      color: m.me ? "#2c1400" : "#efe6fa"
+    };
+  }
+
+  push(text) {
+    const canned = {
+      "Deposit help": "Deposits with GCash or Maya land instantly. Send me your reference number and I'll trace it.",
+      "How to withdraw": "Open your wallet, pick GCash or Maya, minimum \u20b1300. Average payout today is 4 minutes.",
+      "Bonus question": "Your welcome bonus is 100% up to \u20b15,000 on the first deposit. Wagering is 20x.",
+      "Talk to an agent": "Connecting you to a live agent now \u2014 average wait is under a minute."
+    };
+    this.setState(s => ({ msgs: s.msgs.concat([{ me: true, text: text }]), draft: "" }));
+    setTimeout(() => {
+      this.setState(s => ({
+        msgs: s.msgs.concat([{ me: false, text: canned[text] || "Got it. Let me check that for you \u2014 one moment." }])
+      }));
+    }, 700);
+  }
+
+  _rail = React.createRef();
+  _qp = React.createRef();
+  _bonus = React.createRef();
+
+  step(ref, dir) {
+    const n = ref.current;
+    if (!n) return;
+    const card = n.firstElementChild;
+    const gap = parseFloat(getComputedStyle(n).columnGap) || 14;
+    const w = card ? card.getBoundingClientRect().width + gap : 180;
+    n.scrollBy({ left: dir * w, behavior: "smooth" });
+  }
+
+  railInfo(ref) {
+    const n = ref.current;
+    if (!n || getComputedStyle(n).display === "grid") return { ov: false, p: false, n: false };
+    const max = n.scrollWidth - n.clientWidth;
+    return { ov: max > 2, p: n.scrollLeft > 2, n: n.scrollLeft < max - 2 };
+  }
+
+  measureRails() {
+    const r = { hot: this.railInfo(this._rail), qp: this.railInfo(this._qp), bonus: this.railInfo(this._bonus) };
+    const key = JSON.stringify(r);
+    if (key !== this._railKey) { this._railKey = key; this.setState({ rails: r }); }
+  }
+
+  /* Lucky Wheel (bottom navigation → Home#wheel) opens the existing wheel presentation. */
+  syncWheel() {
+    const want = window.location.hash.toLowerCase() === "#wheel";
+    if (want && !this.state.wheelOpen) {
+      this._wheelTrigger = document.activeElement;
+      this.setState({ wheelOpen: true, wheelMsg: "One free spin a day. Tap Spin to try your luck." });
+    }
+  }
+
+  closeWheel() {
+    if (window.location.hash.toLowerCase() === "#wheel") {
+      try { history.replaceState(history.state, "", window.location.pathname + window.location.search); } catch (e) {}
+    }
+    const t = this._wheelTrigger; this._wheelTrigger = null;
+    this.setState({ wheelOpen: false }, () => { if (t && t.isConnected && t.focus) { try { t.focus(); } catch (e) {} } });
+  }
+
+  applyPreview() {
+    const s = window.ChoChoSite;
+    if (!s) { window.addEventListener("chocho:site-ready", () => this.applyPreview(), { once: true }); return; }
+    s.applyPreviewProp(this.props.previewSession);
+  }
+
+  componentDidMount() {
+    this.applyPreview();
+    this._onHash = () => this.syncWheel();
+    window.addEventListener("hashchange", this._onHash);
+    this._onWheelKey = (e) => { if (e.key === "Escape" && this.state.wheelOpen) { e.stopPropagation(); this.closeWheel(); } };
+    document.addEventListener("keydown", this._onWheelKey, true);
+    this.syncWheel();
+    this._t = setInterval(() => { if (!this.state.heroPaused) this.setState(s => ({ hero: (s.hero + 1) % 4 })); }, 7000);
+    this._onResize = () => {
+      const vw = window.innerWidth;
+      if (vw !== this.state.vw) this.setState({ vw: vw });
+      requestAnimationFrame(() => this.measureRails());
+    };
+    window.addEventListener("resize", this._onResize);
+    this._onResize();
+    setTimeout(() => this.measureRails(), 400);
+  }
+
+  componentDidUpdate(prev) {
+    if (prev && prev.previewSession !== this.props.previewSession) this.applyPreview();
+    cancelAnimationFrame(this._raf);
+    this._raf = requestAnimationFrame(() => this.measureRails());
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("hashchange", this._onHash);
+    document.removeEventListener("keydown", this._onWheelKey, true);
+    clearInterval(this._t);
+    cancelAnimationFrame(this._raf);
+    window.removeEventListener("resize", this._onResize);
+  }
+
+  arrows(k) {
+    const r = (this.state.rails || {})[k] || { ov: true, p: false, n: true };
+    const out = {};
+    out[k + "Arrows"] = r.ov && !((this.state.vw || window.innerWidth) < 600);
+    out[k + "PrevDis"] = !r.p; out[k + "NextDis"] = !r.n;
+    out[k + "PrevOp"] = r.p ? 1 : 0.35; out[k + "NextOp"] = r.n ? 1 : 0.35;
+    out[k + "PrevCur"] = r.p ? "pointer" : "default"; out[k + "NextCur"] = r.n ? "pointer" : "default";
+    return out;
+  }
+
+  slideStyle(i) {
+    const on = i === this.state.hero;
+    return {
+      position: i === 0 ? "relative" : "absolute",
+      inset: i === 0 ? "auto" : 0,
+      height: i === 0 ? "100%" : "auto",
+      opacity: on ? 1 : 0,
+      transition: "opacity .55s ease",
+      pointerEvents: on ? "auto" : "none",
+      zIndex: on ? 2 : 1
+    };
+  }
+
+  icon(d, color, size) {
+    return React.createElement("svg", {
+      width: size || 20, height: size || 20, viewBox: "0 0 24 24", fill: "none",
+      stroke: color || "#ffc93c", strokeWidth: 1.7, strokeLinecap: "round", strokeLinejoin: "round"
+    }, React.createElement("path", { d: d }));
+  }
+
+  renderVals() {
+    const goRegister = () => { window.location.href = "ChoCho Registration.dc.html#register"; };
+    this.goRegister = goRegister;
+    const dot = i => ({
+      bg: i === this.state.hero ? "#ffc93c" : "rgba(255,255,255,.28)",
+      w: i === this.state.hero ? "24px" : "8px",
+      glow: i === this.state.hero ? "0 0 12px rgba(255,201,60,.7)" : "none",
+      label: "Show banner " + (i + 1) + " of 4",
+      current: i === this.state.hero ? "true" : null,
+      onClick: () => this.setState({ hero: i })
+    });
+    const vw = this.state.vw || (typeof window !== "undefined" ? window.innerWidth : 1024);
+    const m = vw < 600;
+    // Two cards plus a peek of the next from 350px up; 1.5 cards on the narrowest phones.
+    // Two bonus columns only when each gets at least 10em at the current text size.
+    const fs = typeof document !== "undefined" ? (parseFloat(getComputedStyle(document.documentElement).fontSize) || 16) : 16;
+    const bCols = (vw - 32) >= 2 * 10 * fs + 12 ? 2 : 1;
+    const cw = vw >= 350 ? Math.round(Math.min(172, Math.max(146, (vw - 60) / 2))) : Math.round((vw - 28) / 1.6);
+    const onScroll = () => { cancelAnimationFrame(this._raf); this._raf = requestAnimationFrame(() => this.measureRails()); };
+    return {
+      ...this.arrows("hot"), ...this.arrows("qp"), ...this.arrows("bonus"),
+      hotScroll: onScroll, qpScroll: onScroll, bonusScroll: onScroll,
+      padB: "124px",
+      heroArrows: !m,
+      heroPaused: this.state.heroPaused ? "true" : "false",
+      heroPauseLabel: this.state.heroPaused ? "Resume banner rotation" : "Pause banner rotation",
+      heroPauseGlyph: this.state.heroPaused ? "▶" : "❚❚",
+      heroPause: () => this.setState(s => ({ heroPaused: !s.heroPaused })),
+      heroTouchStart: e => { this._tx = e.touches[0].clientX; this._ty = e.touches[0].clientY; },
+      heroTouchEnd: e => {
+        if (this._tx == null) return;
+        const dx = e.changedTouches[0].clientX - this._tx, dy = e.changedTouches[0].clientY - this._ty;
+        this._tx = null;
+        if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) this.setState(s => ({ hero: (s.hero + (dx < 0 ? 1 : 3)) % 4 }));
+      },
+      cardW: m ? cw + "px" : "clamp(150px, calc((100vw - 56px) / 2.1), 172px)",
+      cardH: m ? Math.round(cw * 1.2326) + "px" : "clamp(185px, calc((100vw - 56px) / 2.1 * 1.2326), 212px)",
+      arrowSize: m ? "44px" : "38px",
+      arrowVis: m ? "32px" : "38px",
+      arrowFont: m ? "15px" : "16px",
+      arrowGap: m ? "0px" : "8px",
+      bCols: m ? "repeat(" + bCols + ", minmax(0, 1fr))" : "none",
+      bHdrH: m ? "0" : "58px",
+      bPad: m ? (bCols === 1 ? "14px 16px" : "16px") : "clamp(16px, 2.2vw, 20px)",
+      bGap: m ? "10px" : "14px",
+      bActH: m ? "32px" : "42px",
+      trustSecPad: m ? "14px 16px" : "clamp(16px, 2.4vw, 20px) clamp(16px, 2.6vw, 24px)",
+      trustSecGap: m ? "10px" : "16px",
+      tagFlex: m ? "1 1 100%" : "0 0 auto",
+      tagMl: m ? "0" : "auto",
+      railGap: m ? "12px" : "14px",
+      railSnap: m ? "x mandatory" : "x proximity",
+      railScrollPad: m ? "16px" : "0px",
+      railPad: m ? "6px 16px 14px" : "6px 2px 14px",
+      railMargin: m ? "-6px -16px -14px" : "-6px -2px -14px",
+      bDisplay: m ? "grid" : "flex",
+      bOverflow: m ? "visible" : "auto",
+      bMinW: m ? "0" : "200px",
+      subMinH: m && bCols === 2 ? "2.7em" : "0",
+      trustMin: m ? "100%" : "170px",
+      trustGap: m ? "8px" : "6px",
+      trustPad: m ? "2px 0" : "2px 16px",
+      heroDots: [0, 1, 2, 3].map(dot),
+      slide0: this.slideStyle(0),
+      heroSlots: [1, 2, 3].map(i => ({ label: "BANNER SLOT " + (i + 1), style: this.slideStyle(i) })),
+      heroPrev: () => this.setState(s => ({ hero: (s.hero + 3) % 4 })),
+      heroNext: () => this.setState(s => ({ hero: (s.hero + 1) % 4 })),
+      bonusRail: this._bonus,
+      bonusPrev: () => this.step(this._bonus, -1),
+      bonusNext: () => this.step(this._bonus, 1),
+      qpRail: this._qp,
+      qpPrev: () => this.step(this._qp, -1),
+      qpNext: () => this.step(this._qp, 1),
+      gcashPoints: ["Instant deposits", "Secure and trusted", "Used by millions"],
+      mayaPoints: ["Fast and easy", "Secure payments", "Popular in the Philippines"],
+      trustItems: [
+        { title: "Secure Payments", sub: "", img: "shield" },
+        { title: "Fast Withdrawals", sub: "", img: "bolt" },
+        { title: "24/7 Support", sub: "", img: "headset" }
+      ].map((t, i) => ({
+        title: t.title,
+        sub: t.sub,
+        divider: (i === 0 || m) ? "transparent" : "rgba(167,139,250,.16)",
+        icon: React.createElement("img", {
+          src: "assets/icon-" + t.img + ".png",
+          alt: t.title,
+          style: { width: 38, height: 38, objectFit: "contain", display: "block", filter: "drop-shadow(0 4px 8px rgba(0,0,0,.85)) drop-shadow(0 0 14px rgba(0,0,0,.6))" }
+        })
+      })),
+      hotRail: this._rail,
+      hotPrev: () => this.step(this._rail, -1),
+      hotNext: () => this.step(this._rail, 1),
+      hotGames: [
+        {
+          name: "Gates of Olympus", provider: "Pragmatic Play",
+          art: "radial-gradient(90% 70% at 50% 22%, #bae6fd 0%, #60a5fa 30%, #3730a3 62%, #150a33 100%)",
+          texture: "radial-gradient(40% 30% at 22% 18%, rgba(255,255,255,.35), transparent 70%), linear-gradient(200deg, rgba(255,255,255,.12), transparent 45%)"
+        },
+        {
+          name: "Sweet Bonanza", provider: "Pragmatic Play",
+          src: "assets/game-sweet-bonanza.webp",
+          art: "#3b0d47",
+          texture: "none"
+        },
+        {
+          name: "Lightning Roulette", provider: "Evolution",
+          art: "radial-gradient(80% 62% at 50% 26%, #fef3c7 0%, #f59e0b 26%, #b91c1c 58%, #1a0a18 100%)",
+          texture: "conic-gradient(from 210deg at 50% 34%, rgba(0,0,0,.35) 0deg, transparent 40deg, rgba(0,0,0,.3) 80deg, transparent 120deg, rgba(0,0,0,.35) 180deg, transparent 220deg, rgba(0,0,0,.3) 280deg, transparent 320deg)"
+        },
+        {
+          name: "Mahjong Ways 2", provider: "PG Soft",
+          art: "radial-gradient(85% 66% at 50% 26%, #d9f99d 0%, #22c55e 26%, #15803d 56%, #0b2418 100%)",
+          texture: "linear-gradient(115deg, rgba(255,255,255,.28) 0 12%, transparent 12% 26%, rgba(255,255,255,.22) 26% 38%, transparent 38% 100%)"
+        },
+        {
+          name: "Buffalo King", provider: "Pragmatic Play",
+          art: "radial-gradient(88% 68% at 50% 26%, #fed7aa 0%, #fb923c 26%, #b45309 56%, #2b1008 100%)",
+          texture: "radial-gradient(46% 34% at 50% 26%, rgba(255,255,255,.28), transparent 70%), linear-gradient(190deg, transparent 40%, rgba(0,0,0,.25))"
+        }
+      ].map(g => Object.assign({}, g, {
+        photo: g.src ? React.createElement("img", {
+          key: g.src, src: g.src, alt: "",
+          style: { width: "100%", height: "100%", objectFit: "cover", objectPosition: "50% 30%", display: "block" }
+        }) : null
+      })),
+      wheelOpen: this.state.wheelOpen,
+      closeWheel: e => { if (e.target === e.currentTarget) this.closeWheel(); },
+      wheelMsg: this.state.wheelMsg,
+      wheelStyle: {
+        transform: "rotate(" + this.state.spinDeg + "deg)",
+        transition: "transform 3.6s cubic-bezier(.16,.84,.15,1)"
+      },
+      spin: () => {
+        // The wheel service isn't connected: no spin result and no prize is ever produced here.
+        this.setState({ wheelMsg: "The Lucky Wheel isn\u2019t connected in this preview, so no spin was made and no prize was awarded." });
+      },
+      closeWheelBtn: () => this.closeWheel(),
+      openGame: (e) => {
+        const name = e.currentTarget.getAttribute("data-game");
+        const site = window.ChoChoSite;
+        if (!site) return;
+        if (name === "Sweet Bonanza") site.openGame("sweet-bonanza");
+        else site.notice(name + " doesn\u2019t have a game page in this preview yet.");
+      },
+      openCategory: (e) => {
+        const c = e.currentTarget.getAttribute("data-cat");
+        const site = window.ChoChoSite;
+        if (site) site.go(c === "All Games" ? "games" : "games?category=" + encodeURIComponent(c));
+      },
+      openPromo: (e) => {
+        const p = e.currentTarget.getAttribute("data-promo");
+        if (window.ChoChoSite) window.ChoChoSite.go("promotions?promo=" + p);
+      },
+      keyActivate: (e) => {
+        if (e.key !== "Enter" && e.key !== " ") return;
+        e.preventDefault();
+        e.currentTarget.click();
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

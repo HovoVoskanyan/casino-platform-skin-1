@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Caveat:wght@600;700&amp;display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; background: #130124; }
+  a { color: #ffc93c; text-decoration: none; }
+  a:hover { color: #ffe08a; }
+  @keyframes chochoTigerWave { 0% { transform: translateY(0) rotate(0deg); } 4% { transform: translateY(1.5px) rotate(.6deg); } 8% { transform: translateY(0) rotate(0deg); } 12% { transform: translateY(1.5px) rotate(-.6deg); } 16% { transform: translateY(0) rotate(0deg); } 20% { transform: translateY(1.5px) rotate(.6deg); } 24% { transform: translateY(0) rotate(0deg); } 28% { transform: translateY(1.5px) rotate(-.6deg); } 32% { transform: translateY(0) rotate(0deg); } 40% { transform: translateY(0) rotate(0deg); } 48% { transform: translateY(-4px) rotate(-2deg); } 56% { transform: translateY(-5px) rotate(-9deg); } 64% { transform: translateY(-5px) rotate(7deg); } 72% { transform: translateY(-5px) rotate(-7deg); } 80% { transform: translateY(-5px) rotate(6deg); } 88% { transform: translateY(-3px) rotate(-2deg); } 100% { transform: translateY(0) rotate(0deg); } }
+  @keyframes chochoRing { 0% { transform: scale(1); opacity: .55; } 100% { transform: scale(1.7); opacity: 0; } }
+  @keyframes vipFade { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+  [data-step-link] { display: block; }
+  @media (max-width: 760px) { [data-step-link] { display: none; } }
+  :focus-visible { outline: 2px solid #ffc93c; outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+</helmet>
+<div style="min-height: 100vh; background: radial-gradient(1100px 640px at 50% -8%, #3a0269 0%, #250143 42%, #130124 100%); font-family: Manrope, sans-serif; color: #fff; display: flex; justify-content: center; padding: 0 0 128px;">
+  <div style="width: 100%; max-width: 1024px; display: flex; flex-direction: column; gap: 46px; padding-bottom: 44px;">
+
+    <dc-import name="ChoCho Header" active="vip" style="position: sticky; top: 0; z-index: 40;" hint-size="100%,76px"></dc-import>
+
+    <section style="margin: 0 clamp(16px, 2.4vw, 22px); position: relative; border: 1px solid rgba(167,139,250,.22); border-radius: 20px; overflow: hidden; background: #150726; box-shadow: 0 20px 50px rgba(6,3,11,.6), 0 0 0 1px rgba(255,255,255,.03) inset;">
+      <span style="position: absolute; inset: 0; background: radial-gradient(65% 100% at 88% 45%, rgba(167,139,250,.2) 0%, transparent 70%), radial-gradient(45% 75% at 4% 0%, rgba(124,58,237,.16) 0%, transparent 72%);"></span>
+      <div style="position: relative; padding: clamp(16px, 2.4vw, 18px) clamp(16px, 3.2vw, 26px); display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;">
+        <div style="flex: 1 1 360px; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 12px;">
+          <h1 style="margin: 0; font-size: clamp(26px, 6.6vw, 34px); font-weight: 800; letter-spacing: -.8px; line-height: 1.1; color: #fff;">ChoCho <span style="color: #ffc93c;">VIP</span></h1>
+          <span style="font-size: 14px; font-weight: 500; line-height: 1.5; max-width: 460px; color: #a795c5; text-wrap: pretty;">Explore VIP levels, benefits, and eligibility.</span>
+          <button onClick="{{ scrollToLevels }}" style="height: 44px; padding: 0 24px; margin-top: 2px; border: 0; border-radius: 12px; background: linear-gradient(180deg, #ffd766, #eb9c0d); color: #2c1400; font-family: Manrope, sans-serif; font-size: 14.5px; font-weight: 800; white-space: nowrap; cursor: pointer; display: flex; align-items: center; gap: 9px; box-shadow: 0 8px 22px rgba(235,156,13,.34); transition: filter .2s ease, transform .2s ease;" style-hover="filter: brightness(1.06); transform: translateY(-1px)">Explore levels <span style="font-size: 13px;">↓</span></button>
+        </div>
+        <sc-if value="{{ heroLogo }}" hint-placeholder-val="{{ true }}"><div style="position: relative; flex: 0 1 168px; min-width: 0; margin-left: -8px; display: flex; flex-direction: column; align-items: center;">
+          <span style="position: absolute; left: 50%; top: 44%; transform: translate(-50%, -50%); width: 230px; height: 230px; border-radius: 50%; pointer-events: none; background: radial-gradient(circle, rgba(167,139,250,.26) 0%, rgba(240,163,10,.14) 42%, transparent 70%); filter: blur(6px);"></span>
+          <img src="assets/chocho-logo-cut.png" alt="ChoCho" style="position: relative; width: 100%; max-width: 152px; object-fit: contain; display: block; filter: drop-shadow(0 16px 30px rgba(0,0,0,.5));">
+          <span style="position: relative; font-family: Caveat, cursive; font-size: 19px; font-weight: 700; color: #e9a832; white-space: nowrap;">Tuloy ang Good Vibes</span>
+        </div>
+        </sc-if>
+      </div>
+    </section>
+
+    <section style="padding: 0 clamp(16px, 2.4vw, 22px); display: flex; flex-direction: column; gap: 22px;">
+      <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+        <span style="width: 4px; height: 28px; border-radius: 999px; background: linear-gradient(180deg, #ffd766, #e07f05); box-shadow: 0 0 12px rgba(240,150,10,.5); flex: none;"></span>
+        <h2 style="margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -.6px; color: #fff;">About ChoCho VIP</h2>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; align-items: stretch;">
+        <sc-for list="{{ about }}" as="a" hint-placeholder-count="3">
+          <div style="display: flex; flex-direction: column; gap: 10px; padding: 18px; border: 1px solid rgba(167,139,250,.2); border-radius: 18px; background: linear-gradient(180deg, #23103f 0%, #180a2c 100%); box-shadow: 0 12px 30px rgba(0,0,0,.4);">
+            <span style="width: 38px; height: 38px; flex: none; border-radius: 12px; border: 1px solid rgba(167,139,250,.26); background: rgba(167,139,250,.12); display: flex; align-items: center; justify-content: center;">{{ a.icon }}</span>
+            <span style="font-size: 16px; font-weight: 800; letter-spacing: -.2px; color: #fff;">{{ a.title }}</span>
+            <span style="font-size: 12.5px; font-weight: 500; line-height: 1.5; color: #a795c5; text-wrap: pretty;">{{ a.copy }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section id="vip-levels" style="padding: 0 clamp(16px, 2.4vw, 22px); display: flex; flex-direction: column; gap: 22px; scroll-margin-top: 92px;">
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+          <span style="width: 4px; height: 28px; border-radius: 999px; background: linear-gradient(180deg, #ffd766, #e07f05); box-shadow: 0 0 12px rgba(240,150,10,.5); flex: none;"></span>
+          <h2 style="margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -.6px; color: #fff;">Explore VIP Levels</h2>
+        </div>
+        <span style="font-size: 13.5px; font-weight: 500; line-height: 1.5; padding-left: 16px; color: #a795c5;">Review the benefits and conditions for each level.</span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; align-items: stretch;">
+        <sc-for list="{{ levels }}" as="lv" hint-placeholder-count="4">
+          <div style="display: flex; flex-direction: column; gap: 12px; padding: 18px; border: 1px solid {{ lv.border }}; border-radius: 18px; background: linear-gradient(180deg, #23103f 0%, #180a2c 100%); box-shadow: 0 12px 30px rgba(0,0,0,.4); transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease;" style-hover="transform: translateY(-2px); border-color: rgba(255,201,60,.42); box-shadow: 0 18px 38px rgba(0,0,0,.5), 0 0 24px rgba(167,139,250,.16)">
+            <span style="height: 40px; display: flex; align-items: center; gap: 2px;">{{ lv.marks }}</span>
+            <span style="font-size: 17px; font-weight: 800; letter-spacing: -.3px; color: #fff;">{{ lv.label }}</span>
+            <span style="height: 24px; display: flex; align-items: center; padding: 0 10px; align-self: flex-start; border-radius: 8px; border: 1px solid rgba(167,139,250,.3); background: rgba(167,139,250,.1); font-size: 10px; font-weight: 800; letter-spacing: 1.1px; white-space: nowrap; color: #c4b5fd;">BENEFITS &amp; ELIGIBILITY</span>
+            <span style="flex: 1; font-size: 12.5px; font-weight: 500; line-height: 1.5; color: #a795c5; text-wrap: pretty;">Explore this level’s details.</span>
+            <button onClick="{{ lv.onClick }}" style="height: 42px; width: 100%; box-sizing: border-box; padding: 0 16px; border-radius: 12px; border: 1px solid rgba(167,139,250,.32); background: rgba(255,255,255,.03); color: #fff; font-family: Manrope, sans-serif; font-size: 13.5px; font-weight: 700; white-space: nowrap; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: border-color .2s ease, background .2s ease, box-shadow .2s ease;" style-hover="border-color: rgba(167,139,250,.6); background: rgba(255,255,255,.06); box-shadow: 0 0 22px rgba(139,92,246,.2)">
+              View Details <span style="font-size: 13px; color: #c4b5fd;">→</span>
+            </button>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section style="padding: 0 clamp(16px, 2.4vw, 22px); display: flex; flex-direction: column; gap: 22px;">
+      <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+        <span style="width: 4px; height: 28px; border-radius: 999px; background: linear-gradient(180deg, #ffd766, #e07f05); box-shadow: 0 0 12px rgba(240,150,10,.5); flex: none;"></span>
+        <h2 style="margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -.6px; color: #fff;">How VIP Works</h2>
+      </div>
+
+      <div style="display: flex; align-items: stretch; flex-wrap: wrap; gap: 14px;">
+        <sc-for list="{{ steps }}" as="s" hint-placeholder-count="3">
+          <div style="flex: 1 1 220px; min-width: 0; display: flex; align-items: stretch; gap: 14px;">
+            <span data-step-link="{{ s.link }}" style="align-self: center; flex: none; width: 22px; height: 1px; background: linear-gradient(90deg, rgba(167,139,250,.05), rgba(167,139,250,.32)); opacity: {{ s.link }};"></span>
+            <div style="flex: 1; min-width: 0; padding: 18px; border: 1px solid rgba(167,139,250,.18); border-radius: 18px; background: rgba(255,255,255,.03); display: flex; flex-direction: column; gap: 10px;">
+              <span style="width: 32px; height: 32px; flex: none; border-radius: 50%; border: 1px solid rgba(255,201,60,.34); background: rgba(255,201,60,.09); display: flex; align-items: center; justify-content: center; font-size: 13.5px; font-weight: 800; color: #ffc93c;">{{ s.n }}</span>
+              <span style="font-size: 15.5px; font-weight: 800; letter-spacing: -.2px; color: #fff;">{{ s.title }}</span>
+              <span style="font-size: 12.5px; font-weight: 500; line-height: 1.5; color: #a795c5; text-wrap: pretty;">{{ s.copy }}</span>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section style="padding: 0 clamp(16px, 2.4vw, 22px); display: flex; flex-direction: column; gap: 18px;">
+      <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+        <span style="width: 4px; height: 28px; border-radius: 999px; background: linear-gradient(180deg, #ffd766, #e07f05); box-shadow: 0 0 12px rgba(240,150,10,.5); flex: none;"></span>
+        <h2 style="margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -.6px; color: #fff;">VIP Questions</h2>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <sc-for list="{{ faqs }}" as="f" hint-placeholder-count="3">
+          <div style="border: 1px solid {{ f.border }}; border-radius: 14px; background: rgba(255,255,255,.03); overflow: hidden; transition: border-color .2s ease;">
+            <button onClick="{{ f.onClick }}" aria-expanded="{{ f.open }}" style="width: 100%; box-sizing: border-box; min-height: 56px; padding: 14px 18px; border: 0; background: transparent; cursor: pointer; display: flex; align-items: center; gap: 14px; text-align: left; font-family: Manrope, sans-serif;" style-hover="background: rgba(255,255,255,.03)">
+              <span style="flex: 1; min-width: 0; font-size: 14.5px; font-weight: 700; line-height: 1.4; color: #fff;">{{ f.q }}</span>
+              <span style="width: 28px; height: 28px; flex: none; border-radius: 8px; border: 1px solid {{ f.iconBorder }}; background: {{ f.iconBg }}; color: {{ f.iconColor }}; font-size: 15px; font-weight: 800; line-height: 1; display: flex; align-items: center; justify-content: center;">{{ f.glyph }}</span>
+            </button>
+            <sc-if value="{{ f.open }}" hint-placeholder-val="{{ false }}">
+              <div style="padding: 0 18px 16px; font-size: 13px; font-weight: 500; line-height: 1.6; color: #a795c5; text-wrap: pretty; animation: vipFade .18s ease-out;">{{ f.a }}</div>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section style="margin: 0 clamp(16px, 2.4vw, 22px); padding: clamp(16px, 2.4vw, 20px) clamp(16px, 3vw, 24px); border: 1px solid rgba(167,139,250,.16); border-radius: 18px; background: linear-gradient(180deg, rgba(255,255,255,.045) 0%, rgba(255,255,255,.02) 100%); display: flex; align-items: center; flex-wrap: wrap; gap: 14px 18px;">
+      <div style="flex: 1 1 340px; min-width: 0; display: flex; flex-direction: column; gap: 5px;">
+        <span style="font-size: 19px; font-weight: 800; letter-spacing: -.3px; color: #fff;">Your VIP information, in one place.</span>
+        <span style="font-size: 13px; font-weight: 500; line-height: 1.5; color: #a795c5;">Sign in to explore your account’s VIP details.</span>
+      </div>
+      <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 10px;">
+        <button onClick="{{ signIn }}" style="height: 44px; padding: 0 26px; border: 0; border-radius: 12px; background: linear-gradient(180deg, #ffd766, #eb9c0d); color: #2c1400; font-family: Manrope, sans-serif; font-size: 14.5px; font-weight: 800; white-space: nowrap; cursor: pointer; box-shadow: 0 8px 22px rgba(235,156,13,.34); transition: filter .2s ease;" style-hover="filter: brightness(1.06)">Sign in</button>
+        <button onClick="{{ register }}" style="height: 44px; padding: 0 clamp(16px, 2.4vw, 22px); border: 1px solid rgba(167,139,250,.32); border-radius: 12px; background: rgba(255,255,255,.03); color: #fff; font-family: Manrope, sans-serif; font-size: 13.5px; font-weight: 700; white-space: nowrap; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: border-color .2s ease, background .2s ease;" style-hover="border-color: rgba(167,139,250,.6); background: rgba(255,255,255,.06)">Create an account <span style="font-size: 13px; color: #c4b5fd;">→</span></button>
+      </div>
+    </section>
+
+    <dc-import name="ChoCho Footer" hint-size="100%,120px"></dc-import>
+
+    <dc-import name="ChoCho Bottom Nav" active="none" hint-size="1px,1px"></dc-import>
+  </div>
+
+  <dc-import name="ChoCho Support" hint-size="1px,1px"></dc-import>
+
+
+
+  <sc-if value="{{ levelOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeLevel }}" style="position: fixed; inset: 0; z-index: 60; background: rgba(5,2,10,.84); display: flex; align-items: center; justify-content: center; padding: 20px;">
+      <div role="dialog" aria-modal="true" aria-label="{{ levelTitle }}" tabindex="-1" data-vip-dialog="1" onClick="{{ stop }}" style="width: 420px; max-width: 100%; max-height: 84vh; overflow-y: auto; box-sizing: border-box; padding: 24px; border-radius: 20px; border: 1px solid rgba(255,201,60,.34); background: linear-gradient(160deg, #2c1050 0%, #170826 100%); box-shadow: 0 24px 60px rgba(0,0,0,.65); display: flex; flex-direction: column; gap: 14px;">
+        <div style="display: flex; align-items: flex-start; gap: 12px;">
+          <span style="flex: 1; min-width: 0; font-size: 22px; font-weight: 800; letter-spacing: -.4px; color: #fff;">{{ levelTitle }}</span>
+          <button onClick="{{ closeLevel }}" aria-label="Close" style="width: 32px; height: 32px; flex: none; border: 1px solid rgba(167,139,250,.3); border-radius: 10px; background: rgba(255,255,255,.05); color: #cbb6e6; font-size: 14px; font-weight: 800; cursor: pointer;" style-hover="background: rgba(255,255,255,.12); color: #fff">✕</button>
+        </div>
+        <span style="height: 24px; display: flex; align-items: center; padding: 0 10px; align-self: flex-start; border-radius: 8px; border: 1px solid rgba(167,139,250,.3); background: rgba(167,139,250,.1); font-size: 10px; font-weight: 800; letter-spacing: 1.1px; color: #c4b5fd;">BENEFITS &amp; ELIGIBILITY</span>
+        <span style="font-size: 13.5px; font-weight: 500; line-height: 1.6; color: #a795c5; text-wrap: pretty;">For current benefits and eligibility, contact support.</span>
+        <button onClick="{{ contactSupport }}" style="height: 44px; padding: 0 clamp(16px, 2.4vw, 22px); border: 0; border-radius: 12px; background: linear-gradient(180deg, #ffd766, #eb9c0d); color: #2c1400; font-family: Manrope, sans-serif; font-size: 14px; font-weight: 800; cursor: pointer; box-shadow: 0 8px 22px rgba(235,156,13,.34);" style-hover="filter: brightness(1.06)">Contact support</button>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1024,&quot;height&quot;:1600},&quot;levelCount&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:4,&quot;min&quot;:2,&quot;max&quot;:6,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Tier data&quot;}}">
+class Component extends DCLogic {
+  state = { menuOpen: false, helpOpen: false, faq: 2, level: null };
+
+  constructor(props) {
+    super(props);
+    this.trigger = null;
+  }
+
+  icon(d, color, size) {
+    return React.createElement("svg", {
+      width: size || 18, height: size || 18, viewBox: "0 0 24 24", fill: "none",
+      stroke: color, strokeWidth: 1.9, strokeLinecap: "round", strokeLinejoin: "round"
+    }, React.createElement("path", { d: d }));
+  }
+
+  dialogNode() { return document.querySelector('[data-vip-dialog]'); }
+
+  componentDidMount() {
+    this._vwR = () => { if (window.innerWidth !== this.state.vw) this.setState({ vw: window.innerWidth }); };
+    window.addEventListener("resize", this._vwR); this._vwR();
+    this.onKey = (e) => {
+      if (this.state.level === null) return;
+      if (e.key === "Escape") { e.preventDefault(); this.close(); return; }
+      if (e.key !== "Tab") return;
+      const root = this.dialogNode();
+      if (!root) return;
+      const f = Array.from(root.querySelectorAll('button, a[href], input, [tabindex]:not([tabindex="-1"])'))
+        .filter(el => el.offsetParent !== null);
+      if (!f.length) return;
+      const first = f[0], last = f[f.length - 1];
+      const inside = root.contains(document.activeElement) && document.activeElement !== root;
+      if (!inside) { e.preventDefault(); (e.shiftKey ? last : first).focus(); return; }
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    };
+    document.addEventListener("keydown", this.onKey, true);
+  }
+  componentWillUnmount() { document.removeEventListener("keydown", this.onKey, true); }
+
+  open(i, ev) {
+    this.trigger = ev && ev.currentTarget;
+    this.setState({ level: i });
+    requestAnimationFrame(() => { const r = this.dialogNode(); if (r) r.focus(); });
+  }
+
+  close() {
+    const t = this.trigger;
+    this.trigger = null;
+    this.setState({ level: null });
+    requestAnimationFrame(() => { if (t) { try { t.focus(); } catch (e) {} } });
+  }
+
+  go(href) { if (href) window.location.href = href; }
+
+  renderVals() {
+    const lv = this.state.level;
+    const chev = (n, color) => Array.from({ length: n }).map((_, i) =>
+      React.createElement("svg", {
+        key: i, width: 14, height: 18, viewBox: "0 0 12 20", fill: "none",
+        stroke: color, strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round"
+      }, React.createElement("path", { d: "M3 4l6 6-6 6" })));
+
+    return {
+      heroLogo: (this.state.vw || window.innerWidth) >= 600,
+      signIn: () => { window.location.href = "ChoCho Registration.dc.html#signin"; },
+      register: () => { window.location.href = "ChoCho Registration.dc.html#register"; },
+
+      scrollToLevels: () => {
+        const el = document.getElementById("vip-levels");
+        if (!el) return;
+        const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        const y = el.getBoundingClientRect().top + window.pageYOffset - 92;
+        window.scrollTo({ top: y, behavior: reduce ? "auto" : "smooth" });
+      },
+
+      about: [
+        { title: "VIP levels", copy: "Explore the program’s membership levels.", d: "M4 18l4-6 3.5 3L16 8l4 10H4z" },
+        { title: "Member benefits", copy: "Discover what each level includes.", d: "M12 4l2.2 4.6 5 .7-3.6 3.5.8 5-4.4-2.3-4.4 2.3.8-5L4.8 9.3l5-.7z" },
+        { title: "Eligibility", copy: "Understand the requirements and conditions.", d: "M9 12l2 2 4-4M12 3l7 3v6c0 4.2-2.9 7.6-7 9-4.1-1.4-7-4.8-7-9V6l7-3z" }
+      ].map(a => ({ title: a.title, copy: a.copy, icon: this.icon(a.d, "#c4b5fd", 19) })),
+
+      levels: Array.from({ length: Math.max(2, Math.min(6, this.props.levelCount ?? 4)) }, (_, i) => i + 1).map((n, i, arr) => ({
+        label: "Level " + n,
+        marks: chev(Math.min(n, 4), i === arr.length - 1 ? "#ffc93c" : "#a78bfa"),
+        border: i === arr.length - 1 ? "rgba(255,201,60,.3)" : "rgba(167,139,250,.2)",
+        onClick: (ev) => this.open(i, ev)
+      })),
+
+      steps: [
+        { n: "1", title: "Explore levels", copy: "Get to know the VIP program." },
+        { n: "2", title: "Review conditions", copy: "Check eligibility and benefits." },
+        { n: "3", title: "Sign in", copy: "View your account’s VIP information." }
+      ].map((s, i) => ({ n: s.n, title: s.title, copy: s.copy, link: i === 0 ? 0 : 1 })),
+
+      faqs: [
+        { q: "How do VIP levels work?", a: "Each level has its own benefits and eligibility conditions. Review the current program details before participating." },
+        { q: "Where can I find the eligibility requirements?", a: "Open a level’s details or contact support for the current requirements." },
+        { q: "Where can I see my VIP information?", a: "Sign in to view the VIP information associated with your account." }
+      ].map((f, i) => {
+        const open = this.state.faq === i;
+        return {
+          q: f.q, a: f.a, open: open,
+          glyph: open ? "−" : "+",
+          border: open ? "rgba(255,201,60,.32)" : "rgba(167,139,250,.18)",
+          iconBorder: open ? "rgba(255,201,60,.45)" : "rgba(167,139,250,.26)",
+          iconBg: open ? "rgba(255,201,60,.12)" : "rgba(255,255,255,.04)",
+          iconColor: open ? "#ffc93c" : "#c4b5fd",
+          onClick: () => this.setState(s => ({ faq: s.faq === i ? -1 : i }))
+        };
+      }),
+
+
+
+
+      levelOpen: lv !== null,
+      levelTitle: lv === null ? "" : "Level " + (lv + 1),
+      closeLevel: () => this.close(),
+      stop: (e) => e.stopPropagation(),
+      contactSupport: () => { this.close(); window.dispatchEvent(new CustomEvent("chocho:support")); }
+    };
+  }
+}
+</script>
+</body>
+</html>

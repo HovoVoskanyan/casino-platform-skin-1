@@ -1,0 +1,110 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   ChoCho design tokens — from design/chocho/ChoCho UI Foundations.dc.html, 1:1.
+   Every colour in the app comes from a --cc-* variable; never a raw hex in TSX.
+   One skin, one theme: the ChoCho canvas is dark purple, always.
+--------------------------------------------------------------------------- */
+:root {
+  --cc-canvas-top: #3a0269;
+  --cc-canvas-mid: #250143;
+  --cc-canvas-base: #130124;
+  --cc-surface: #150726;
+  --cc-surface-raised: #23103f;
+  --cc-card: #180a2c;
+  --cc-gold: #ffc93c;
+  --cc-gold-deep: #eb9c0d;
+  --cc-gold-light: #ffd766;
+  --cc-gold-hover: #ffe08a;
+  --cc-line: rgba(167, 139, 250, 0.2);
+  --cc-line-strong: rgba(167, 139, 250, 0.28);
+  --cc-ink: #ffffff;
+  --cc-text: #e9e0f5;
+  --cc-label: #e6ddf5;
+  --cc-lavender: #a795c5;
+  --cc-muted: #8f7aae;
+  --cc-control: #c5b5de;
+  --cc-rose: #ff5d7d;
+  --cc-ok: #86efac;
+  --cc-ok-soft: rgba(74, 222, 128, 0.1);
+  --cc-ok-line: rgba(74, 222, 128, 0.32);
+  --cc-danger: #fca5a5;
+  --cc-danger-soft: rgba(248, 113, 113, 0.1);
+  --cc-danger-line: rgba(248, 113, 113, 0.4);
+  --cc-info-soft: rgba(167, 139, 250, 0.08);
+  --cc-info-line: rgba(167, 139, 250, 0.28);
+  --cc-info-text: #cfc0ea;
+  --cc-telegram: #5eabeb;
+  --cc-scrim: rgba(6, 2, 12, 0.76);
+  --cc-canvas: radial-gradient(1100px 640px at 50% -8%, var(--cc-canvas-top) 0%, var(--cc-canvas-mid) 42%, var(--cc-canvas-base) 100%);
+  --cc-gold-cta: linear-gradient(180deg, var(--cc-gold-light), var(--cc-gold-deep));
+  --cc-dialog: linear-gradient(170deg, #2a1049 0%, #1a0930 55%, #160726 100%);
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-cc-canvas-base: var(--cc-canvas-base);
+  --color-cc-surface: var(--cc-surface);
+  --color-cc-surface-raised: var(--cc-surface-raised);
+  --color-cc-card: var(--cc-card);
+  --color-cc-gold: var(--cc-gold);
+  --color-cc-gold-deep: var(--cc-gold-deep);
+  --color-cc-gold-hover: var(--cc-gold-hover);
+  --color-cc-line: var(--cc-line);
+  --color-cc-line-strong: var(--cc-line-strong);
+  --color-cc-ink: var(--cc-ink);
+  --color-cc-text: var(--cc-text);
+  --color-cc-label: var(--cc-label);
+  --color-cc-lavender: var(--cc-lavender);
+  --color-cc-muted: var(--cc-muted);
+  --color-cc-control: var(--cc-control);
+  --color-cc-rose: var(--cc-rose);
+  --color-cc-ok: var(--cc-ok);
+  --color-cc-ok-soft: var(--cc-ok-soft);
+  --color-cc-ok-line: var(--cc-ok-line);
+  --color-cc-danger: var(--cc-danger);
+  --color-cc-danger-soft: var(--cc-danger-soft);
+  --color-cc-danger-line: var(--cc-danger-line);
+  --color-cc-info-soft: var(--cc-info-soft);
+  --color-cc-info-line: var(--cc-info-line);
+  --color-cc-info-text: var(--cc-info-text);
+  --color-cc-telegram: var(--cc-telegram);
+  --color-cc-scrim: var(--cc-scrim);
+  --font-sans: "Manrope", system-ui, sans-serif;
+  --font-brand: "Caveat", cursive;
+  --radius-cc: 10px;
+  --radius-cc-md: 12px;
+  --radius-cc-lg: 14px;
+  --radius-cc-xl: 18px;
+  --radius-cc-2xl: 22px;
+  --animate-cc-fade: cc-fade 0.18s ease-out;
+  --animate-cc-rise: cc-rise 0.22s ease-out;
+  @keyframes cc-fade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes cc-rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+}
+
+@layer base {
+  * { box-sizing: border-box; }
+  html { height: 100%; background: var(--cc-canvas-base); }
+  body {
+    margin: 0;
+    min-height: 100%;
+    background: var(--cc-canvas);
+    background-attachment: fixed;
+    color: var(--cc-ink);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: clip;
+  }
+  a { color: var(--cc-gold); text-decoration: none; }
+  a:hover { color: var(--cc-gold-hover); }
+  :focus-visible { outline: 2px solid var(--cc-gold); outline-offset: 2px; }
+  input, select, textarea, button { font: inherit; color: inherit; }
+  input::placeholder { color: #7c689b; }
+  button { cursor: pointer; }
+  button:disabled { cursor: not-allowed; }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+  .tabular { font-variant-numeric: tabular-nums; }
+}

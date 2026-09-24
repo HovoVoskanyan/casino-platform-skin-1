@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Caveat:wght@600;700&amp;display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; background: #130124; }
+  a { color: #ffc93c; text-decoration: none; }
+  a:hover { color: #ffe08a; }
+  .chocho-info :focus-visible { outline: 2px solid #ffc93c; outline-offset: 2px; }
+  .chocho-info input[type="search"]::-webkit-search-cancel-button { display: none; }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
+</style>
+<script src="chocho-site.js"></script>
+</helmet>
+<div class="chocho-info" style="min-height: 100vh; background: radial-gradient(1100px 640px at 50% -8%, #3a0269 0%, #250143 42%, #130124 100%); font-family: Manrope, sans-serif; color: #fff; display: flex; justify-content: center; padding: 0 0 128px; overflow-x: clip;">
+  <div style="width: 100%; max-width: 1024px; min-width: 0; display: flex; flex-direction: column; gap: 28px; padding-bottom: 44px;">
+
+    <dc-import name="ChoCho Header" active="none" style="position: sticky; top: 0; z-index: 40;" hint-size="100%,76px"></dc-import>
+
+    <main id="main" style="padding: 0 {{ gut }}; display: flex; flex-direction: column; gap: 22px; min-width: 0;">
+      <nav aria-label="Breadcrumb">
+        <ol style="margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 600;">
+          <li style="display: flex;"><a href="ChoCho Home.dc.html" style="min-height: 44px; display: flex; align-items: center; color: #a795c5;" style-hover="color: #fff">Home</a></li>
+          <li aria-hidden="true" style="color: #6f5a8f;">/</li>
+          <li aria-current="page" style="color: #e6ddf5;">{{ title }}</li>
+        </ol>
+      </nav>
+
+      <div style="display: flex; flex-direction: column; gap: 10px; max-width: 760px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <span style="width: 4px; height: 30px; border-radius: 999px; background: linear-gradient(180deg, #ffd766, #e07f05); box-shadow: 0 0 12px rgba(240,150,10,.5); flex: none;"></span>
+          <h1 style="margin: 0; font-size: {{ h1Size }}; font-weight: 800; letter-spacing: -.7px; line-height: 1.15; color: #fff; overflow-wrap: anywhere;">{{ title }}</h1>
+        </div>
+        <p style="margin: 0; padding-left: 16px; font-size: 16px; font-weight: 500; line-height: 1.6; color: #a795c5; text-wrap: pretty;">{{ intro }}</p>
+      </div>
+
+      <div data-review-only="content-draft" style="max-width: 760px; box-sizing: border-box; padding: 12px 16px; border: 1px dashed rgba(255,201,60,.4); border-radius: 14px; background: rgba(255,201,60,.06); display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px;">
+        <span style="font-size: 11px; font-weight: 800; letter-spacing: 1.1px; color: #ffc93c;">{{ draftLabel }}</span>
+        <span style="flex: 1 1 260px; min-width: 0; font-size: 13.5px; font-weight: 500; line-height: 1.55; color: #f3e6c7; text-wrap: pretty;">{{ draftNote }}</span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: {{ cols }}; gap: {{ colGap }}; align-items: start; min-width: 0;">
+
+        <sc-if value="{{ showToc }}" hint-placeholder-val="{{ true }}">
+          <nav aria-label="{{ tocLabel }}" style="position: {{ tocPos }}; top: 100px; box-sizing: border-box; padding: 14px 16px; border: 1px solid rgba(167,139,250,.18); border-radius: 16px; background: rgba(255,255,255,.03); display: flex; flex-direction: column; gap: 4px; min-width: 0;">
+            <span style="padding-bottom: 6px; font-size: 11px; font-weight: 800; letter-spacing: 1.1px; color: #8f7aae;">{{ tocTitle }}</span>
+            <ol style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 2px;">
+              <sc-for list="{{ toc }}" as="t" hint-placeholder-count="4">
+                <li style="display: flex;"><a href="{{ t.href }}" onClick="{{ t.onClick }}" style="flex: 1; min-height: 40px; display: flex; align-items: center; padding: 6px 8px; margin: 0 -8px; border-radius: 9px; font-size: 14px; font-weight: 600; line-height: 1.35; color: #cbb6e6; text-wrap: pretty;" style-hover="color: #fff; background: rgba(255,255,255,.05)">{{ t.label }}</a></li>
+              </sc-for>
+            </ol>
+            <sc-if value="{{ tocEmpty }}" hint-placeholder-val="{{ false }}">
+              <span style="font-size: 13.5px; font-weight: 500; line-height: 1.5; color: #8f7aae;">No matching topics.</span>
+            </sc-if>
+          </nav>
+        </sc-if>
+
+        <div style="max-width: 760px; min-width: 0; display: flex; flex-direction: column; gap: 34px;">
+
+          <sc-if value="{{ isFaq }}" hint-placeholder-val="{{ false }}">
+            <div role="search" style="display: flex; flex-direction: column; gap: 8px;">
+              <label for="faq-search" style="font-size: 14px; font-weight: 700; color: #e6ddf5;">Search FAQs</label>
+              <div style="position: relative; display: flex;">
+                <input id="faq-search" type="search" ref="{{ searchRef }}" value="{{ query }}" onChange="{{ onQuery }}" onKeyDown="{{ onSearchKey }}" aria-describedby="faq-count" placeholder="Search by question or keyword" autocomplete="off" style="flex: 1; min-width: 0; height: 50px; box-sizing: border-box; padding: 0 {{ inputPadR }} 0 16px; border-radius: 12px; border: 1px solid rgba(167,139,250,.3); background: rgba(0,0,0,.32); color: #fff; font-family: Manrope, sans-serif; font-size: 16px; font-weight: 500; outline: none;" style-focus="border-color: rgba(255,201,60,.6)">
+                <sc-if value="{{ hasQuery }}" hint-placeholder-val="{{ false }}">
+                  <button type="button" onClick="{{ clearQuery }}" aria-label="Clear search" style="position: absolute; right: 3px; top: 3px; width: 44px; height: 44px; border: 0; border-radius: 10px; background: transparent; color: #cbb6e6; font-size: 15px; font-weight: 800; cursor: pointer;" style-hover="background: rgba(255,255,255,.08); color: #fff">✕</button>
+                </sc-if>
+              </div>
+              <span id="faq-count" role="status" style="font-size: 13px; font-weight: 500; color: #8f7aae;">{{ countText }}</span>
+            </div>
+
+            <sc-for list="{{ groups }}" as="g" hint-placeholder-count="3">
+              <section id="{{ g.id }}" aria-labelledby="{{ g.hid }}" style="scroll-margin-top: 96px; display: flex; flex-direction: column; gap: 10px;">
+                <h2 id="{{ g.hid }}" style="margin: 0; font-size: 20px; font-weight: 800; letter-spacing: -.3px; color: #fff;">{{ g.title }}</h2>
+                <sc-for list="{{ g.items }}" as="f" hint-placeholder-count="2">
+                  <div style="border: 1px solid {{ f.border }}; border-radius: 14px; background: rgba(255,255,255,.03); overflow: hidden; transition: border-color .2s ease;">
+                    <h3 style="margin: 0;">
+                      <button type="button" id="{{ f.bid }}" onClick="{{ f.toggle }}" aria-expanded="{{ f.expanded }}" aria-controls="{{ f.pid }}" style="width: 100%; box-sizing: border-box; min-height: 56px; padding: 14px 18px; border: 0; background: transparent; cursor: pointer; display: flex; align-items: center; gap: 14px; text-align: left; font-family: Manrope, sans-serif;" style-hover="background: rgba(255,255,255,.03)">
+                        <span style="flex: 1; min-width: 0; font-size: 15.5px; font-weight: 700; line-height: 1.45; color: #fff; text-wrap: pretty;">{{ f.q }}</span>
+                        <span aria-hidden="true" style="width: 28px; height: 28px; flex: none; border-radius: 8px; border: 1px solid {{ f.iconBorder }}; background: {{ f.iconBg }}; color: {{ f.iconColor }}; font-size: 15px; font-weight: 800; line-height: 1; display: flex; align-items: center; justify-content: center;">{{ f.glyph }}</span>
+                      </button>
+                    </h3>
+                    <sc-if value="{{ f.open }}" hint-placeholder-val="{{ false }}">
+                      <div id="{{ f.pid }}" role="region" aria-labelledby="{{ f.bid }}" style="padding: 0 18px 18px; display: flex; flex-direction: column; align-items: flex-start; gap: 14px;">
+                        <p style="margin: 0; font-size: 16px; font-weight: 500; line-height: 1.6; color: #cfc2e3; text-wrap: pretty;">{{ f.a }}</p>
+                        <sc-if value="{{ f.hasLink }}" hint-placeholder-val="{{ false }}">
+                          <a href="{{ f.href }}" onClick="{{ f.onLink }}" style="min-height: 44px; display: flex; align-items: center; gap: 8px; padding: 0 16px; box-sizing: border-box; border: 1px solid rgba(167,139,250,.32); border-radius: 12px; background: rgba(255,255,255,.03); color: #fff; font-size: 14px; font-weight: 700; white-space: nowrap;" style-hover="border-color: rgba(167,139,250,.6); background: rgba(255,255,255,.06); color: #fff">{{ f.linkLabel }} <span aria-hidden="true" style="color: #c4b5fd;">→</span></a>
+                        </sc-if>
+                        <sc-if value="{{ f.isSupport }}" hint-placeholder-val="{{ false }}">
+                          <button type="button" onClick="{{ openSupport }}" style="min-height: 44px; padding: 0 20px; border: 0; border-radius: 12px; background: linear-gradient(180deg, #ffd766, #eb9c0d); color: #2c1400; font-family: Manrope, sans-serif; font-size: 14px; font-weight: 800; cursor: pointer; box-shadow: 0 8px 22px rgba(235,156,13,.3);" style-hover="filter: brightness(1.06)">Contact support</button>
+                        </sc-if>
+                      </div>
+                    </sc-if>
+                  </div>
+                </sc-for>
+              </section>
+            </sc-for>
+
+            <sc-if value="{{ noResults }}" hint-placeholder-val="{{ false }}">
+              <div style="padding: 28px 22px; border: 1px dashed rgba(167,139,250,.3); border-radius: 18px; background: rgba(255,255,255,.02); display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center;">
+                <span style="font-size: 16px; font-weight: 700; line-height: 1.5; color: #fff; overflow-wrap: anywhere;">No matching questions</span>
+                <span style="font-size: 14px; font-weight: 500; line-height: 1.55; color: #a795c5; text-wrap: pretty;">Try a different keyword or clear your search to see all questions.</span>
+                <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
+                  <button type="button" onClick="{{ clearQuery }}" style="min-height: 44px; padding: 0 20px; border: 1px solid rgba(167,139,250,.36); border-radius: 12px; background: rgba(255,255,255,.04); color: #fff; font-family: Manrope, sans-serif; font-size: 14px; font-weight: 700; white-space: nowrap; cursor: pointer;" style-hover="background: rgba(255,255,255,.08)">Clear search</button>
+                  <button type="button" onClick="{{ openSupport }}" style="min-height: 44px; padding: 0 20px; border: 0; border-radius: 12px; background: linear-gradient(180deg, #ffd766, #eb9c0d); color: #2c1400; font-family: Manrope, sans-serif; font-size: 14px; font-weight: 800; cursor: pointer;" style-hover="filter: brightness(1.06)">Contact support</button>
+                </div>
+              </div>
+            </sc-if>
+
+            <div style="padding: 18px 20px; border: 1px solid rgba(167,139,250,.16); border-radius: 18px; background: linear-gradient(180deg, rgba(255,255,255,.045) 0%, rgba(255,255,255,.02) 100%); display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px;">
+              <div style="flex: 1 1 260px; min-width: 0; display: flex; flex-direction: column; gap: 4px;">
+                <span style="font-size: 17px; font-weight: 800; letter-spacing: -.2px; color: #fff;">Still need help?</span>
+                <span style="font-size: 14px; font-weight: 500; line-height: 1.55; color: #a795c5;">Open the support panel without leaving this page.</span>
+              </div>
+              <button type="button" onClick="{{ openSupport }}" style="min-height: 44px; padding: 0 22px; border: 0; border-radius: 12px; background: linear-gradient(180deg, #ffd766, #eb9c0d); color: #2c1400; font-family: Manrope, sans-serif; font-size: 14px; font-weight: 800; cursor: pointer; box-shadow: 0 8px 22px rgba(235,156,13,.3);" style-hover="filter: brightness(1.06)">Contact support</button>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isDoc }}" hint-placeholder-val="{{ true }}">
+            <sc-for list="{{ sections }}" as="s" hint-placeholder-count="4">
+              <section id="{{ s.id }}" aria-labelledby="{{ s.hid }}" style="scroll-margin-top: 96px; display: flex; flex-direction: column; gap: 14px;">
+                <h2 id="{{ s.hid }}" tabindex="-1" style="margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -.4px; line-height: 1.3; color: #fff; outline: none; text-wrap: pretty;">{{ s.title }}</h2>
+                <sc-for list="{{ s.blocks }}" as="k" hint-placeholder-count="2">
+                  <sc-if value="{{ k.isP }}" hint-placeholder-val="{{ true }}">
+                    <p style="margin: 0; font-size: 16px; font-weight: 500; line-height: 1.6; color: #cfc2e3; text-wrap: pretty; overflow-wrap: anywhere;">{{ k.text }}</p>
+                  </sc-if>
+                  <sc-if value="{{ k.isLink }}" hint-placeholder-val="{{ false }}">
+                    <a href="{{ k.href }}" target="_blank" rel="noopener noreferrer" style="align-self: flex-start; max-width: 100%; min-height: 44px; display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 700; line-height: 1.45; color: #ffc93c; text-decoration: underline; text-underline-offset: 4px; text-decoration-color: rgba(255,201,60,.45); overflow-wrap: anywhere;" style-hover="color: #ffe08a">{{ k.text }}<span aria-hidden="true" style="flex: none; text-decoration: none;">↗</span><span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0);"> (opens in a new tab)</span></a>
+                  </sc-if>
+                  <sc-if value="{{ k.isSupport }}" hint-placeholder-val="{{ false }}">
+                    <button type="button" onClick="{{ openSupport }}" style="align-self: flex-start; min-height: 44px; padding: 0 22px; border: 0; border-radius: 12px; background: linear-gradient(180deg, #ffd766, #eb9c0d); color: #2c1400; font-family: Manrope, sans-serif; font-size: 14px; font-weight: 800; cursor: pointer; box-shadow: 0 8px 22px rgba(235,156,13,.3);" style-hover="filter: brightness(1.06)">Contact support</button>
+                  </sc-if>
+                  <sc-if value="{{ k.isReq }}" hint-placeholder-val="{{ false }}">
+                    <div data-required-field="{{ s.id }}" style="padding: 13px 16px; border: 1px dashed rgba(167,139,250,.4); border-radius: 14px; background: rgba(167,139,250,.05); display: flex; flex-direction: column; gap: 6px;">
+                      <span style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px;">
+                        <span style="height: 22px; display: flex; align-items: center; padding: 0 8px; border-radius: 6px; background: rgba(167,139,250,.16); font-size: 10.5px; font-weight: 800; letter-spacing: 1px; color: #c4b5fd;">REQUIRED</span>
+                        <sc-if value="{{ k.label }}" hint-placeholder-val="{{ false }}">
+                          <span style="font-size: 14.5px; font-weight: 800; color: #e6ddf5;">{{ k.label }}</span>
+                        </sc-if>
+                      </span>
+                      <span style="font-size: 14px; font-weight: 500; line-height: 1.55; color: #a795c5; text-wrap: pretty; overflow-wrap: anywhere;">{{ k.text }}</span>
+                    </div>
+                  </sc-if>
+                </sc-for>
+              </section>
+            </sc-for>
+          </sc-if>
+        </div>
+      </div>
+    </main>
+
+    <dc-import name="ChoCho Footer" info-page="{{ page }}" hint-size="100%,120px"></dc-import>
+
+    <dc-import name="ChoCho Bottom Nav" active="none" hint-size="1px,1px"></dc-import>
+  </div>
+
+  <dc-import name="ChoCho Support" hint-size="1px,1px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1024,&quot;height&quot;:1400},&quot;page&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;responsible-gaming&quot;,&quot;faq&quot;,&quot;terms&quot;,&quot;privacy&quot;],&quot;default&quot;:&quot;faq&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Internal review&quot;},&quot;faqOpen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;first&quot;,&quot;none&quot;],&quot;default&quot;:&quot;first&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Internal review&quot;},&quot;previewSession&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;shared&quot;,&quot;guest&quot;,&quot;signed-in&quot;],&quot;default&quot;:&quot;shared&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Internal review&quot;}}">
+// Content for the four footer information pages (proposed review copy, 24 Sep 2026 content pack).
+// Not approved policy. Blocks: P = paragraph, R = [[REQUIRED]] completion field (internal),
+// L = external resource link, S = the shared Contact support action. No dates, contacts or
+// operator facts are filled in — those stay as REQUIRED fields until the operator supplies them.
+const P = (text) => ({ t: "p", text: text });
+const R = (label, text) => ({ t: "req", label: label || "", text: text });
+const L = (text, href) => ({ t: "link", text: text, href: href });
+const S = () => ({ t: "support" });
+const POLICY_DRAFT = "Draft copy for internal review. Marked company details and policy wording must be confirmed before publication.";
+
+const INFO_PAGES = {
+  "responsible-gaming": {
+    title: "Responsible Gaming",
+    intro: "Practical information to help you recognise risk, take breaks and find support.",
+    draftLabel: "INTERNAL REVIEW · CONTENT DRAFT",
+    draftNote: "Guidance copy added. ChoCho\u2019s account controls and restriction procedure still require confirmation.",
+    sections: [
+      { id: "responsible-play", title: "Responsible play", blocks: [
+        P("Set a time limit and a spending limit before you play. Never borrow money to gamble or try to win back losses. Keep gambling from interfering with family, work and other activities."),
+        P("Spending more than planned, rising debt or difficulty stopping are signs to pause and seek support.")
+      ]},
+      { id: "account-controls", title: "Account controls", blocks: [
+        P("Before relying on an account control, check what it covers, when it takes effect and how changes are handled."),
+        R("", "Describe only the protection tools ChoCho actually provides. For each, supply its name, location, effect, activation timing and rules for changing it. If there are no player-operated controls, supply the approved alternative process.")
+      ]},
+      { id: "taking-a-break", title: "Taking a break or restricting access", blocks: [
+        P("For information about the external exclusion process, PAGCOR provides an official online self-exclusion application portal. Read the current instructions there before applying."),
+        L("PAGCOR self-exclusion application portal", "https://osea.pagcor.ph/"),
+        R("", "Add ChoCho\u2019s confirmed process for requesting a break, self-exclusion or account closure, including the correct contact route, when restrictions start, their scope and any reopening rules. Distinguish ordinary account closure from self-exclusion.")
+      ]},
+      { id: "getting-help", title: "Getting help", blocks: [
+        P("Talk with someone you trust. PAGCOR\u2019s responsible gaming page lists support resources in the Philippines."),
+        L("Responsible gaming information and support resources", "https://www.pagcor.ph/regulatory/responsible-gaming.php"),
+        P("For questions about navigating your ChoCho account, open the support panel using the button below."),
+        S()
+      ]}
+    ]
+  },
+  faq: {
+    title: "FAQ",
+    intro: "Find your way around ChoCho, review your account information and learn where to get help.",
+    draftLabel: "INTERNAL REVIEW · CONTENT DRAFT",
+    draftNote: "Answers describe where features sit in the current interface. Payment methods, fees, limits, processing times, verification documents, wagering, eligibility, support availability and account closure are held until the actual rules are supplied."
+  },
+  terms: {
+    title: "Terms",
+    intro: "Read the conditions that apply to your account, games, payments and offers on ChoCho.",
+    draftLabel: "INTERNAL REVIEW \u2014 POLICY DRAFT",
+    draftNote: POLICY_DRAFT,
+    sections: [
+      { id: "overview", title: "Overview", blocks: [
+        P("These Terms describe the conditions for using ChoCho. Read them alongside the Privacy page, Responsible Gaming information and any rules that apply to a particular game or offer."),
+        R("Operator", "Legal entity name, registered address and relevant registration details."),
+        R("Regulatory information", "Verified licensing or regulatory status, relevant licence details and authorised service/domain information."),
+        R("Scope and acceptance", "Services and territories covered, how these Terms are accepted, the relationship with game/offer rules, and how changes are communicated."),
+        R("Effective date and version", "Operator-approved date and version.")
+      ]},
+      { id: "account-use", title: "Account use", blocks: [
+        P("Review the eligibility and verification requirements before creating an account. Keep your sign-in details private and check that the information you provide is accurate."),
+        R("Eligibility", "Confirmed minimum age, permitted territories and other prohibited or restricted categories."),
+        R("Registration and verification", "Approved account requirements, identity checks, when checks occur, and what happens if information cannot be verified."),
+        R("Account responsibilities", "Approved rules covering account ownership, duplicate accounts, access by other people, account-information changes and reporting unauthorised access.")
+      ]},
+      { id: "games-and-wallet", title: "Games and wallet", blocks: [
+        P("Check the rules for the game you intend to play and review payment conditions before submitting a transaction. Wallet provides the account\u2019s balance and transaction views; the conditions below explain how funds are handled."),
+        R("Game rules and issues", "Applicable game rules, interrupted play, technical errors, settlement and the process for reviewing a disputed result."),
+        R("Deposits and withdrawals", "Supported currencies and methods, ownership checks, limits, fees, timing, verification conditions, failed transactions and cancellation or refund rules."),
+        R("Balances", "How cash, bonus funds and withdrawable funds are distinguished; treatment of pending funds; any applicable deductions or other conditions.")
+      ]},
+      { id: "offers-and-bonuses", title: "Offers and bonuses", blocks: [
+        P("Read the conditions of each offer before taking part. Check eligibility, any required action, time limits and restrictions on using or withdrawing bonus funds. My Account \u2192 Bonuses is the place to review the bonuses displayed for your account."),
+        R("General bonus rules", "Approved activation and eligibility rules, permitted participation, use of cash and bonus funds, wagering requirements, expiry, cancellation and treatment of winnings."),
+        R("Offer-specific conditions", "Identify the reviewed conditions for each available offer and explain how they relate to these Terms.")
+      ]},
+      { id: "restrictions-and-closure", title: "Account restrictions or closure", blocks: [
+        P("Account closure, temporary restrictions and self-exclusion can have different effects. Review the relevant process before making a request. Responsible Gaming provides guidance and external support information."),
+        R("Player requests", "Confirmed contact route, identity checks, timing, effect on access and outstanding funds, and any reopening conditions."),
+        R("Operator restrictions", "Approved grounds and process for restriction or closure, notice and review arrangements, and treatment of balances and pending transactions.")
+      ]},
+      { id: "questions-and-disputes", title: "Questions and disputes", blocks: [
+        P("For general help navigating ChoCho, open the support panel. When raising an account or transaction issue, give a clear description and include the relevant reference, if available. Keep passwords and one-time codes private."),
+        R("Formal complaints", "Actual complaints channel, information required, acknowledgement and response process, and escalation options."),
+        R("Governing law and dispute process", "Operator-approved wording appropriate to the verified service and jurisdiction.")
+      ]}
+    ]
+  },
+  privacy: {
+    title: "Privacy",
+    intro: "How personal information is handled in connection with ChoCho, and where to ask questions or exercise your rights.",
+    draftLabel: "INTERNAL REVIEW \u2014 POLICY DRAFT",
+    draftNote: POLICY_DRAFT,
+    sections: [
+      { id: "overview", title: "Overview", blocks: [
+        P("This notice explains the personal information covered by ChoCho\u2019s service, the purposes for which it is used, who may receive it and the choices and rights available to you."),
+        R("Responsible organisation", "Legal identity and contact details of the personal information controller and any relevant representative."),
+        R("Scope", "Actual websites, services and activities covered, and the distinction between ChoCho\u2019s handling of information and third-party services."),
+        R("Effective date and version", "Approved date and version.")
+      ]},
+      { id: "information-handled", title: "Information handled by the service", blocks: [
+        P("The information involved depends on the services you use and your interactions with ChoCho."),
+        R("", "Insert the verified data inventory. For each category, state the information involved, where it comes from, whether providing it is required or optional, and the consequence of not providing required information."),
+        R("Cookies and similar technologies", "Actual technologies used, their purposes, relevant providers, duration and available choices. State a negative only if verified.")
+      ]},
+      { id: "purposes", title: "Purposes of use", blocks: [
+        R("", "Explain the actual purpose and applicable legal basis for each processing activity. Keep account access, payments, verification, support, security, marketing and analytics distinct where they actually apply. Do not treat consent as the basis for every activity."),
+        R("Automated decisions or profiling", "Confirm whether either occurs. Where applicable, explain the processing, significance, consequences and relevant rights using approved wording.")
+      ]},
+      { id: "sharing-and-retention", title: "Sharing and retention", blocks: [
+        R("", "Identify the recipients or recipient categories that actually receive information, why they receive it, and any relevant processing outside the Philippines. Describe the real safeguards and arrangements where applicable."),
+        R("", "State retention periods or meaningful criteria for each relevant record category, including the effect of account closure and any required retention. Describe deletion or anonymisation only as actually implemented."),
+        R("Protection of information", "A factual, approved description of the safeguards used. Do not invent encryption claims, certifications or guarantees.")
+      ]},
+      { id: "preferences-and-requests", title: "Preferences and requests", blocks: [
+        P("You can review the preference options displayed in My Account \u2192 Preferences. These interface choices do not replace your rights under applicable data-protection law."),
+        P("Where the Philippine Data Privacy Act applies, rights include being informed, access, correction, objection, erasure or blocking, data portability, filing a complaint and seeking damages, subject to applicable conditions and limitations. The National Privacy Commission explains these rights on its website."),
+        L("Your data privacy rights", "https://privacy.gov.ph/data-subject-rights/"),
+        R("Making a request", "The verified privacy-request channel, how identity is checked, how requests are handled and any applicable response periods or limitations."),
+        R("Marketing choices and consent", "Actual choices and withdrawal methods where relevant, their effect and any distinction between promotional and essential service communications.")
+      ]},
+      { id: "contact", title: "Contact", blocks: [
+        P("For questions about this notice or the handling of your personal information, contact:"),
+        R("Organisation", "Legal entity name."),
+        R("Privacy contact", "Confirmed privacy contact or Data Protection Officer details, as applicable."),
+        R("Contact channel", "Monitored email, form or postal address, as applicable."),
+        P("Information about privacy rights and complaints is available from the National Privacy Commission.")
+      ]}
+    ]
+  }
+};
+
+// Every destination below exists in the current project (tabs via My Account ?tab=).
+const FAQ = [
+  { id: "wallet", title: "Wallet", items: [
+    { id: "balance", q: "Where can I view my balance?",
+      a: "Sign in and open Wallet to review the balance information shown for your account. You can also select the balance in the header to open its summary.",
+      link: "Go to Wallet", dest: "wallet" },
+    { id: "transactions", q: "Where can I view my deposits and withdrawals?",
+      a: "Open Wallet and go to Recent transactions. Use All, Deposits or Withdrawals to filter the list. Select View details on a transaction to see the information available for that entry.",
+      link: "Go to Wallet", dest: "wallet" }
+  ]},
+  { id: "bonuses", title: "Bonuses", items: [
+    { id: "my-bonuses", q: "Where can I find my available and active bonuses?",
+      a: "Open My Account and choose Bonuses. When you are signed in, you can also select your balance in the header and choose View my bonuses.",
+      link: "Open My Account \u2192 Bonuses", dest: "account?tab=Bonuses" },
+    { id: "promotions", q: "Where can I find promotions and offer details?",
+      a: "Open Promotions to browse the offers displayed on ChoCho. Review an offer\u2019s own details and conditions before taking part. For bonuses linked to your account, open My Account \u2192 Bonuses.",
+      link: "Open Promotions", dest: "promotions" }
+  ]},
+  { id: "account", title: "Account", items: [
+    { id: "profile", q: "Where can I review my profile?",
+      a: "Sign in, open My Account and select Profile to review the profile information shown for your account.",
+      link: "Open My Account \u2192 Profile", dest: "account?tab=Profile" },
+    { id: "security", q: "Where can I find security settings?",
+      a: "Open My Account \u2192 Security to review the security options shown for your account. Keep your password and one-time sign-in codes private.",
+      link: "Open My Account \u2192 Security", dest: "account?tab=Security" },
+    { id: "verification", q: "Where can I check my verification status?",
+      a: "Open My Account \u2192 Verification to view the status shown for your account and any instructions displayed there.",
+      link: "Open My Account \u2192 Verification", dest: "account?tab=Verification" },
+    { id: "preferences", q: "Where can I review account preferences?",
+      a: "Open My Account \u2192 Preferences to review the choices displayed for your account.",
+      link: "Open My Account \u2192 Preferences", dest: "account?tab=Preferences" }
+  ]},
+  { id: "support", title: "Support", items: [
+    { id: "open-support", q: "How do I open support?",
+      a: "Select Help in the header, Support in the footer or a Contact support button. The support panel opens without leaving the page you are viewing.",
+      support: true },
+    { id: "report-problem", q: "What information is useful when reporting a problem?",
+      a: "Describe what you were trying to do, what happened and when it happened. Include the page name and exact error message, if there is one. For a payment issue, include the transaction reference if available. If you share a screenshot, cover personal information that is not needed to explain the issue. Do not send passwords, one-time codes or full payment credentials.",
+      support: true },
+    { id: "responsible-gaming", q: "Where can I find responsible gaming information?",
+      a: "Select Responsible Gaming in the footer for practical guidance and links to external support resources.",
+      link: "Open Responsible Gaming", dest: "responsible-gaming" }
+  ]}
+];
+
+class Component extends DCLogic {
+  state = { vw: typeof window !== "undefined" ? window.innerWidth : 1024, query: "", open: {}, authed: false };
+  _search = React.createRef();
+
+  page() {
+    const q = (window.location.search.match(/[?&]page=([\w-]+)/) || [])[1];
+    if (INFO_PAGES[q]) return q;
+    const p = this.props.page ?? "faq";
+    return INFO_PAGES[p] ? p : "faq";
+  }
+
+  connectSite() {
+    const s = window.ChoChoSite;
+    if (!s) { window.addEventListener("chocho:site-ready", () => this.connectSite(), { once: true }); return; }
+    s.applyPreviewProp(this.props.previewSession);
+    this._unsub = s.subscribe(() => this.setState({ authed: s.isAuthed() }));
+    this.setState({ authed: s.isAuthed() });
+  }
+
+  // Direct entry with #section: content renders after load, so jump once it exists.
+  jumpToHash(focus) {
+    const id = decodeURIComponent((window.location.hash || "").slice(1));
+    if (!id || /^(signin|register|reset)$/.test(id)) return;
+    const el = document.getElementById(id);
+    if (!el) return;
+    window.scrollTo({ top: el.getBoundingClientRect().top + window.pageYOffset - 96, behavior: "auto" });
+    if (focus) { const h = el.querySelector("h2"); if (h) { if (!h.hasAttribute("tabindex")) h.setAttribute("tabindex", "-1"); try { h.focus({ preventScroll: true }); } catch (e) {} } }
+  }
+
+  componentDidMount() {
+    this.connectSite();
+    const info = INFO_PAGES[this.page()];
+    document.title = info.title + " · ChoCho";
+    const f = this.props.faqOpen ?? "first";
+    if (this.page() === "faq" && f === "first") this.setState({ open: { transactions: true } });
+    this._onResize = () => { if (window.innerWidth !== this.state.vw) this.setState({ vw: window.innerWidth }); };
+    window.addEventListener("resize", this._onResize);
+    this._onResize();
+    this._onHash = () => this.jumpToHash(true);
+    window.addEventListener("hashchange", this._onHash);
+    [60, 400].forEach(t => setTimeout(() => this.jumpToHash(false), t));
+  }
+  componentWillUnmount() {
+    window.removeEventListener("resize", this._onResize);
+    window.removeEventListener("hashchange", this._onHash);
+    if (this._unsub) this._unsub();
+  }
+
+  support() { window.dispatchEvent(new CustomEvent("chocho:support")); }
+
+  renderVals() {
+    const key = this.page(), info = INFO_PAGES[key];
+    const vw = this.state.vw, phone = vw < 600, wide = vw >= 900;
+    const isFaq = key === "faq";
+    const q = this.state.query.trim().toLowerCase();
+    const words = q ? q.split(/\s+/) : [];
+    const matches = (g, it) => {
+      const hay = (g.title + " " + it.q + " " + it.a + " " + (it.link || "")).toLowerCase();
+      return words.every(w => hay.indexOf(w) >= 0);
+    };
+    const site = window.ChoChoSite;
+    const groups = FAQ.map(g => ({
+      id: "faq-" + g.id, hid: "faq-" + g.id + "-h", title: g.title,
+      items: g.items.filter(it => matches(g, it)).map(it => {
+        const open = !!this.state.open[it.id];
+        const href = site ? site.href(it.dest || "home") : "#";
+        return {
+          q: it.q, a: it.a, open: open, expanded: open ? "true" : "false",
+          bid: "faq-q-" + it.id, pid: "faq-a-" + it.id,
+          glyph: open ? "−" : "+",
+          border: open ? "rgba(255,201,60,.32)" : "rgba(167,139,250,.18)",
+          iconBorder: open ? "rgba(255,201,60,.45)" : "rgba(167,139,250,.26)",
+          iconBg: open ? "rgba(255,201,60,.12)" : "rgba(255,255,255,.04)",
+          iconColor: open ? "#ffc93c" : "#c4b5fd",
+          toggle: () => this.setState(s => ({ open: Object.assign({}, s.open, { [it.id]: !s.open[it.id] }) })),
+          hasLink: !!it.dest, linkLabel: it.link || "", href: href,
+          // Guests keep the existing sign-in gate for Wallet and My Account.
+          onLink: (e) => {
+            const s2 = window.ChoChoSite;
+            if (s2 && s2.isProtected(it.dest.split(/[?#]/)[0]) && !s2.isAuthed()) { e.preventDefault(); s2.go(it.dest); }
+          },
+          isSupport: !!it.support
+        };
+      })
+    })).filter(g => g.items.length);
+    const count = groups.reduce((n, g) => n + g.items.length, 0);
+    const docSections = (info.sections || []).map(s => ({
+      id: s.id, hid: s.id + "-h", title: s.title,
+      blocks: (s.blocks || []).map(k => ({
+        isP: k.t === "p", isReq: k.t === "req", isLink: k.t === "link", isSupport: k.t === "support",
+        text: k.text || "", label: k.label || "", href: k.href || ""
+      }))
+    }));
+    const tocSrc = isFaq ? groups.map(g => ({ id: g.id, label: g.title })) : docSections.map(s => ({ id: s.id, label: s.title }));
+    const jump = (id) => (e) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      e.preventDefault();
+      if (window.location.hash !== "#" + id) history.pushState(null, "", "#" + id);
+      this.jumpToHash(true);
+    };
+
+    return {
+      page: key,
+      title: info.title,
+      intro: info.intro,
+      draftLabel: info.draftLabel,
+      draftNote: info.draftNote,
+      gut: phone ? "16px" : "22px",
+      h1Size: phone ? "28px" : "34px",
+      cols: wide ? "220px minmax(0, 720px)" : "minmax(0, 1fr)",
+      colGap: wide ? "40px" : "24px",
+      tocPos: wide ? "sticky" : "static",
+      // Desktop keeps the column steady while FAQ search narrows the topics; mobile drops an empty list.
+      showToc: wide || tocSrc.length >= 2,
+      tocEmpty: tocSrc.length === 0,
+      tocTitle: isFaq ? "TOPICS" : "ON THIS PAGE",
+      tocLabel: isFaq ? "FAQ topics" : "On this page",
+      toc: tocSrc.map(t => ({ label: t.label, href: "#" + t.id, onClick: jump(t.id) })),
+
+      isFaq: isFaq,
+      isDoc: !isFaq,
+      sections: docSections,
+      openSupport: () => this.support(),
+
+      searchRef: this._search,
+      query: this.state.query,
+      hasQuery: !!this.state.query,
+      inputPadR: this.state.query ? "52px" : "16px",
+      onQuery: (e) => this.setState({ query: e.target.value }),
+      onSearchKey: (e) => { if (e.key === "Escape" && this.state.query) { e.stopPropagation(); this.setState({ query: "" }); } },
+      clearQuery: () => this.setState({ query: "" }, () => { const i = this._search.current; if (i) i.focus(); }),
+      groups: groups,
+      noResults: isFaq && count === 0,
+      countText: q ? (count === 0 ? "No matching questions." : count + (count === 1 ? " question matches." : " questions match.")) : count + " questions"
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<script src="chocho-account.js"></script>
+<style>
+  @keyframes bnPulse { 0%, 100% { opacity: .45; } 50% { opacity: .8; } }
+</style>
+</helmet>
+<div style="font-family: Manrope, sans-serif; color: #fff; display: flex; flex-direction: column; gap: 18px;">
+
+  <sc-if value="{{ showHeading }}" hint-placeholder-val="{{ true }}">
+    <div style="display: flex; flex-direction: column; gap: 7px;">
+      <h2 style="margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -.4px; color: #fff;">My bonuses</h2>
+      <span style="font-size: 13.5px; font-weight: 500; line-height: 1.5; color: #a795c5; text-wrap: pretty;">View available bonuses and manage your active bonuses.</span>
+    </div>
+  </sc-if>
+
+  <div style="padding: 14px 16px; border: 1px solid rgba(167,139,250,.2); border-radius: 16px; background: linear-gradient(180deg, #23103f 0%, #180a2c 100%); display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px;">
+    <span style="flex: 1 1 180px; min-width: 0; display: flex; flex-direction: column; gap: 4px;">
+      <span style="font-size: 10.5px; font-weight: 800; letter-spacing: 1.1px; color: #8f7aae;">BONUS BALANCE</span>
+      <span aria-live="polite" style="font-size: 24px; font-weight: 800; letter-spacing: -.6px; font-variant-numeric: tabular-nums; color: #fff;">{{ bonusBalance }}</span>
+    </span>
+    <button onClick="{{ toggleHidden }}" aria-pressed="{{ hiddenAttr }}" style="flex: none; height: 36px; padding: 0 13px; border: 1px solid rgba(167,139,250,.26); border-radius: 10px; background: rgba(255,255,255,.04); color: #cbb6e6; font-family: Manrope, sans-serif; font-size: 12.5px; font-weight: 700; cursor: pointer;" style-hover="background: rgba(167,139,250,.16); color: #fff">{{ hiddenLabel }}</button>
+  </div>
+
+  <sc-if value="{{ isLoading }}" hint-placeholder-val="{{ false }}">
+    <div aria-busy="true" aria-label="Loading your bonuses" style="display: flex; flex-direction: column; gap: 10px;">
+      <sc-for list="{{ skeletons }}" as="k" hint-placeholder-count="3">
+        <span style="height: 108px; border-radius: 16px; border: 1px solid rgba(167,139,250,.14); background: rgba(255,255,255,.03); animation: bnPulse 1.4s ease-in-out infinite;"></span>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isError }}" hint-placeholder-val="{{ false }}">
+    <div role="alert" style="padding: 18px; border: 1px solid rgba(248,113,113,.4); border-radius: 16px; background: rgba(248,113,113,.08); display: flex; flex-direction: column; gap: 12px;">
+      <span style="font-size: 13.5px; font-weight: 600; line-height: 1.55; color: #fca5a5; text-wrap: pretty;">We couldn’t load your bonuses. Please try again.</span>
+      <div style="display: flex; flex-wrap: wrap; gap: 9px;">
+        <button onClick="{{ retry }}" style="min-height: 44px; padding: 0 18px; border: 0; border-radius: 12px; background: linear-gradient(180deg, #ffd766, #eb9c0d); color: #2c1400; font-family: Manrope, sans-serif; font-size: 13.5px; font-weight: 800; cursor: pointer;" style-hover="filter: brightness(1.05)">Retry</button>
+        <button onClick="{{ openSupport }}" data-help-trigger="1" style="min-height: 44px; padding: 0 18px; border: 1px solid rgba(167,139,250,.32); border-radius: 12px; background: rgba(255,255,255,.04); color: #fff; font-family: Manrope, sans-serif; font-size: 13.5px; font-weight: 700; cursor: pointer;" style-hover="background: rgba(255,255,255,.08)">24/7 Support</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isReady }}" hint-placeholder-val="{{ true }}">
+    <div style="display: flex; flex-direction: column; gap: 22px;">
+
+      <section style="display: flex; flex-direction: column; gap: 12px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <h3 style="margin: 0; font-size: 15px; font-weight: 800; letter-spacing: -.2px; color: #fff;">Available to claim</h3>
+          <span style="height: 22px; display: inline-flex; align-items: center; padding: 0 9px; border-radius: 999px; border: 1px solid rgba(167,139,250,.3); background: rgba(167,139,250,.12); font-size: 11px; font-weight: 800; color: #d8c8f2;">{{ availableCount }}</span>
+        </div>
+
+        <sc-if value="{{ availableEmpty }}" hint-placeholder-val="{{ false }}">
+          <span style="padding: 16px; border: 1px dashed rgba(167,139,250,.26); border-radius: 14px; font-size: 13.5px; font-weight: 600; color: #a795c5;">No bonuses available to claim right now.</span>
+        </sc-if>
+
+        <div style="display: grid; grid-template-columns: {{ cols }}; gap: 12px; align-items: start;">
+          <sc-for list="{{ available }}" as="b" hint-placeholder-count="2">
+            <div style="padding: 15px 16px; border: 1px solid rgba(167,139,250,.2); border-radius: 16px; background: linear-gradient(180deg, #23103f 0%, #180a2c 100%); display: flex; flex-direction: column; gap: 10px;">
+              <div style="display: flex; align-items: flex-start; flex-wrap: wrap; gap: 8px 10px;">
+                <span style="width: 34px; height: 34px; flex: none; border-radius: 11px; border: 1px solid rgba(255,201,60,.24); background: rgba(255,201,60,.1); display: flex; align-items: center; justify-content: center;">{{ b.icon }}</span>
+                <span style="flex: 1 1 140px; min-width: 0; display: flex; flex-direction: column; gap: 3px;">
+                  <span style="font-size: 15px; font-weight: 800; color: #fff; text-wrap: pretty;">{{ b.name }}</span>
+                  <span style="font-size: 13.5px; font-weight: 600; color: #ffd98a; text-wrap: pretty;">{{ b.reward }}</span>
+                </span>
+                <span style="flex: none; height: 24px; display: inline-flex; align-items: center; gap: 6px; padding: 0 10px; border-radius: 999px; border: 1px solid rgba(74,222,128,.32); background: rgba(74,222,128,.1); font-size: 10px; font-weight: 800; letter-spacing: .6px; white-space: nowrap; color: #86efac;">AVAILABLE</span>
+              </div>
+
+              <sc-if value="{{ b.deadline }}" hint-placeholder-val="{{ true }}">
+                <span style="font-size: 12.5px; font-weight: 700; color: #ffc93c;">{{ b.deadline }}</span>
+              </sc-if>
+
+              <span style="font-size: 12.5px; font-weight: 500; line-height: 1.55; color: #a795c5; text-wrap: pretty;">{{ b.conditions }}</span>
+
+              <sc-if value="{{ b.termsOpen }}" hint-placeholder-val="{{ false }}">
+                <div style="padding: 12px 14px; border: 1px solid rgba(167,139,250,.18); border-radius: 12px; background: rgba(255,255,255,.03); display: flex; flex-direction: column; gap: 7px;">
+                  <span style="font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #8f7aae;">BONUS TERMS</span>
+                  <sc-for list="{{ b.terms }}" as="t" hint-placeholder-count="3">
+                    <span style="font-size: 12.5px; font-weight: 500; line-height: 1.5; color: #cbb6e6; text-wrap: pretty;">• {{ t }}</span>
+                  </sc-for>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ b.confirming }}" hint-placeholder-val="{{ false }}">
+                <label style="display: flex; align-items: flex-start; gap: 10px; padding: 12px 13px; border: 1px solid rgba(255,201,60,.3); border-radius: 12px; background: rgba(255,201,60,.07); cursor: pointer;">
+                  <input type="checkbox" checked="{{ b.accepted }}" onChange="{{ b.onAccept }}" style="width: 20px; height: 20px; flex: none; margin: 1px 0 0; accent-color: #eb9c0d; cursor: pointer;">
+                  <span style="flex: 1; min-width: 0; font-size: 12.5px; font-weight: 600; line-height: 1.5; color: #f3e6c7; text-wrap: pretty;">I have read and accept the terms of this bonus.</span>
+                </label>
+              </sc-if>
+
+              <sc-if value="{{ b.message }}" hint-placeholder-val="{{ false }}">
+                <span role="status" style="padding: 11px 13px; border: 1px solid {{ b.messageBorder }}; border-radius: 12px; background: {{ b.messageBg }}; font-size: 12.5px; font-weight: 600; line-height: 1.5; color: {{ b.messageColor }}; text-wrap: pretty;">{{ b.message }}</span>
+              </sc-if>
+
+              <div style="display: flex; flex-wrap: wrap; gap: 8px; padding-top: 2px;">
+                <button onClick="{{ b.onTerms }}" aria-expanded="{{ b.termsExpanded }}" style="flex: 0 1 auto; min-height: 44px; padding: 0 15px; border: 1px solid rgba(167,139,250,.3); border-radius: 12px; background: rgba(255,255,255,.04); color: #e9e0f5; font-family: Manrope, sans-serif; font-size: 13px; font-weight: 700; white-space: nowrap; cursor: pointer;" style-hover="border-color: rgba(167,139,250,.6); color: #fff">{{ b.termsLabel }}</button>
+                <sc-if value="{{ b.showClaim }}" hint-placeholder-val="{{ true }}">
+                  <button onClick="{{ b.onClaim }}" disabled="{{ b.claimDisabled }}" style="flex: 1 1 150px; min-height: 44px; padding: 0 18px; border: 0; border-radius: 12px; background: {{ b.claimBg }}; color: #2c1400; font-family: Manrope, sans-serif; font-size: 13.5px; font-weight: 800; white-space: nowrap; cursor: {{ b.claimCursor }}; opacity: {{ b.claimOpacity }}; box-shadow: 0 8px 20px rgba(235,156,13,.28);" style-hover="filter: brightness(1.05)">{{ b.claimLabel }}</button>
+                </sc-if>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+
+      <section style="display: flex; flex-direction: column; gap: 12px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <h3 style="margin: 0; font-size: 15px; font-weight: 800; letter-spacing: -.2px; color: #fff;">Active bonuses</h3>
+          <span style="height: 22px; display: inline-flex; align-items: center; padding: 0 9px; border-radius: 999px; border: 1px solid rgba(167,139,250,.3); background: rgba(167,139,250,.12); font-size: 11px; font-weight: 800; color: #d8c8f2;">{{ activeCount }}</span>
+        </div>
+
+        <sc-if value="{{ activeEmpty }}" hint-placeholder-val="{{ false }}">
+          <span style="padding: 16px; border: 1px dashed rgba(167,139,250,.26); border-radius: 14px; font-size: 13.5px; font-weight: 600; color: #a795c5;">You have no active bonuses.</span>
+        </sc-if>
+
+        <div style="display: grid; grid-template-columns: {{ cols }}; gap: 12px; align-items: start;">
+          <sc-for list="{{ active }}" as="b" hint-placeholder-count="2">
+            <div style="padding: 15px 16px; border: 1px solid rgba(167,139,250,.2); border-radius: 16px; background: linear-gradient(180deg, #23103f 0%, #180a2c 100%); display: flex; flex-direction: column; gap: 10px;">
+              <div style="display: flex; align-items: flex-start; flex-wrap: wrap; gap: 8px 10px;">
+                <span style="width: 34px; height: 34px; flex: none; border-radius: 11px; border: 1px solid rgba(167,139,250,.26); background: rgba(167,139,250,.12); display: flex; align-items: center; justify-content: center;">{{ b.icon }}</span>
+                <span style="flex: 1 1 140px; min-width: 0; display: flex; flex-direction: column; gap: 3px;">
+                  <span style="font-size: 15px; font-weight: 800; color: #fff; text-wrap: pretty;">{{ b.name }}</span>
+                  <span style="font-size: 13.5px; font-weight: 600; color: #e6ddf5; text-wrap: pretty;">{{ b.reward }}</span>
+                </span>
+                <span style="flex: none; height: 24px; display: inline-flex; align-items: center; gap: 6px; padding: 0 10px; border-radius: 999px; border: 1px solid {{ b.statusBorder }}; background: {{ b.statusBg }}; font-size: 10px; font-weight: 800; letter-spacing: .6px; white-space: nowrap; color: {{ b.statusColor }};">{{ b.statusLabel }}</span>
+              </div>
+
+              <sc-if value="{{ b.remaining }}" hint-placeholder-val="{{ true }}">
+                <span style="font-size: 12.5px; font-weight: 600; color: #cbb6e6; text-wrap: pretty;">{{ b.remaining }}</span>
+              </sc-if>
+
+              <sc-if value="{{ b.hasProgress }}" hint-placeholder-val="{{ false }}">
+                <span style="display: flex; flex-direction: column; gap: 6px;">
+                  <span style="height: 7px; border-radius: 999px; background: rgba(255,255,255,.07); overflow: hidden; display: block;">
+                    <span style="display: block; height: 100%; width: {{ b.progressWidth }}; border-radius: 999px; background: linear-gradient(90deg, #ffd766, #eb9c0d);"></span>
+                  </span>
+                  <span style="font-size: 12px; font-weight: 600; color: #a795c5; text-wrap: pretty;">{{ b.progressLabel }}</span>
+                </span>
+              </sc-if>
+
+              <sc-if value="{{ b.expiry }}" hint-placeholder-val="{{ true }}">
+                <span style="font-size: 12.5px; font-weight: 600; color: #a795c5;">{{ b.expiry }}</span>
+              </sc-if>
+
+              <sc-if value="{{ b.detailsOpen }}" hint-placeholder-val="{{ false }}">
+                <div style="padding: 12px 14px; border: 1px solid rgba(167,139,250,.18); border-radius: 12px; background: rgba(255,255,255,.03); display: flex; flex-direction: column; gap: 7px;">
+                  <span style="font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #8f7aae;">CONDITIONS</span>
+                  <sc-for list="{{ b.details }}" as="t" hint-placeholder-count="3">
+                    <span style="font-size: 12.5px; font-weight: 500; line-height: 1.5; color: #cbb6e6; text-wrap: pretty;">• {{ t }}</span>
+                  </sc-for>
+                </div>
+              </sc-if>
+
+              <div style="display: flex; flex-wrap: wrap; gap: 8px; padding-top: 2px;">
+                <button onClick="{{ b.onDetails }}" aria-expanded="{{ b.detailsExpanded }}" style="min-height: 44px; padding: 0 15px; border: 1px solid rgba(167,139,250,.3); border-radius: 12px; background: rgba(255,255,255,.04); color: #e9e0f5; font-family: Manrope, sans-serif; font-size: 13px; font-weight: 700; white-space: nowrap; cursor: pointer;" style-hover="border-color: rgba(167,139,250,.6); color: #fff">{{ b.detailsLabel }}</button>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+
+      <span style="font-size: 12px; font-weight: 500; line-height: 1.55; color: #8f7aae; text-wrap: pretty;">Bonus credit is separate from your cash balance and follows each bonus’s own conditions.</span>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:720,&quot;height&quot;:900},&quot;variant&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;page&quot;,&quot;panel&quot;],&quot;default&quot;:&quot;page&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Surface&quot;},&quot;showHeading&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Surface&quot;},&quot;dataState&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;loaded&quot;,&quot;loading&quot;,&quot;empty&quot;,&quot;error&quot;],&quot;default&quot;:&quot;loaded&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Preview fixtures&quot;},&quot;claimOutcome&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;not-connected&quot;,&quot;active&quot;,&quot;awaiting&quot;,&quot;expired&quot;,&quot;already&quot;,&quot;ineligible&quot;,&quot;timeout&quot;],&quot;default&quot;:&quot;not-connected&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Preview fixtures&quot;}}">
+class Component extends DCLogic {
+  state = {
+    status: "loading", data: null,
+    open: {},            // inline terms / details expansion, keyed by bonus id
+    confirming: null,    // bonus id awaiting terms acceptance
+    accepted: {},        // never preselected
+    claiming: null,
+    messages: {},        // service response per bonus id
+    hidden: false
+  };
+
+  componentDidMount() {
+    this._mounted = true;
+    this.connect();
+    this.fetch();
+  }
+
+  componentWillUnmount() {
+    this._mounted = false;
+    if (this._unsub) this._unsub();
+  }
+
+  acct() { return window.ChoChoAccount; }
+
+  connect() {
+    const a = this.acct();
+    if (!a) { window.addEventListener("chocho:account-ready", () => this.connect(), { once: true }); return; }
+    this.setState({ hidden: a.isHidden() });
+    this._unsub = a.subscribe(() => {
+      if (this._mounted) this.setState({ hidden: a.isHidden() });
+    });
+  }
+
+  fetch() {
+    const a = this.acct();
+    if (!a) { setTimeout(() => this.fetch(), 120); return; }
+    const want = this.props.dataState ?? "loaded";
+    this.setState({ status: "loading" });
+    a.load(want).then(
+      d => { if (this._mounted) this.setState({ status: "ready", data: d }); },
+      () => { if (this._mounted) this.setState({ status: "error" }); }
+    );
+  }
+
+  icon(kind) {
+    const paths = {
+      gift: "M4 11h16v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1zM3 7h18v4H3zM12 7v14M8 7a2 2 0 1 1 2-3c1.5 0 2 3 2 3M16 7a2 2 0 1 0-2-3c-1.5 0-2 3-2 3",
+      coins: "M12 6c4 0 7 1.1 7 2.5S16 11 12 11s-7-1.1-7-2.5S8 6 12 6zM5 8.5v7c0 1.4 3 2.5 7 2.5s7-1.1 7-2.5v-7"
+    };
+    return React.createElement("svg", {
+      width: 17, height: 17, viewBox: "0 0 24 24", fill: "none",
+      stroke: kind === "gift" ? "#ffc93c" : "#c4b5fd",
+      strokeWidth: 1.8, strokeLinecap: "round", strokeLinejoin: "round"
+    }, React.createElement("path", { d: paths[kind] }));
+  }
+
+  toggleOpen(id) {
+    this.setState(s => ({ open: Object.assign({}, s.open, { [id]: !s.open[id] }) }));
+  }
+
+  startClaim(id) {
+    // Never auto-claims: the first press reveals the terms-acceptance step.
+    this.setState(s => ({
+      confirming: id,
+      open: Object.assign({}, s.open, { [id]: true }),
+      messages: Object.assign({}, s.messages, { [id]: null })
+    }));
+  }
+
+  confirmClaim(id) {
+    if (this.state.claiming) return;
+    const a = this.acct();
+    if (!a) return;
+    this.setState({ claiming: id });
+    a.claim(id, this.props.claimOutcome ?? "not-connected").then(res => {
+      if (!this._mounted) return;
+      if (res.ok) {
+        // The list is refreshed from the service response; the card only moves
+        // to Active if the returned status says it is active.
+        this.setState(s => {
+          const d = s.data ? JSON.parse(JSON.stringify(s.data)) : s.data;
+          if (d) {
+            const i = d.available.findIndex(b => b.id === id);
+            if (i > -1) {
+              const b = d.available.splice(i, 1)[0];
+              d.active.unshift({
+                id: b.id, name: b.name, reward: b.reward,
+                status: res.status,
+                statusLabel: res.status === "active" ? "ACTIVE" : "AWAITING ACTIVATION",
+                remaining: "", expiry: "", details: b.terms || []
+              });
+            }
+          }
+          return {
+            claiming: null, confirming: null, data: d,
+            accepted: Object.assign({}, s.accepted, { [id]: false }),
+            messages: Object.assign({}, s.messages, { [id]: { tone: "ok", text: res.message || "Bonus claimed." } })
+          };
+        });
+        return;
+      }
+      this.setState(s => ({
+        claiming: null,
+        confirming: res.code === "timeout" ? null : s.confirming,
+        messages: Object.assign({}, s.messages, { [id]: { tone: res.code === "timeout" ? "warn" : "error", text: res.message } })
+      }));
+    });
+  }
+
+  tone(kind) {
+    if (kind === "ok") return { border: "rgba(74,222,128,.34)", bg: "rgba(74,222,128,.1)", color: "#a7f3c0" };
+    if (kind === "warn") return { border: "rgba(255,201,60,.4)", bg: "rgba(255,201,60,.1)", color: "#f3e6c7" };
+    return { border: "rgba(248,113,113,.4)", bg: "rgba(248,113,113,.09)", color: "#fca5a5" };
+  }
+
+  statusChip(status) {
+    if (status === "active") return { color: "#86efac", bg: "rgba(74,222,128,.1)", border: "rgba(74,222,128,.32)" };
+    return { color: "#ffc93c", bg: "rgba(255,201,60,.12)", border: "rgba(255,201,60,.42)" };
+  }
+
+  renderVals() {
+    const s = this.state;
+    const a = this.acct();
+    const peso = a ? a.peso : (n => "\u20B1" + n);
+    const mask = a ? a.mask : "\u2022\u2022\u2022\u2022\u2022\u2022";
+    const d = s.data;
+    const ready = s.status === "ready" && !!d;
+    const panel = (this.props.variant ?? "page") === "panel";
+
+    const available = ready ? d.available : [];
+    const active = ready ? d.active : [];
+
+    return {
+      showHeading: (this.props.showHeading ?? true) && !panel,
+      cols: panel ? "minmax(0, 1fr)" : "repeat(auto-fit, minmax(min(100%, 290px), 1fr))",
+      skeletons: [0, 1, 2],
+
+      bonusBalance: !ready ? "—" : (s.hidden ? mask : peso(d.balances.bonus)),
+      hiddenAttr: s.hidden ? "true" : "false",
+      hiddenLabel: s.hidden ? "Show" : "Hide",
+      toggleHidden: () => { if (a) a.toggleHidden(); },
+
+      isLoading: s.status === "loading",
+      isError: s.status === "error",
+      isReady: ready,
+      retry: () => this.fetch(),
+      openSupport: () => { window.dispatchEvent(new CustomEvent("chocho:support")); },
+
+      availableCount: available.length,
+      activeCount: active.length,
+      availableEmpty: ready && available.length === 0,
+      activeEmpty: ready && active.length === 0,
+
+      available: available.map(b => {
+        const msg = s.messages[b.id];
+        const t = msg ? this.tone(msg.tone) : this.tone("error");
+        const confirming = s.confirming === b.id;
+        const claiming = s.claiming === b.id;
+        const blocked = msg && (msg.tone === "error" || msg.tone === "warn");
+        const canSubmit = confirming ? !!s.accepted[b.id] : true;
+        return {
+          name: b.name, reward: b.reward, deadline: b.deadline, conditions: b.conditions,
+          terms: b.terms || [],
+          icon: this.icon("gift"),
+          termsOpen: !!s.open[b.id],
+          termsExpanded: s.open[b.id] ? "true" : "false",
+          termsLabel: s.open[b.id] ? "Hide terms" : "View terms",
+          onTerms: () => this.toggleOpen(b.id),
+          confirming: confirming,
+          accepted: !!s.accepted[b.id],
+          onAccept: (e) => {
+            const v = e.target.checked;
+            this.setState(st => ({ accepted: Object.assign({}, st.accepted, { [b.id]: v }) }));
+          },
+          message: msg ? msg.text : "",
+          messageBorder: t.border, messageBg: t.bg, messageColor: t.color,
+          showClaim: b.claimable !== false,
+          claimLabel: claiming ? "Claiming…" : (confirming ? "Confirm claim" : "Claim bonus"),
+          claimDisabled: claiming || (confirming && !canSubmit) || (msg && msg.tone === "warn") ? true : undefined,
+          claimCursor: claiming ? "progress" : (confirming && !canSubmit) ? "not-allowed" : "pointer",
+          claimOpacity: claiming || (confirming && !canSubmit) || (msg && msg.tone === "warn") ? .6 : 1,
+          claimBg: "linear-gradient(180deg, #ffd766, #eb9c0d)",
+          onClaim: () => {
+            if (claiming) return;
+            if (!confirming) { this.startClaim(b.id); return; }
+            if (!s.accepted[b.id]) return;
+            this.confirmClaim(b.id);
+          }
+        };
+      }),
+
+      active: active.map(b => {
+        const c = this.statusChip(b.status);
+        const p = b.progress;
+        const pct = p && p.target ? Math.max(0, Math.min(100, Math.round((p.done / p.target) * 100))) : 0;
+        return {
+          name: b.name, reward: b.reward,
+          remaining: b.remaining || "", expiry: b.expiry || "",
+          statusLabel: b.statusLabel,
+          statusColor: c.color, statusBg: c.bg, statusBorder: c.border,
+          icon: this.icon("coins"),
+          hasProgress: !!p,
+          progressWidth: pct + "%",
+          progressLabel: p ? p.meaning + ": " + peso(p.done) + " of " + peso(p.target) : "",
+          details: b.details || [],
+          detailsOpen: !!s.open[b.id],
+          detailsExpanded: s.open[b.id] ? "true" : "false",
+          detailsLabel: s.open[b.id] ? "Hide details" : "View details",
+          onDetails: () => this.toggleOpen(b.id)
+        };
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>

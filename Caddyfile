@@ -1,0 +1,22 @@
+# The skin front container: SPA on / (history fallback), /api/* → the gateway, prefix KEPT (the gateway serves
+# /api/* itself; only the BO front strips). GATEWAY_UPSTREAM defaults to the compose service name. On a real
+# deployment the platform's edge Caddy already routes /api/* to the gateway on the skin domain (Caddyfile.staging),
+# so there this container only serves the static files.
+{
+	admin off
+	auto_https off
+}
+
+:80 {
+	encode gzip
+
+	handle /api/* {
+		reverse_proxy {$GATEWAY_UPSTREAM:gateway:8080}
+	}
+
+	handle {
+		root * /srv
+		try_files {path} /index.html
+		file_server
+	}
+}

@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Caveat:wght@600;700&amp;display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; background: #130124; }
+  a { color: #ffc93c; text-decoration: none; }
+  a:hover { color: #ffe08a; }
+  @keyframes regFade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes regRise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  @keyframes regSpin { to { transform: rotate(360deg); } }
+  input::placeholder { color: #7c689b; }
+  :focus-visible { outline: 2px solid #ffc93c; outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+<script src="chocho-site.js"></script>
+</helmet>
+<div style="font-family: Manrope, sans-serif; color: #fff;">
+
+  <sc-if value="{{ dialogOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ backdropClick }}" style="position: fixed; inset: 0; z-index: 200; background: {{ scrimBg }}; display: flex; align-items: {{ surfaceAlign }}; justify-content: center; padding: {{ scrimPad }}; overflow: {{ scrimOverflow }}; animation: regFade .18s ease-out; -webkit-overflow-scrolling: touch;">
+      <div role="dialog" aria-modal="true" aria-labelledby="auth-title" tabindex="-1" data-reg-dialog="1" onClick="{{ stop }}" style="position: relative; width: {{ surfaceWidth }}; max-width: 100%; min-height: {{ surfaceMinHeight }}; max-height: {{ surfaceMaxHeight }}; overflow-y: {{ surfaceOverflow }}; -webkit-overflow-scrolling: touch; border: {{ surfaceBorder }}; border-radius: {{ surfaceRadius }}; box-sizing: border-box; padding: {{ surfacePad }}; background: linear-gradient(170deg, #2a1049 0%, #1a0930 55%, #160726 100%); box-shadow: 0 30px 80px rgba(4,1,9,.7); display: flex; flex-direction: column; gap: 18px; animation: regRise .22s ease-out;">
+
+        <div style="position: sticky; top: 0; z-index: 2; margin: {{ barMargin }}; padding: {{ barPad }}; background: #2a1049; border-bottom: 1px solid rgba(167,139,250,.14); display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
+          <img src="assets/chocho-logo-cut.png" alt="ChoCho" style="height: 44px; width: 62px; flex: none; object-fit: contain; display: block; filter: drop-shadow(0 4px 12px rgba(0,0,0,.5));">
+          <button onClick="{{ close }}" aria-label="{{ closeLabel }}" style="width: 40px; height: 40px; flex: none; border: 1px solid rgba(167,139,250,.28); border-radius: 12px; background: rgba(255,255,255,.06); color: #cbb6e6; font-size: 15px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center;" style-hover="background: rgba(255,255,255,.14); color: #fff">✕</button>
+        </div>
+
+        <sc-if value="{{ showForm }}" hint-placeholder-val="{{ true }}">
+          <div style="display: flex; flex-direction: column; gap: 18px;">
+
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+              <h1 id="auth-title" style="margin: 0; font-size: 25px; font-weight: 800; letter-spacing: -.6px; line-height: 1.2; color: #fff;">{{ heading }}</h1>
+              <span style="font-size: 13.5px; font-weight: 500; line-height: 1.5; color: #a795c5; text-wrap: pretty;">{{ subhead }}</span>
+            </div>
+
+            <div role="tablist" aria-label="Contact method" style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 5px; border: 1px solid rgba(167,139,250,.2); border-radius: 14px; background: rgba(255,255,255,.03);">
+              <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="2">
+                <button role="tab" aria-selected="{{ t.selected }}" onClick="{{ t.onClick }}" style="height: 46px; border: 0; border-radius: 10px; cursor: pointer; font-family: Manrope, sans-serif; font-size: 14px; font-weight: 800; letter-spacing: .1px; background: {{ t.bg }}; color: {{ t.color }}; box-shadow: {{ t.shadow }}; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background .18s ease, color .18s ease;">{{ t.label }}</button>
+              </sc-for>
+            </div>
+
+            <sc-if value="{{ formError }}" hint-placeholder-val="{{ false }}">
+              <div role="alert" style="display: flex; align-items: flex-start; gap: 10px; padding: 13px 15px; border: 1px solid rgba(248,113,113,.4); border-radius: 14px; background: rgba(248,113,113,.1);">
+                <span style="width: 18px; height: 18px; flex: none; margin-top: 1px; border-radius: 50%; border: 1.5px solid #fca5a5; color: #fca5a5; font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center;">!</span>
+                <span style="flex: 1; min-width: 0; font-size: 12.5px; font-weight: 600; line-height: 1.5; color: #fecaca; text-wrap: pretty;">{{ formError }}</span>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ isPhone }}" hint-placeholder-val="{{ true }}">
+              <div style="display: flex; flex-direction: column; gap: 8px;">
+                <label for="reg-phone" style="font-size: 12.5px; font-weight: 700; letter-spacing: .2px; color: #e6ddf5;">Mobile number</label>
+                <div style="display: flex; align-items: stretch; gap: 8px;">
+                  <span style="height: 52px; flex: none; display: flex; align-items: center; padding: 0 14px; border: 1px solid {{ phoneBorder }}; border-radius: 14px; background: rgba(255,255,255,.03); font-size: 14.5px; font-weight: 700; color: #e6ddf5;">+63</span>
+                  <input id="reg-phone" type="tel" inputMode="tel" autoComplete="tel-national" name="phone" placeholder="Enter mobile number" aria-invalid="{{ phoneInvalid }}" aria-describedby="reg-phone-err" value="{{ phone }}" onChange="{{ onPhone }}" onFocus="{{ focusPhone }}" onBlur="{{ blurField }}" style="flex: 1; min-width: 0; height: 52px; box-sizing: border-box; padding: 0 {{ inputPadX }}; border: 1px solid {{ phoneBorder }}; border-radius: 14px; background: rgba(255,255,255,.03); color: #fff; font-family: Manrope, sans-serif; font-size: {{ inputFont }}; font-weight: 600; letter-spacing: .3px; outline: none; transition: border-color .18s ease, box-shadow .18s ease; box-shadow: {{ phoneGlow }};">
+                </div>
+                <span id="reg-phone-err" style="display: {{ phoneHintShow }}; font-size: 12px; font-weight: 600; line-height: 1.4; color: {{ phoneHintColor }};">{{ phoneHint }}</span>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ isEmail }}" hint-placeholder-val="{{ false }}">
+              <div style="display: flex; flex-direction: column; gap: 8px;">
+                <label for="reg-email" style="font-size: 12.5px; font-weight: 700; letter-spacing: .2px; color: #e6ddf5;">Email address</label>
+                <input id="reg-email" type="email" inputMode="email" autoCapitalize="none" autoCorrect="off" spellCheck="false" autoComplete="email" name="email" placeholder="Enter your email address" aria-invalid="{{ emailInvalid }}" aria-describedby="reg-email-err" value="{{ email }}" onChange="{{ onEmail }}" onFocus="{{ focusEmail }}" onBlur="{{ blurField }}" style="height: 52px; box-sizing: border-box; padding: 0 {{ inputPadX }}; border: 1px solid {{ emailBorder }}; border-radius: 14px; background: rgba(255,255,255,.03); color: #fff; font-family: Manrope, sans-serif; font-size: {{ inputFont }}; font-weight: 600; outline: none; transition: border-color .18s ease, box-shadow .18s ease; box-shadow: {{ emailGlow }};">
+                <span id="reg-email-err" style="display: {{ emailHintShow }}; font-size: 12px; font-weight: 600; line-height: 1.4; color: {{ emailHintColor }};">{{ emailHint }}</span>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ needsPassword }}" hint-placeholder-val="{{ true }}">
+              <div style="display: flex; flex-direction: column; gap: 8px;">
+                <label for="reg-password" style="font-size: 12.5px; font-weight: 700; letter-spacing: .2px; color: #e6ddf5;">Password</label>
+                <div style="position: relative; display: flex;">
+                  <input id="reg-password" type="{{ passwordType }}" name="password" autoComplete="{{ passwordAutocomplete }}" placeholder="{{ passwordPlaceholder }}" aria-invalid="{{ passInvalid }}" aria-describedby="reg-pass-err" value="{{ password }}" onChange="{{ onPassword }}" onFocus="{{ focusPass }}" onBlur="{{ blurField }}" style="flex: 1; min-width: 0; height: 52px; box-sizing: border-box; padding: 0 96px 0 {{ inputPadX }}; border: 1px solid {{ passBorder }}; border-radius: 14px; background: rgba(255,255,255,.03); color: #fff; font-family: Manrope, sans-serif; font-size: {{ inputFont }}; font-weight: 600; outline: none; transition: border-color .18s ease, box-shadow .18s ease; box-shadow: {{ passGlow }};">
+                  <button type="button" onClick="{{ togglePassword }}" aria-pressed="{{ passwordShown }}" style="position: absolute; right: 6px; top: 6px; height: 40px; min-width: 76px; padding: 0 14px; border: 1px solid rgba(167,139,250,.24); border-radius: 10px; background: rgba(255,255,255,.05); color: #cbb6e6; font-family: Manrope, sans-serif; font-size: 12.5px; font-weight: 700; cursor: pointer;" style-hover="background: rgba(167,139,250,.16); color: #fff">{{ passwordToggleLabel }}</button>
+                </div>
+                <span id="reg-pass-err" style="display: {{ passHintShow }}; font-size: 12px; font-weight: 600; line-height: 1.4; color: {{ passHintColor }};">{{ passHint }}</span>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ isSignin }}" hint-placeholder-val="{{ true }}">
+              <div style="display: flex; justify-content: flex-end; margin-top: -4px;">
+                <button onClick="{{ goReset }}" style="min-height: 44px; padding: 0 2px; border: 0; background: transparent; color: #ffc93c; font-family: Manrope, sans-serif; font-size: 13px; font-weight: 700; cursor: pointer;" style-hover="color: #ffe08a">Forgot password?</button>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ isRegister }}" hint-placeholder-val="{{ false }}">
+              <div style="display: flex; align-items: flex-start; gap: 12px;">
+                <button type="button" role="checkbox" aria-checked="{{ consent }}" aria-labelledby="reg-consent-label" onClick="{{ toggleConsent }}" style="width: 26px; height: 26px; flex: none; margin-top: 1px; border: 1px solid {{ consentBorder }}; border-radius: 8px; background: {{ consentBg }}; color: #2c1400; font-size: 14px; font-weight: 800; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .18s ease, border-color .18s ease;">{{ consentMark }}</button>
+                <span id="reg-consent-label" style="flex: 1; min-width: 0; font-size: 12.5px; font-weight: 500; line-height: 1.55; color: #a795c5; text-wrap: pretty;">I agree to the <a href="{{ termsHref }}" target="_blank" rel="noopener">Terms &amp; Conditions<span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0);"> (opens in a new tab)</span></a> and <a href="{{ privacyHref }}" target="_blank" rel="noopener">Privacy Policy<span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0);"> (opens in a new tab)</span></a>.</span>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ isReset }}" hint-placeholder-val="{{ false }}">
+              <span style="font-size: 12.5px; font-weight: 500; line-height: 1.55; color: #8f7aae; text-wrap: pretty;">We’ll only send reset instructions if these details match an account.</span>
+            </sc-if>
+
+            <button onClick="{{ submit }}" aria-busy="{{ submitting }}" disabled="{{ submitting }}" style="height: 54px; width: 100%; box-sizing: border-box; border: 0; border-radius: 14px; background: linear-gradient(180deg, #ffd766, #eb9c0d); color: #2c1400; font-family: Manrope, sans-serif; font-size: 15.5px; font-weight: 800; letter-spacing: .1px; cursor: {{ submitCursor }}; opacity: {{ submitOpacity }}; box-shadow: 0 10px 26px rgba(235,156,13,.34); display: flex; align-items: center; justify-content: center; gap: 10px; transition: filter .2s ease;" style-hover="filter: brightness(1.05)">
+              <sc-if value="{{ submitting }}" hint-placeholder-val="{{ false }}">
+                <span style="width: 16px; height: 16px; border-radius: 50%; border: 2px solid rgba(44,20,0,.3); border-top-color: #2c1400; animation: regSpin .8s linear infinite;"></span>
+              </sc-if>
+              {{ submitLabel }}
+            </button>
+
+            <sc-if value="{{ showTelegram }}" hint-placeholder-val="{{ true }}">
+              <div style="display: flex; flex-direction: column; gap: 18px;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                  <span style="flex: 1; height: 1px; background: rgba(167,139,250,.18);"></span>
+                  <span style="font-size: 11.5px; font-weight: 700; letter-spacing: 1px; color: #8f7aae;">or</span>
+                  <span style="flex: 1; height: 1px; background: rgba(167,139,250,.18);"></span>
+                </div>
+                <button onClick="{{ telegram }}" aria-busy="{{ tgBusy }}" disabled="{{ tgBusy }}" style="height: 54px; width: 100%; box-sizing: border-box; border: 1px solid rgba(94,167,235,.4); border-radius: 14px; background: linear-gradient(180deg, #2b1450 0%, #1d0b36 100%); color: #fff; font-family: Manrope, sans-serif; font-size: 14.5px; font-weight: 700; cursor: {{ tgCursor }}; opacity: {{ tgOpacity }}; display: flex; align-items: center; justify-content: center; gap: 11px; transition: border-color .2s ease, background .2s ease;" style-hover="border-color: rgba(94,167,235,.75); background: linear-gradient(180deg, #321856 0%, #210d3d 100%)">
+                  {{ tgIcon }}{{ tgLabel }}
+                </button>
+              </div>
+            </sc-if>
+
+            <span style="font-size: 13px; font-weight: 500; text-align: center; color: #a795c5;">{{ switchPrompt }} <a href="#" onClick="{{ switchView }}" style="font-weight: 700;">{{ switchLabel }}</a></span>
+
+            <span style="height: 1px; background: rgba(167,139,250,.14);"></span>
+
+            <button onClick="{{ openSupport }}" data-help-trigger="1" style="min-height: 44px; border: 0; background: transparent; color: #a795c5; font-family: Manrope, sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;" style-hover="color: #fff">Need help? <span style="color: #ffc93c; font-weight: 800;">24/7 Support</span></button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ handoff }}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; flex-direction: column; gap: 16px; padding-bottom: 6px;">
+            <span style="width: 52px; height: 52px; border-radius: 16px; border: 1px solid {{ handoffBorder }}; background: {{ handoffBg }}; display: flex; align-items: center; justify-content: center;">{{ handoffIcon }}</span>
+            <h1 id="auth-title" style="margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -.4px; line-height: 1.25; color: #fff;">{{ handoffTitle }}</h1>
+            <span style="font-size: 13.5px; font-weight: 500; line-height: 1.6; color: #a795c5; text-wrap: pretty;">{{ handoffCopy }}</span>
+            <button onClick="{{ backToForm }}" style="height: 50px; width: 100%; box-sizing: border-box; border: 0; border-radius: 14px; background: linear-gradient(180deg, #ffd766, #eb9c0d); color: #2c1400; font-family: Manrope, sans-serif; font-size: 15px; font-weight: 800; cursor: pointer; box-shadow: 0 10px 26px rgba(235,156,13,.34);" style-hover="filter: brightness(1.05)">{{ handoffAction }}</button>
+            <button onClick="{{ openSupport }}" data-help-trigger="1" style="min-height: 44px; border: 0; background: transparent; color: #a795c5; font-family: Manrope, sans-serif; font-size: 13px; font-weight: 600; cursor: pointer;" style-hover="color: #fff">Need help? <span style="color: #ffc93c; font-weight: 800;">24/7 Support</span></button>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1024,&quot;height&quot;:900},&quot;embedded&quot;:{&quot;editor&quot;:null,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;layout&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;auto&quot;,&quot;mobile&quot;],&quot;default&quot;:&quot;auto&quot;,&quot;tsType&quot;:&quot;\&quot;desktop\&quot; | \&quot;mobile\&quot;&quot;,&quot;section&quot;:&quot;Surface&quot;},&quot;serviceResult&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;unavailable&quot;,&quot;invalid&quot;,&quot;locked&quot;],&quot;default&quot;:&quot;unavailable&quot;,&quot;tsType&quot;:&quot;\&quot;unavailable\&quot; | \&quot;invalid\&quot; | \&quot;locked\&quot;&quot;,&quot;section&quot;:&quot;Reviewable states&quot;}}">
+class Component extends DCLogic {
+  state = {
+    open: false, view: "signin", mode: "phone", phone: "", email: "", password: "",
+    shown: false, consent: false, focus: null, touched: {},
+    submitting: false, formError: "", handoff: null, tgBusy: false, support: false,
+    destination: null
+  };
+
+  constructor(props) {
+    super(props);
+    this.lastTrigger = null;
+    this.helpTrigger = null;
+  }
+
+  dialogNode() { return document.querySelector("[data-reg-dialog]"); }
+  supportNode() { return document.querySelector("[data-support-dialog]"); }
+
+  componentDidMount() {
+    this._onVw = () => { if (window.innerWidth !== this.state.vw) this.setState({ vw: window.innerWidth }); };
+    window.addEventListener("resize", this._onVw);
+    this._onVw();
+    this.onAuth = (e) => {
+      const d = (e && e.detail) || {};
+      if (window.ChoChoSite) window.ChoChoSite.pendingAuth = null;
+      if (d.mode === "register" || d.mode === "signin") {
+        this.openDialog(d.mode === "register" ? "register" : "signin", null, d.returnTo || null);
+      }
+    };
+    window.addEventListener("chocho:auth", this.onAuth);
+
+    // Opened on its own (old links / editor preview): the flow now lives over
+    // the page that asked for it, so hand over to Home with the same mode.
+    if (!this.props.embedded) {
+      const mode = /register/i.test(window.location.hash) ? "#register" : /reset/i.test(window.location.hash) ? "#reset" : "#signin";
+      window.location.replace("ChoCho Home.dc.html" + mode);
+      return;
+    }
+    // #signin / #register / #reset stay valid entry points on any page.
+    const h = window.location.hash.toLowerCase();
+    if (h === "#register") this.openDialog("register", null, null);
+    else if (h === "#signin") this.openDialog("signin", null, null);
+    else if (h === "#reset") this.openDialog("reset", null, null);
+
+    // Selecting the internal signed-in preview while the dialog is open
+    // continues to the retained destination (never arbitrary URLs).
+    this.connectSite();
+
+    this.onKey = (e) => {
+      if (e.key === "Escape") {
+        if (this.state.support) { e.stopPropagation(); this.closeSupport(); return; }
+        if (this.state.open) { e.stopPropagation(); this.close(); }
+        return;
+      }
+      if (e.key !== "Tab") return;
+      const root = this.state.support ? this.supportNode() : (this.state.open ? this.dialogNode() : null);
+      if (!root) return;
+      const f = Array.from(root.querySelectorAll('button:not([disabled]), a[href], input:not([disabled]), [tabindex]:not([tabindex="-1"])'))
+        .filter(el => el.offsetParent !== null);
+      if (!f.length) return;
+      const first = f[0], last = f[f.length - 1];
+      const active = document.activeElement;
+      if (!root.contains(active)) { e.preventDefault(); first.focus(); return; }
+      if (e.shiftKey && active === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && active === last) { e.preventDefault(); first.focus(); }
+    };
+    document.addEventListener("keydown", this.onKey, true);
+  }
+
+  connectSite() {
+    const s = window.ChoChoSite;
+    if (!s) { window.addEventListener("chocho:site-ready", () => this.connectSite(), { once: true }); return; }
+    // A page may have asked for sign-in before this dialog finished mounting.
+    if (s.pendingAuth) { const p = s.pendingAuth; s.pendingAuth = null; this.openDialog(p.mode, null, p.returnTo); }
+    this._unsubSite = s.subscribe(() => {
+      if (!s.isAuthed() || !this.state.open) return;
+      const t = s.consumeReturnTo();
+      this.close(true);
+      if (t && t.split(/[?#]/)[0] !== s.currentUrl().split(/[?#]/)[0]) window.location.href = t;
+    });
+  }
+
+  componentWillUnmount() {
+    if (this._unsubSite) this._unsubSite();
+    window.removeEventListener("chocho:auth", this.onAuth);
+    document.removeEventListener("keydown", this.onKey, true);
+    clearTimeout(this.timer);
+    clearTimeout(this.tgTimer);
+  }
+
+  focusDialog() {
+    const r = this.dialogNode();
+    if (r) r.focus();
+  }
+
+  openDialog(view, trigger, destination) {
+    this.lastTrigger = trigger || (document.activeElement && document.activeElement !== document.body ? document.activeElement : null);
+    this.setState({
+      open: true, view: view || "signin", handoff: null, formError: "", touched: {},
+      destination: destination || this.state.destination
+    }, () => this.focusDialog());
+  }
+
+  setView(view) {
+    // one shared container: switch the view in place, never stack dialogs.
+    this.setState({ view: view, handoff: null, formError: "", touched: {}, password: "", shown: false }, () => this.focusDialog());
+  }
+
+  close(keepReturn) {
+    const t = this.lastTrigger;
+    this.lastTrigger = null;
+    const s = window.ChoChoSite;
+    if (s && !keepReturn) s.consumeReturnTo();
+    if (/^#(signin|register|reset)$/i.test(window.location.hash)) {
+      try { history.replaceState(history.state, "", window.location.pathname + window.location.search); } catch (e) {}
+    }
+    window.dispatchEvent(new CustomEvent("chocho:auth-closed"));
+    // passwords and codes never persist beyond the flow
+    this.setState({
+      open: false, password: "", shown: false, submitting: false,
+      formError: "", handoff: null, tgBusy: false, touched: {}, focus: null
+    }, () => { if (t && t.isConnected) { try { t.focus(); } catch (e) {} } });
+  }
+
+  openSupport(trigger) {
+    window.dispatchEvent(new CustomEvent("chocho:support"));
+    return;
+    /* legacy inline panel retired — shared support controller owns the panel */
+    this.setState({ support: true }, () => { const r = this.supportNode(); if (r) r.focus(); });
+  }
+
+  closeSupport() {
+    const t = this.helpTrigger;
+    this.helpTrigger = null;
+    this.setState({ support: false }, () => {
+      const live = (t && t.isConnected) ? t : document.querySelector("[data-help-trigger]");
+      if (live) { try { live.focus(); } catch (e) {} }
+    });
+  }
+
+  normalizePhone(raw) {
+    let v = String(raw).replace(/[^\d+]/g, "").replace(/\+/g, "");
+    if (v.startsWith("0063")) v = v.slice(4);
+    else if (v.startsWith("63")) v = v.slice(2);
+    else if (v.startsWith("0")) v = v.slice(1);
+    return v.slice(0, 10);
+  }
+
+  phoneError() {
+    const v = this.state.phone;
+    if (!v) return "Enter your mobile number.";
+    if (!/^9\d{9}$/.test(v)) return "Enter a 10-digit PH mobile number starting with 9.";
+    return "";
+  }
+
+  emailError() {
+    const v = this.state.email.trim();
+    if (!v) return "Enter your email address.";
+    if (!/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(v)) return "Enter a valid email address.";
+    return "";
+  }
+
+  passError() {
+    const v = this.state.password;
+    if (!v) return this.state.view === "register" ? "Create a password." : "Enter your password.";
+    if (this.state.view !== "register") return "";
+    if (v.length < 8) return "Use at least 8 characters.";
+    if (!/[a-zA-Z]/.test(v) || !/\d/.test(v)) return "Include at least one letter and one number.";
+    return "";
+  }
+
+  serviceResult() {
+    const kind = this.props.serviceResult ?? "unavailable";
+    const view = this.state.view;
+    if (kind === "invalid") {
+      return {
+        inline: view === "signin"
+          ? "Those sign-in details don’t match an account. Check them and try again."
+          : "We couldn’t complete that request. Check your details and try again."
+      };
+    }
+    if (kind === "locked") {
+      return { inline: "For your security this account is temporarily locked. Try again later or contact support." };
+    }
+    if (view === "reset") {
+      return {
+        handoff: {
+          kind: "info",
+          title: "Password recovery not connected",
+          copy: "The interface is complete, but no recovery service is wired up in this environment. Once connected, a confirmed request shows the neutral message: “If an account matches those details, we’ll send password reset instructions.”",
+          action: "Back to Sign in",
+          to: "signin"
+        }
+      };
+    }
+    return {
+      handoff: {
+        kind: "info",
+        title: view === "signin" ? "Sign-in service not connected" : "Registration service not connected",
+        copy: view === "signin"
+          ? "The interface is complete, but this environment has no authentication endpoint wired up, so no session is created. Your entries are kept."
+          : "The interface is complete, but this environment has no registration endpoint wired up. Once the service is connected, this step continues into its own required SMS, email, or onboarding sequence. Your entries are kept.",
+        action: view === "signin" ? "Back to Sign in" : "Back to registration",
+        to: null
+      }
+    };
+  }
+
+  submit() {
+    if (this.state.submitting) return;
+    const view = this.state.view;
+    const isPhone = this.state.mode === "phone";
+    const contactErr = isPhone ? this.phoneError() : this.emailError();
+    const passErr = view === "reset" ? "" : this.passError();
+    const needConsent = view === "register" && !this.state.consent;
+    const touched = Object.assign({}, this.state.touched, { phone: true, email: true, password: true, consent: true });
+
+    if (contactErr || passErr || needConsent) {
+      this.setState({
+        touched: touched,
+        formError: needConsent && !contactErr && !passErr
+          ? "Please accept the Terms & Conditions and Privacy Policy to continue."
+          : "Check the highlighted fields and try again."
+      }, () => {
+        const id = contactErr ? (isPhone ? "reg-phone" : "reg-email") : (passErr ? "reg-password" : null);
+        const el = id && document.getElementById(id);
+        if (el) el.focus();
+      });
+      return;
+    }
+
+    this.setState({ touched: touched, formError: "", submitting: true });
+    // Real services are not configured here: surface the honest result state,
+    // never a simulated account or session.
+    this.timer = setTimeout(() => {
+      const r = this.serviceResult();
+      if (r.inline) this.setState({ submitting: false, formError: r.inline });
+      else this.setState({ submitting: false, handoff: r.handoff }, () => this.focusDialog());
+    }, 1400);
+  }
+
+  telegram() {
+    if (this.state.tgBusy) return;
+    // Independent path: no Phone/Email validation runs here.
+    const signin = this.state.view !== "register";
+    this.setState({ tgBusy: true, formError: "" });
+    this.tgTimer = setTimeout(() => {
+      this.setState({
+        tgBusy: false,
+        formError: signin
+          ? "Telegram sign-in is currently unavailable. Please choose Phone or Email."
+          : "Telegram registration is currently unavailable. Please choose Phone or Email."
+      });
+    }, 1100);
+  }
+
+  field(name, errText) {
+    const focused = this.state.focus === name;
+    const invalid = !!(errText && this.state.touched[name]);
+    return {
+      border: invalid ? "rgba(248,113,113,.6)" : focused ? "rgba(255,201,60,.55)" : "rgba(167,139,250,.24)",
+      glow: invalid ? "0 0 0 3px rgba(248,113,113,.14)" : focused ? "0 0 0 3px rgba(255,201,60,.14)" : "none",
+      invalid: invalid ? "true" : "false",
+      hint: invalid ? errText : ""
+    };
+  }
+
+  renderVals() {
+    const s = this.state;
+    const mobile = (this.props.layout ?? "auto") === "mobile" || (this.state.vw || 1024) < 600;
+    const view = s.view;
+    const isSignin = view === "signin", isRegister = view === "register", isReset = view === "reset";
+    const isPhone = s.mode === "phone";
+    const pf = this.field("phone", this.phoneError());
+    const ef = this.field("email", this.emailError());
+    const pwf = this.field("password", this.passError());
+    const h = s.handoff;
+
+    const tgIcon = React.createElement("svg", {
+      key: "tg", width: 20, height: 20, viewBox: "0 0 24 24", fill: "#5eabeb"
+    }, React.createElement("path", { d: "M21.6 3.4 2.9 10.6c-.9.3-.9 1.5 0 1.8l4.4 1.5 1.7 5.3c.2.7 1.1.9 1.6.3l2.4-2.6 4.5 3.3c.6.4 1.5.1 1.7-.7l3-14.4c.2-.9-.7-1.6-1.6-1.3z" })
+    );
+
+    const registerHint = isRegister
+      ? { phone: "PH mobile numbers only — the +63 prefix is added for you.", pass: "At least 8 characters, with a letter and a number." }
+      : { phone: "", pass: "" };
+
+    return {
+      termsHref: "ChoCho Info.dc.html?page=terms",
+      privacyHref: "ChoCho Info.dc.html?page=privacy",
+      dialogOpen: s.open,
+      showForm: s.open && !h,
+      backdropEvents: s.open ? "none" : "auto",
+
+      heading: isSignin ? "Welcome back to ChoCho" : isRegister ? "Create your ChoCho account" : "Reset your password",
+      subhead: isSignin ? "Sign in to your account."
+        : isRegister ? "Choose how you’d like to register."
+        : "Tell us the details on your account and we’ll start the reset.",
+      closeLabel: isRegister ? "Close registration" : isReset ? "Close password reset" : "Close sign in",
+      isSignin: isSignin, isRegister: isRegister, isReset: isReset,
+      needsPassword: !isReset,
+      showTelegram: !isReset,
+
+      scrimBg: mobile ? "#130124" : "rgba(6,2,12,.76)",
+      scrimPad: mobile ? "0" : "24px",
+      scrimOverflow: mobile ? "auto" : "hidden",
+      surfaceMaxHeight: mobile ? "none" : "calc(100vh - 48px)",
+      surfaceOverflow: mobile ? "visible" : "auto",
+      surfaceAlign: mobile ? "stretch" : "center",
+      surfaceWidth: mobile ? "100%" : "476px",
+      inputFont: mobile ? "16px" : "15px",
+      inputPadX: mobile ? "12px" : "16px",
+      surfaceMinHeight: mobile ? "100vh" : "0",
+      surfacePad: mobile ? "0 20px calc(40px + env(safe-area-inset-bottom))" : "0 28px 24px",
+      barMargin: mobile ? "0 -20px" : "0 -28px",
+      barPad: mobile ? "18px 20px 14px" : "22px 28px 14px",
+      surfaceRadius: mobile ? "0" : "22px",
+      surfaceBorder: mobile ? "0" : "1px solid rgba(167,139,250,.26)",
+      backdropClick: mobile ? () => {} : (e) => { if (e.target === e.currentTarget) this.close(); },
+      stop: (e) => e.stopPropagation(),
+
+      close: () => this.close(),
+      goReset: () => this.setView("reset"),
+      switchPrompt: isSignin ? "New to ChoCho?" : isRegister ? "Already have an account?" : "Remembered it?",
+      switchLabel: isSignin ? "Create account" : isRegister ? "Sign in" : "Back to Sign in",
+      switchView: (e) => { if (e && e.preventDefault) e.preventDefault(); this.setView(isSignin ? "register" : "signin"); },
+
+      tabs: [
+        { label: "Phone", key: "phone" },
+        { label: "Email", key: "email" }
+      ].map(t => {
+        const sel = s.mode === t.key;
+        return {
+          label: t.label,
+          selected: sel ? "true" : "false",
+          bg: sel ? "linear-gradient(180deg, #ffd766, #eb9c0d)" : "transparent",
+          color: sel ? "#2c1400" : "#bfaed8",
+          shadow: sel ? "0 6px 18px rgba(235,156,13,.3)" : "none",
+          onClick: () => this.setState({ mode: t.key, formError: "" })
+        };
+      }),
+
+      isPhone: isPhone,
+      isEmail: !isPhone,
+
+      phone: s.phone,
+      onPhone: (e) => this.setState({ phone: this.normalizePhone(e.target.value) }),
+      focusPhone: () => this.setState({ focus: "phone" }),
+      phoneBorder: pf.border, phoneGlow: pf.glow, phoneInvalid: pf.invalid,
+      phoneHint: pf.hint || registerHint.phone,
+      phoneHintShow: (pf.hint || registerHint.phone) ? "block" : "none",
+      phoneHintColor: pf.hint ? "#fca5a5" : "#8f7aae",
+
+      email: s.email,
+      onEmail: (e) => this.setState({ email: e.target.value }),
+      focusEmail: () => this.setState({ focus: "email" }),
+      emailBorder: ef.border, emailGlow: ef.glow, emailInvalid: ef.invalid,
+      emailHint: ef.hint,
+      emailHintShow: ef.hint ? "block" : "none",
+      emailHintColor: "#fca5a5",
+
+      password: s.password,
+      onPassword: (e) => this.setState({ password: e.target.value }),
+      focusPass: () => this.setState({ focus: "password" }),
+      blurField: (e) => {
+        const n = e.target.id === "reg-phone" ? "phone" : e.target.id === "reg-email" ? "email" : "password";
+        this.setState(st => ({ focus: null, touched: Object.assign({}, st.touched, { [n]: true }) }));
+      },
+      passBorder: pwf.border, passGlow: pwf.glow, passInvalid: pwf.invalid,
+      passHint: pwf.hint || registerHint.pass,
+      passHintShow: (pwf.hint || registerHint.pass) ? "block" : "none",
+      passHintColor: pwf.hint ? "#fca5a5" : "#8f7aae",
+      passwordPlaceholder: isRegister ? "Create a password" : "Enter your password",
+      passwordAutocomplete: isRegister ? "new-password" : "current-password",
+      passwordType: s.shown ? "text" : "password",
+      passwordShown: s.shown ? "true" : "false",
+      passwordToggleLabel: s.shown ? "Hide" : "Show",
+      togglePassword: () => this.setState(st => ({ shown: !st.shown })),
+
+      consent: s.consent ? "true" : "false",
+      consentMark: s.consent ? "✓" : "",
+      consentBg: s.consent ? "linear-gradient(180deg, #ffd766, #eb9c0d)" : "rgba(255,255,255,.04)",
+      consentBorder: s.consent ? "rgba(255,201,60,.6)" : (s.touched.consent && !s.consent ? "rgba(248,113,113,.6)" : "rgba(167,139,250,.3)"),
+      toggleConsent: () => this.setState(st => ({ consent: !st.consent, formError: "" })),
+
+      formError: s.formError,
+      submitting: s.submitting,
+      submitLabel: s.submitting
+        ? (isSignin ? "Signing in…" : isRegister ? "Creating account…" : "Sending…")
+        : (isSignin ? "Sign in" : isRegister ? "Create account" : "Continue"),
+      submitCursor: s.submitting ? "progress" : "pointer",
+      submitOpacity: s.submitting ? .75 : 1,
+      submit: () => this.submit(),
+
+      tgIcon: tgIcon,
+      tgBusy: s.tgBusy,
+      tgLabel: s.tgBusy ? "Opening Telegram…" : (isRegister ? "Continue with Telegram" : "Continue with Telegram"),
+      tgCursor: s.tgBusy ? "progress" : "pointer",
+      tgOpacity: s.tgBusy ? .75 : 1,
+      telegram: () => this.telegram(),
+
+      handoff: !!h,
+      handoffTitle: h ? h.title : "",
+      handoffCopy: h ? h.copy : "",
+      handoffAction: h ? h.action : "",
+      handoffBorder: "rgba(255,201,60,.3)",
+      handoffBg: "rgba(255,201,60,.1)",
+      handoffIcon: React.createElement("svg", {
+        key: "info", width: 22, height: 22, viewBox: "0 0 24 24", fill: "none",
+        stroke: "#ffc93c", strokeWidth: 1.9, strokeLinecap: "round"
+      }, React.createElement("path", { d: "M12 8v5M12 16.5v.5" }), React.createElement("circle", { cx: 12, cy: 12, r: 9 })),
+      backToForm: () => {
+        if (h && h.to) this.setView(h.to);
+        else this.setState({ handoff: null }, () => this.focusDialog());
+      },
+
+      supportOpen: s.support,
+      openSupport: (e) => this.openSupport(e && e.currentTarget),
+      closeSupport: () => this.closeSupport()
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+  .chocho-bn button:focus-visible { outline: 2px solid #ffc93c; outline-offset: -4px; }
+</style>
+<script src="chocho-site.js"></script>
+</helmet>
+<nav class="chocho-bn" aria-label="Primary" style="position: fixed; left: 50%; bottom: {{ navBottom }}; transform: translateX(-50%); z-index: 44; width: {{ navW }}; max-width: 980px; box-sizing: border-box; height: 82px; border: 1px solid rgba(167,139,250,.2); border-radius: {{ navRadius }}; background: linear-gradient(180deg, rgba(35,16,63,.97) 0%, rgba(21,7,38,.97) 100%); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); box-shadow: 0 12px 30px rgba(0,0,0,.5); display: grid; height: {{ barH }}; grid-template-columns: repeat(5, minmax(0, 1fr)); align-items: center;">
+  <sc-for list="{{ items }}" as="n" hint-placeholder-count="5">
+    <button onClick="{{ n.onClick }}" aria-current="{{ n.current }}" style="position: relative; height: 82px; min-width: 44px; padding: 0 2px; border: 0; background: transparent; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: {{ iconGap }}; font-family: Manrope, sans-serif; height: {{ barH }};">
+      <span style="width: {{ iconBoxW }}; height: {{ iconBoxH }}; flex: none; display: flex; align-items: center; justify-content: center;">{{ n.icon }}</span>
+      <span style="max-width: 100%; font-size: {{ labelSize }}; font-weight: 700; line-height: 1.1; letter-spacing: .2px; text-align: center; white-space: {{ labelWrap }}; color: {{ n.color }};">{{ n.label }}</span>
+    </button>
+  </sc-for>
+</nav>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1024,&quot;height&quot;:120},&quot;active&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;none&quot;,&quot;home&quot;,&quot;games&quot;,&quot;wallet&quot;,&quot;bonuses&quot;,&quot;wheel&quot;],&quot;default&quot;:&quot;none&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;compact&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  state = { wide: typeof window !== "undefined" && window.innerWidth >= 900, phone: typeof window !== "undefined" && window.innerWidth < 600 };
+
+  componentDidMount() {
+    this._onResize = () => {
+      const wide = window.innerWidth >= 900, phone = window.innerWidth < 600;
+      if (wide !== this.state.wide || phone !== this.state.phone) this.setState({ wide: wide, phone: phone });
+    };
+    window.addEventListener("resize", this._onResize);
+  }
+
+  componentWillUnmount() { window.removeEventListener("resize", this._onResize); }
+
+  icon(name, on) {
+    const size = this.state.phone ? (name === "nav-wheel" ? 34 : 28) : (name === "nav-wheel" ? 40 : 34);
+    return React.createElement("img", {
+      src: "assets/" + name + ".png",
+      alt: "",
+      style: {
+        width: size, height: size, objectFit: "contain", display: "block",
+        filter: "drop-shadow(0 3px 7px rgba(0,0,0,.8))" + (on ? " brightness(1.12)" : ""),
+        opacity: on ? 1 : 0.88
+      }
+    });
+  }
+
+  renderVals() {
+    const active = this.props.active ?? "none";
+    // Slightly shorter bar on desktop only; mobile keeps the comfortable height.
+    const tight = (this.props.compact ?? false) && this.state.wide;
+    const phone = this.state.phone;
+    return {
+      barH: phone ? "72px" : (tight ? "70px" : "82px"),
+      iconGap: phone ? "4px" : (tight ? "4px" : "7px"),
+      navBottom: phone ? "max(8px, env(safe-area-inset-bottom))" : "16px",
+      navW: phone ? "calc(100% - 16px)" : "calc(100% - 44px)",
+      navRadius: phone ? "16px" : "18px",
+      iconBoxW: phone ? "36px" : "42px",
+      iconBoxH: phone ? "34px" : "40px",
+      labelSize: phone ? "11px" : "12px",
+      labelWrap: phone ? "normal" : "nowrap",
+      items: [
+        { key: "home", label: "Home", img: "nav-home", href: "ChoCho Home.dc.html", dest: "home" },
+        { key: "games", label: "Games", img: "nav-games", href: "ChoCho Games.dc.html", dest: "games" },
+        { key: "wallet", label: "Wallet", img: "nav-wallet", href: "ChoCho Wallet.dc.html", dest: "wallet" },
+        { key: "bonuses", label: "Bonuses", img: "nav-bonuses", href: "ChoCho Promotions.dc.html", dest: "promotions" },
+        { key: "wheel", label: "Lucky Wheel", img: "nav-wheel", href: "ChoCho Home.dc.html#wheel", dest: "home#wheel" }
+      ].map(n => {
+        const on = active === n.key;
+        return {
+          label: n.label,
+          icon: this.icon(n.img, on),
+          color: on ? "#ffc93c" : "#a795c5",
+          bar: on ? 1 : 0,
+          current: on ? "page" : null,
+          onClick: () => {
+            // Same destinations as the header; Wallet asks a guest to sign in first.
+            const site = window.ChoChoSite;
+            if (site) site.go(n.dest); else window.location.href = n.href;
+          }
+        };
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>

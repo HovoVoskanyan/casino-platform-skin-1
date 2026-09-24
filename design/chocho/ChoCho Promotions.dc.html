@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Caveat:wght@700&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; }
+  a { color: #cbb6e6; }
+  a:hover { color: #ffe08a; }
+  @keyframes chochoWave { 0%,60%,100% { transform: rotate(0deg); } 70% { transform: rotate(-13deg); } 80% { transform: rotate(11deg); } 90% { transform: rotate(-7deg); } }
+  @keyframes promoFade { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+  [data-step-link] { display: block; }
+  @media (max-width: 760px) { [data-step-link] { display: none; } }
+  :focus-visible { outline: 2px solid #ffc93c; outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+<script src="chocho-site.js"></script>
+</helmet>
+<div style="min-height: 100vh; background: radial-gradient(1100px 640px at 50% -8%, #3a0269 0%, #250143 42%, #130124 100%); font-family: Manrope, sans-serif; color: #fff; display: flex; justify-content: center;">
+  <div style="width: 100%; max-width: 1024px; display: flex; flex-direction: column; gap: 46px; padding-bottom: 150px;">
+
+    <dc-import name="ChoCho Header" active="promotions" style="position: sticky; top: 0; z-index: 40;" hint-size="100%,76px"></dc-import>
+
+    <section style="margin: 0 clamp(16px, 2.4vw, 22px); position: relative; border: 1px solid rgba(167,139,250,.22); border-radius: 20px; overflow: hidden; background: #150726; box-shadow: 0 20px 50px rgba(6,3,11,.6), 0 0 0 1px rgba(255,255,255,.03) inset;">
+      <span style="position: absolute; inset: 0; background: radial-gradient(65% 100% at 88% 45%, rgba(167,139,250,.2) 0%, transparent 70%), radial-gradient(45% 75% at 4% 0%, rgba(124,58,237,.16) 0%, transparent 72%);"></span>
+      <div style="position: relative; padding: clamp(16px, 2.4vw, 18px) clamp(16px, 3.2vw, 26px); display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;">
+        <div style="flex: 1 1 360px; min-width: 0; display: flex; flex-direction: column; gap: 10px;">
+          <span style="font-size: clamp(26px, 6.6vw, 34px); font-weight: 800; letter-spacing: -.8px; line-height: 1.1; color: #fff;">Promotions &amp; <span style="color: #ffc93c;">Rewards</span></span>
+          <span style="font-size: 14px; font-weight: 500; line-height: 1.5; max-width: 460px; color: #a795c5; text-wrap: pretty;">Discover bonuses, cashback, boosts, and special offers.</span>
+        </div>
+        <sc-if value="{{ heroLogo }}" hint-placeholder-val="{{ true }}"><div style="position: relative; flex: 0 1 168px; min-width: 0; margin-left: -8px; display: flex; flex-direction: column; align-items: center; gap: 0;">
+          <span style="position: absolute; left: 50%; top: 44%; transform: translate(-50%, -50%); width: 230px; height: 230px; border-radius: 50%; pointer-events: none; background: radial-gradient(circle, rgba(167,139,250,.26) 0%, rgba(240,163,10,.14) 42%, transparent 70%); filter: blur(6px);"></span>
+          <img src="assets/chocho-logo-cut.png" alt="ChoCho" style="position: relative; width: 100%; max-width: 152px; object-fit: contain; display: block; filter: drop-shadow(0 16px 30px rgba(0,0,0,.5));">
+          <span style="position: relative; font-family: Caveat, cursive; font-size: 19px; font-weight: 700; color: #e9a832; white-space: nowrap;">Tuloy ang Good Vibes</span>
+        </div>
+        </sc-if>
+      </div>
+    </section>
+
+    <section style="padding: 0 clamp(16px, 2.4vw, 22px);">
+      <div style="display: flex; gap: 10px; overflow-x: auto; padding: 4px 2px; margin: -4px -2px; scrollbar-width: none;">
+        <sc-for list="{{ categories }}" as="c" hint-placeholder-count="7">
+          <button onClick="{{ c.onClick }}" style="height: 42px; flex: none; display: flex; align-items: center; gap: 8px; padding: 0 16px; border-radius: 12px; cursor: pointer; font-family: Manrope, sans-serif; font-size: 13.5px; font-weight: 700; white-space: nowrap; border: 1px solid {{ c.border }}; background: {{ c.bg }}; color: {{ c.color }}; box-shadow: {{ c.glow }}; transition: border-color .2s ease, background .2s ease, box-shadow .2s ease;" style-hover="border-color: rgba(167,139,250,.42)">
+            {{ c.icon }}{{ c.label }}
+          </button>
+        </sc-for>
+      </div>
+    </section>
+
+    <section style="margin-top: -14px; padding: 0 clamp(16px, 2.4vw, 22px); display: flex; flex-direction: column; gap: 22px;">
+      <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+        <span style="width: 4px; height: 28px; border-radius: 999px; background: linear-gradient(180deg, #ffd766, #e07f05); box-shadow: 0 0 12px rgba(240,150,10,.5); flex: none;"></span>
+        <span style="font-size: 28px; font-weight: 800; letter-spacing: -.6px; color: #fff;">Featured Promotion</span>
+      </div>
+
+      <div style="position: relative; border: 1px solid rgba(167,139,250,.22); border-radius: 18px; overflow: hidden; background: linear-gradient(180deg, #23103f 0%, #180a2c 100%); box-shadow: 0 20px 44px rgba(6,3,11,.5); transition: border-color .25s ease, box-shadow .25s ease;" style-hover="border-color: rgba(255,201,60,.4); box-shadow: 0 24px 52px rgba(6,3,11,.6), 0 0 30px rgba(167,139,250,.18)">
+        <span style="position: absolute; inset: 0; pointer-events: none; background: radial-gradient(70% 110% at 86% 50%, rgba(167,139,250,.18) 0%, transparent 68%), radial-gradient(40% 70% at 92% 78%, rgba(240,163,10,.14) 0%, transparent 72%);"></span>
+        <div style="position: relative; display: flex; align-items: center; gap: 22px; flex-wrap: wrap; padding: 18px 22px;">
+          <div style="flex: 3 1 340px; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 10px;">
+            <span style="height: 26px; display: flex; align-items: center; padding: 0 12px; border-radius: 8px; border: 1px solid rgba(255,201,60,.4); background: rgba(255,201,60,.1); font-size: 10.5px; font-weight: 800; letter-spacing: 1.2px; white-space: nowrap; color: #ffc93c;">WELCOME BONUS</span>
+            <span style="font-size: clamp(26px, 6.6vw, 34px); font-weight: 800; letter-spacing: -.8px; line-height: 1.1; color: #fff;">100% up to <span style="color: #ffc93c;">₱5,000</span></span>
+            <span style="font-size: 14px; font-weight: 500; line-height: 1.55; max-width: 400px; color: #a795c5; text-wrap: pretty;">Make your first deposit and enjoy extra rewards.</span>
+            <button onClick="{{ featuredDetails }}" style="height: 40px; padding: 0 24px; margin-top: 2px; border: 0; border-radius: 10px; background: linear-gradient(180deg, #ffd766, #eb9c0d); color: #2c1400; font-family: Manrope, sans-serif; font-size: 14.5px; font-weight: 800; white-space: nowrap; cursor: pointer; display: flex; align-items: center; gap: 9px; box-shadow: 0 8px 22px rgba(235,156,13,.34); transition: filter .2s ease, transform .2s ease;" style-hover="filter: brightness(1.06); transform: translateY(-1px)">View Details <span style="font-size: 13px;">→</span></button>
+          </div>
+
+          <div style="flex: 2 1 240px; min-width: 0; display: flex; align-items: stretch; justify-content: center;">
+            <div style="position: relative; width: 100%; min-height: 150px; border-radius: 16px; overflow: hidden; border: 1px solid rgba(167,139,250,.12); background: transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px;">
+              <span style="position: absolute; inset: 0; background: radial-gradient(62% 58% at 50% 40%, rgba(255,201,60,.13) 0%, transparent 72%);"></span>
+              <span style="position: relative; width: 68px; height: 68px; border-radius: 18px; border: 1px solid rgba(255,201,60,.32); background: linear-gradient(160deg, rgba(255,201,60,.16), rgba(167,139,250,.12)); display: flex; align-items: center; justify-content: center; font-size: 23px; font-weight: 800; letter-spacing: -1px; color: #ffc93c;">100%</span>
+              <span style="position: relative; font-size: 11px; font-weight: 700; letter-spacing: 1.4px; color: #8f7aae;">PROMO ARTWORK</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section style="padding: 0 clamp(16px, 2.4vw, 22px); display: flex; flex-direction: column; gap: 22px;">
+      <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+        <span style="width: 4px; height: 28px; border-radius: 999px; background: linear-gradient(180deg, #ffd766, #e07f05); box-shadow: 0 0 12px rgba(240,150,10,.5); flex: none;"></span>
+        <span ref="{{ listRef }}" style="font-size: 28px; font-weight: 800; letter-spacing: -.6px; color: #fff;">All Promotions</span>
+        <span style="font-size: 13px; font-weight: 600; color: #a795c5;">{{ activeCount }}</span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; align-items: stretch;">
+        <sc-for list="{{ promos }}" as="p" hint-placeholder-count="6">
+          <div style="display: flex; flex-direction: column; gap: 14px; padding: 18px; border: 1px solid rgba(167,139,250,.2); border-radius: 18px; background: linear-gradient(180deg, #23103f 0%, #180a2c 100%); box-shadow: 0 12px 30px rgba(0,0,0,.4); transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease;" style-hover="transform: translateY(-2px); border-color: rgba(255,201,60,.42); box-shadow: 0 18px 38px rgba(0,0,0,.5), 0 0 24px rgba(167,139,250,.16)">
+            <div style="position: relative; height: 78px; border-radius: 14px; overflow: hidden; border: 1px dashed rgba(167,139,250,.28); background: linear-gradient(150deg, #331363 0%, #1d0838 62%, #150726 100%); display: flex; align-items: center; justify-content: center; transition: box-shadow .22s ease;" style-hover="box-shadow: 0 0 24px rgba(255,201,60,.14) inset">
+              <span style="position: absolute; inset: 0; background: radial-gradient(58% 60% at 50% 38%, rgba(255,201,60,.16) 0%, transparent 70%);"></span>
+              <span style="position: relative; width: 58px; height: 58px; border-radius: 16px; border: 1px solid rgba(255,201,60,.3); background: linear-gradient(160deg, rgba(255,201,60,.16), rgba(167,139,250,.12)); display: flex; align-items: center; justify-content: center;">{{ p.mark }}</span>
+            </div>
+
+            <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 8px; flex: 1; min-height: 0;">
+              <span style="height: 24px; display: flex; align-items: center; padding: 0 10px; border-radius: 8px; border: 1px solid rgba(255,201,60,.34); background: rgba(255,201,60,.09); font-size: 10px; font-weight: 800; letter-spacing: 1.2px; white-space: nowrap; color: #ffc93c;">{{ p.tag }}</span>
+              <span style="font-size: 17px; font-weight: 800; letter-spacing: -.3px; line-height: 1.2; color: #fff;">{{ p.title }}</span>
+              <span style="margin: 3px 0 5px; font-size: 22px; font-weight: 800; letter-spacing: -.5px; line-height: 1.15; color: #ffc93c;">{{ p.value }}</span>
+              <span style="flex: 1; font-size: 12.5px; font-weight: 500; line-height: 1.5; color: #a795c5; text-wrap: pretty;">{{ p.copy }}</span>
+            </div>
+
+            <button onClick="{{ p.onDetails }}" style="height: 42px; width: 100%; box-sizing: border-box; padding: 0 16px; border-radius: 12px; border: 1px solid rgba(167,139,250,.32); background: rgba(255,255,255,.03); color: #fff; font-family: Manrope, sans-serif; font-size: 13.5px; font-weight: 700; white-space: nowrap; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: border-color .2s ease, background .2s ease, box-shadow .2s ease;" style-hover="border-color: rgba(167,139,250,.6); background: rgba(255,255,255,.06); box-shadow: 0 0 22px rgba(139,92,246,.2)">
+              View Details <span style="font-size: 13px; color: #c4b5fd;">→</span>
+            </button>
+          </div>
+        </sc-for>
+      </div>
+
+      <sc-if value="{{ isEmpty }}" hint-placeholder-val="{{ false }}">
+        <div style="padding: 34px 22px; border: 1px dashed rgba(167,139,250,.26); border-radius: 18px; background: rgba(255,255,255,.02); display: flex; flex-direction: column; align-items: center; gap: 8px;">
+          <span style="width: 48px; height: 48px; border-radius: 50%; border: 1px solid rgba(255,201,60,.35); background: rgba(255,201,60,.09); display: flex; align-items: center; justify-content: center; font-size: 19px; color: #ffc93c;">★</span>
+          <span style="font-size: 17px; font-weight: 800; color: #fff;">No offers in this category</span>
+          <span style="font-size: 13px; font-weight: 500; color: #a795c5;">Check back soon — new promotions land every week.</span>
+          <button onClick="{{ showAll }}" style="height: 42px; margin-top: 6px; padding: 0 20px; border-radius: 12px; border: 1px solid rgba(167,139,250,.32); background: rgba(255,255,255,.03); color: #fff; font-family: Manrope, sans-serif; font-size: 13.5px; font-weight: 700; cursor: pointer;" style-hover="border-color: rgba(167,139,250,.6); background: rgba(255,255,255,.06)">Show all promotions</button>
+        </div>
+      </sc-if>
+    </section>
+
+    <section style="padding: 0 clamp(16px, 2.4vw, 22px); display: flex; flex-direction: column; gap: 22px;">
+      <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+        <span style="width: 4px; height: 28px; border-radius: 999px; background: linear-gradient(180deg, #ffd766, #e07f05); box-shadow: 0 0 12px rgba(240,150,10,.5); flex: none;"></span>
+        <span style="font-size: 28px; font-weight: 800; letter-spacing: -.6px; color: #fff;">How Promotions Work</span>
+      </div>
+
+      <div style="display: flex; align-items: stretch; flex-wrap: wrap; gap: 14px;">
+        <sc-for list="{{ steps }}" as="s" hint-placeholder-count="4">
+          <div style="flex: 1 1 210px; min-width: 0; display: flex; align-items: stretch; gap: 12px;">
+            <span data-step-link="{{ s.link }}" style="align-self: center; flex: none; width: 18px; height: 1px; background: linear-gradient(90deg, rgba(167,139,250,.05), rgba(167,139,250,.32)); opacity: {{ s.link }};"></span>
+            <div style="flex: 1; min-width: 0; padding: 18px; border: 1px solid rgba(167,139,250,.18); border-radius: 18px; background: rgba(255,255,255,.03); display: flex; flex-direction: column; gap: 10px;">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="width: 34px; height: 34px; flex: none; border-radius: 10px; border: 1px solid rgba(167,139,250,.22); background: rgba(167,139,250,.1); display: flex; align-items: center; justify-content: center;">{{ s.icon }}</span>
+                <span style="font-size: 11px; font-weight: 800; letter-spacing: 1.4px; color: #ffc93c;">STEP {{ s.n }}</span>
+              </div>
+              <span style="font-size: 15.5px; font-weight: 800; letter-spacing: -.2px; color: #fff;">{{ s.title }}</span>
+              <span style="font-size: 12.5px; font-weight: 500; line-height: 1.5; color: #a795c5; text-wrap: pretty;">{{ s.copy }}</span>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section style="padding: 0 clamp(16px, 2.4vw, 22px); display: flex; flex-direction: column; gap: 18px;">
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+          <span style="width: 4px; height: 28px; border-radius: 999px; background: linear-gradient(180deg, #ffd766, #e07f05); box-shadow: 0 0 12px rgba(240,150,10,.5); flex: none;"></span>
+          <span style="font-size: 28px; font-weight: 800; letter-spacing: -.6px; color: #fff;">Promotion Rules &amp; Conditions</span>
+        </div>
+        <span style="font-size: 13.5px; font-weight: 500; line-height: 1.5; padding-left: 16px; color: #a795c5;">Everything you need to know before activating an offer.</span>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <sc-for list="{{ faqs }}" as="f" hint-placeholder-count="6">
+          <div style="border: 1px solid {{ f.border }}; border-radius: 14px; background: rgba(255,255,255,.03); overflow: hidden; transition: border-color .2s ease;">
+            <button onClick="{{ f.onClick }}" style="width: 100%; box-sizing: border-box; min-height: 56px; padding: 14px 18px; border: 0; background: transparent; cursor: pointer; display: flex; align-items: center; gap: 14px; text-align: left; font-family: Manrope, sans-serif;" style-hover="background: rgba(255,255,255,.03)">
+              <span style="flex: 1; min-width: 0; font-size: 14.5px; font-weight: 700; line-height: 1.4; color: #fff;">{{ f.q }}</span>
+              <span style="width: 28px; height: 28px; flex: none; border-radius: 8px; border: 1px solid {{ f.iconBorder }}; background: {{ f.iconBg }}; color: {{ f.iconColor }}; font-size: 15px; font-weight: 800; line-height: 1; display: flex; align-items: center; justify-content: center;">{{ f.glyph }}</span>
+            </button>
+            <sc-if value="{{ f.open }}" hint-placeholder-val="{{ false }}">
+              <div style="padding: 0 18px 16px; font-size: 13px; font-weight: 500; line-height: 1.6; color: #a795c5; text-wrap: pretty; animation: promoFade .18s ease-out;">{{ f.a }}</div>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section style="padding: 0 clamp(16px, 2.4vw, 22px); display: flex; flex-direction: column; gap: 18px;">
+      <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+        <span style="width: 4px; height: 28px; border-radius: 999px; background: linear-gradient(180deg, #ffd766, #e07f05); box-shadow: 0 0 12px rgba(240,150,10,.5); flex: none;"></span>
+        <span style="font-size: 28px; font-weight: 800; letter-spacing: -.6px; color: #fff;">My Promotions</span>
+      </div>
+
+      <sc-if value="{{ loggedOut }}" hint-placeholder-val="{{ true }}">
+        <div style="padding: 20px; border: 1px solid rgba(167,139,250,.16); border-radius: 18px; background: linear-gradient(180deg, rgba(255,255,255,.045) 0%, rgba(255,255,255,.02) 100%); display: flex; align-items: center; flex-wrap: wrap; gap: 14px 18px;">
+          <span style="flex: 1 1 340px; min-width: 0; font-size: 13.5px; font-weight: 500; line-height: 1.55; color: #a795c5; text-wrap: pretty;">Sign in to view your active bonuses, progress, and completed promotions.</span>
+          <button onClick="{{ signIn }}" style="height: 42px; padding: 0 20px; border: 1px solid rgba(167,139,250,.32); border-radius: 12px; background: rgba(255,255,255,.03); color: #fff; font-family: Manrope, sans-serif; font-size: 13.5px; font-weight: 700; white-space: nowrap; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: border-color .2s ease, background .2s ease;" style-hover="border-color: rgba(167,139,250,.6); background: rgba(255,255,255,.06)">Sign in <span style="font-size: 13px; color: #c4b5fd;">→</span></button>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ loggedIn }}" hint-placeholder-val="{{ false }}">
+        <div style="padding: 18px 20px; border: 1px solid rgba(167,139,250,.16); border-radius: 18px; background: linear-gradient(180deg, rgba(255,255,255,.045) 0%, rgba(255,255,255,.02) 100%); display: flex; align-items: center; flex-wrap: wrap; gap: 14px 26px;">
+          <sc-for list="{{ statuses }}" as="s" hint-placeholder-count="3">
+            <div style="flex: 1 1 210px; min-width: 0; display: flex; align-items: center; gap: 12px;">
+              <span style="height: 28px; flex: none; display: flex; align-items: center; gap: 7px; padding: 0 11px; border-radius: 999px; border: 1px solid {{ s.border }}; background: {{ s.bg }}; font-size: 11px; font-weight: 800; letter-spacing: .8px; white-space: nowrap; color: {{ s.color }};">
+                <span style="width: 7px; height: 7px; border-radius: 50%; background: {{ s.dot }};"></span>{{ s.label }}
+              </span>
+              <span style="min-width: 0; font-size: 12.5px; font-weight: 500; line-height: 1.45; color: #a795c5;">{{ s.copy }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+    </section>
+
+    <section style="margin: 0 clamp(16px, 2.4vw, 22px); padding: clamp(16px, 2.4vw, 20px) clamp(16px, 3vw, 24px); border: 1px solid rgba(167,139,250,.16); border-radius: 18px; background: linear-gradient(180deg, rgba(255,255,255,.045) 0%, rgba(255,255,255,.02) 100%); display: flex; align-items: center; flex-wrap: wrap; gap: 16px;">
+      <div style="flex: 1 1 700px; min-width: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 6px;">
+        <sc-for list="{{ trustItems }}" as="t" hint-placeholder-count="4">
+          <div style="display: flex; align-items: center; gap: 11px; min-width: 0; padding: 6px 10px; border-left: 1px solid {{ t.divider }};">
+            <span style="width: 34px; height: 34px; flex: none; border-radius: 10px; background: rgba(167,139,250,.12); border: 1px solid rgba(255,201,60,.2); display: flex; align-items: center; justify-content: center;">{{ t.icon }}</span>
+            <span style="display: flex; flex-direction: column; gap: 3px; min-width: 0;">
+              <span style="font-size: 14px; font-weight: 700; white-space: nowrap; color: #fff;">{{ t.title }}</span>
+              <span style="font-size: 12px; font-weight: 500; line-height: 1.35; white-space: nowrap; color: #a795c5;">{{ t.sub }}</span>
+            </span>
+          </div>
+        </sc-for>
+      </div>
+      <span style="flex: 0 0 auto; margin-left: auto; display: flex; align-items: center; gap: 8px; font-family: Caveat, cursive; font-size: 20px; font-weight: 700; color: #e9a832; white-space: nowrap;">Tuloy ang Good Vibes <span style="font-size: 15px; color: #ff5d7d;">♥</span></span>
+    </section>
+
+    <dc-import name="ChoCho Footer" hint-size="100%,120px"></dc-import>
+
+    <dc-import name="ChoCho Bottom Nav" active="bonuses" hint-size="1px,1px"></dc-import>
+  </div>
+
+  <dc-import name="ChoCho Support" hint-size="1px,1px"></dc-import>
+
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1024,&quot;height&quot;:900},&quot;previewSession&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;shared&quot;,&quot;guest&quot;,&quot;signed-in&quot;],&quot;default&quot;:&quot;shared&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Internal review&quot;}}">
+// Home bonus cards open the matching offer here (?promo=…).
+const PROMO_LINKS = { welcome: "Welcome Bonus", reload: "Reload Bonus", cashback: "Cashback", boost: "Deposit Boost" };
+
+class Component extends DCLogic {
+  _list = React.createRef();
+
+  componentDidMount() {
+    this._vwR = () => { if (window.innerWidth !== this.state.vw) this.setState({ vw: window.innerWidth }); };
+    window.addEventListener("resize", this._vwR); this._vwR();
+    this.connectSite();
+    const id = new URLSearchParams(window.location.search).get("promo");
+    if (id && PROMO_LINKS[id]) {
+      this.setState({ category: PROMO_LINKS[id] }, () => setTimeout(() => {
+        const el = this._list.current;
+        if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 110, behavior: "smooth" });
+      }, 350));
+    }
+  }
+
+  connectSite() {
+    const s = window.ChoChoSite;
+    if (!s) { window.addEventListener("chocho:site-ready", () => this.connectSite(), { once: true }); return; }
+    s.applyPreviewProp(this.props.previewSession ?? (this.props.signedIn === undefined ? undefined : String(this.props.signedIn)));
+    this._unsub = s.subscribe(() => this.setState({ authed: s.isAuthed() }));
+    this.setState({ authed: s.isAuthed() });
+  }
+
+  componentDidUpdate(prev) {
+    if ((prev.previewSession !== this.props.previewSession || prev.signedIn !== this.props.signedIn) && window.ChoChoSite) {
+      window.ChoChoSite.applyPreviewProp(this.props.previewSession ?? (this.props.signedIn === undefined ? undefined : String(this.props.signedIn)));
+    }
+  }
+
+  componentWillUnmount() { if (this._unsub) this._unsub(); }
+
+  state = { authed: (() => { try { return localStorage.getItem("chocho:previewSession") === "signed-in"; } catch (e) { return false; } })(), category: "All", menuOpen: false, openFaq: 0, helpOpen: false };
+  icon(d, color, size) {
+    return React.createElement("svg", {
+      width: size || 16, height: size || 16, viewBox: "0 0 24 24", fill: "none",
+      stroke: color, strokeWidth: 1.9, strokeLinecap: "round", strokeLinejoin: "round"
+    }, React.createElement("path", { d: d }));
+  }
+
+  renderVals() {
+    const catalog = [
+      { tag: "WELCOME", title: "Welcome Bonus", value: "100% up to ₱5,000", copy: "Make your first deposit and enjoy extra rewards.", cat: "Welcome Bonus", d: "M4 9h16v10a2 2 0 01-2 2H6a2 2 0 01-2-2V9zm0 0V7h16v2M12 9v12M8.5 7a2.5 2.5 0 010-4c2 0 3.5 4 3.5 4m3.5 0a2.5 2.5 0 000-4c-2 0-3.5 4-3.5 4" },
+      { tag: "RELOAD", title: "Reload Bonus", value: "50% up to ₱3,000", copy: "Get more value from your next deposit.", cat: "Reload Bonus", d: "M20 12a8 8 0 11-2.6-5.9M20 4v4h-4" },
+      { tag: "CASHBACK", title: "Weekly Cashback", value: "Up to 10% back", copy: "Get a share back every week.", cat: "Cashback", d: "M6 18L18 6M8.5 8.5a1.6 1.6 0 110-3.2 1.6 1.6 0 010 3.2zm7 10a1.6 1.6 0 110-3.2 1.6 1.6 0 010 3.2z" },
+      { tag: "BOOST", title: "Deposit Boost", value: "Extra +5%", copy: "Get more value on eligible deposits.", cat: "Deposit Boost", d: "M12 20V6m0 0l-5 5m5-5l5 5" },
+      { tag: "FREE SPINS", title: "Free Spins", value: "Up to 100 FS", copy: "Enjoy extra spins on selected games.", cat: "Free Spins", d: "M12 3a9 9 0 100 18 9 9 0 000-18zm0 5.5a3.5 3.5 0 100 7 3.5 3.5 0 000-7z" },
+      { tag: "VIP", title: "VIP Rewards", value: "Exclusive perks", copy: "Higher rewards for VIP players.", cat: "VIP Offers", d: "M4 8l3.6 3L12 5l4.4 6L20 8l-1.6 10H5.6L4 8z" }
+    ];
+    const cat = this.state.category;
+    const list = cat === "All" ? catalog : catalog.filter(p => p.cat === cat);
+
+    return {
+      heroLogo: (this.state.vw || window.innerWidth) >= 600,
+      activeCount: catalog.length + " active offers",
+      isEmpty: list.length === 0,
+      showAll: () => this.setState({ category: "All" }),
+      promos: list.map(p => ({
+        tag: p.tag, title: p.title, value: p.value, copy: p.copy,
+        onDetails: () => { if (window.ChoChoSite) window.ChoChoSite.unavailable("Full terms for " + p.title); },
+        mark: this.icon(p.d, "#ffc93c", 26)
+      })),
+
+      steps: [
+        { n: "1", title: "Choose Offer", copy: "Browse available promotions and select the one you want.", d: "M4 6h16M4 12h10M4 18h7" },
+        { n: "2", title: "Check Conditions", copy: "Review eligibility, deposit requirements, and important terms.", d: "M9 12l2 2 4-4M12 3l7 3v6c0 4.2-2.9 7.6-7 9-4.1-1.4-7-4.8-7-9V6l7-3z" },
+        { n: "3", title: "Activate", copy: "Activate the promotion or complete the required action.", d: "M13 3L5 13.5h5L9.5 21 18 10h-5l1-7z" },
+        { n: "4", title: "Enjoy Your Reward", copy: "Receive the bonus and use it according to the promotion conditions.", d: "M4 9h16v10a2 2 0 01-2 2H6a2 2 0 01-2-2V9zm0 0V7h16v2M12 9v12" }
+      ].map((s, i) => ({
+        n: s.n, title: s.title, copy: s.copy, link: i === 0 ? 0 : 1,
+        icon: this.icon(s.d, "#c4b5fd", 17)
+      })),
+
+      faqs: [
+        { q: "Who can use promotions?", a: "Promotions are available to verified account holders who meet the conditions of the offer." },
+        { q: "How do wagering requirements work?", a: "Some promotions may require the bonus to be played through before withdrawal. Exact requirements depend on the offer." },
+        { q: "How long are promotions valid?", a: "Each offer runs for its own period. The validity window is shown on the promotion details." },
+        { q: "Which games are eligible?", a: "Eligible game categories are listed in the conditions of each promotion." },
+        { q: "Can multiple promotions be active at once?", a: "Usually one bonus is active at a time, unless the offer states otherwise." },
+        { q: "Where can I see my active bonuses?", a: "Sign in and open My Promotions to see available, active, and completed offers." }
+      ].map((f, i) => {
+        const open = this.state.openFaq === i;
+        return {
+          q: f.q, a: f.a, open: open,
+          glyph: open ? "−" : "+",
+          border: open ? "rgba(255,201,60,.32)" : "rgba(167,139,250,.18)",
+          iconBorder: open ? "rgba(255,201,60,.45)" : "rgba(167,139,250,.26)",
+          iconBg: open ? "rgba(255,201,60,.12)" : "rgba(255,255,255,.04)",
+          iconColor: open ? "#ffc93c" : "#c4b5fd",
+          onClick: () => this.setState(s => ({ openFaq: s.openFaq === i ? -1 : i }))
+        };
+      }),
+
+      statuses: [
+        { label: "AVAILABLE", copy: "Offer can be activated.", color: "#c4b5fd", dot: "#a78bfa", bg: "rgba(167,139,250,.12)", border: "rgba(167,139,250,.4)" },
+        { label: "ACTIVE", copy: "Promotion is currently in progress.", color: "#ffc93c", dot: "#ffc93c", bg: "rgba(255,201,60,.12)", border: "rgba(255,201,60,.45)" },
+        { label: "COMPLETED", copy: "Reward requirements have been fulfilled.", color: "#86efac", dot: "#4ade80", bg: "rgba(74,222,128,.1)", border: "rgba(74,222,128,.32)" }
+      ],
+
+      loggedIn: this.state.authed,
+      loggedOut: !this.state.authed,
+      signIn: () => { if (window.ChoChoSite) window.ChoChoSite.openAuth("signin", window.ChoChoSite.currentUrl()); },
+      listRef: this._list,
+      featuredDetails: () => { if (window.ChoChoSite) window.ChoChoSite.unavailable("Full terms for the Welcome Bonus"); },
+
+      trustItems: [
+        { title: "Secure Payments", sub: "Local payment options", d: "M12 3l7 3v6c0 4.2-2.9 7.6-7 9-4.1-1.4-7-4.8-7-9V6l7-3z" },
+        { title: "Fast Withdrawals", sub: "Quick cashout", d: "M13 3L5 13.5h5L9.5 21 18 10h-5l1-7z" },
+        { title: "Play Anywhere", sub: "Mobile, tablet & desktop", d: "M3 5h12v10H3zM17 9h4v11h-4zM7 19h6" },
+        { title: "24/7 Support", sub: "Always here to help", d: "M4 13v-1a8 8 0 0116 0v1m-16 0v3a2 2 0 002 2h1v-6H6a2 2 0 00-2 2zm16 0v3a2 2 0 01-2 2h-1v-6h1a2 2 0 012 2z" }
+      ].map((t, i) => ({
+        title: t.title, sub: t.sub,
+        divider: i === 0 ? "transparent" : "rgba(167,139,250,.14)",
+        icon: this.icon(t.d, "#ffc93c", 18)
+      })),
+
+
+
+
+      categories: [
+        { label: "All", d: "M4 5h6v6H4zM14 5h6v6h-6zM4 13h6v6H4zM14 13h6v6h-6z" },
+        { label: "Welcome Bonus", d: "M4 9h16v10a2 2 0 01-2 2H6a2 2 0 01-2-2V9zm0 0V7h16v2M12 9v12" },
+        { label: "Reload Bonus", d: "M20 12a8 8 0 11-2.6-5.9M20 4v4h-4" },
+        { label: "Cashback", d: "M3 8a2 2 0 012-2h12a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm9 1.5a2.5 2.5 0 100 5 2.5 2.5 0 000-5z" },
+        { label: "Free Spins", d: "M12 3a9 9 0 100 18 9 9 0 000-18zm0 5.5a3.5 3.5 0 100 7 3.5 3.5 0 000-7z" },
+        { label: "Deposit Boost", d: "M12 20V6m0 0l-5 5m5-5l5 5" },
+        { label: "VIP Offers", d: "M12 4l2.2 4.6 5 .7-3.6 3.5.8 5-4.4-2.3-4.4 2.3.8-5L4.8 9.3l5-.7z" }
+      ].map(c => {
+        const on = this.state.category === c.label;
+        return {
+          label: c.label,
+          icon: this.icon(c.d, on ? "#2c1400" : "#c4b5fd"),
+          bg: on ? "linear-gradient(180deg,#ffd766,#eb9c0d)" : "rgba(255,255,255,.03)",
+          border: on ? "rgba(255,201,60,.6)" : "rgba(167,139,250,.2)",
+          color: on ? "#2c1400" : "#e9e0f5",
+          glow: on ? "0 8px 22px rgba(235,156,13,.32)" : "none",
+          onClick: () => this.setState({ category: c.label })
+        };
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>
