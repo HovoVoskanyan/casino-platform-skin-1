@@ -54,9 +54,15 @@ export function useSessionState() {
   return useQuery(sessionQueryOptions());
 }
 
+/**
+ * P3-24: by email OR by phone (E.164 — the dialog composes +63 and the ten digits). `ageConfirmed` is the register
+ * checkbox: identity refuses a sign-up without it (a consent, never a date of birth).
+ */
 export interface SignUpInput {
-  email: string;
+  email?: string | null;
+  phone?: string | null;
   password: string;
+  ageConfirmed: boolean;
   /** Affiliate attribution captured from the landing URL (P3-16): forwarded as identity's `externaldatakey` header. */
   affiliate?: string | null;
   source?: string | null;
@@ -73,7 +79,15 @@ export function useSignUp() {
       if (input.affiliate) headers.externaldatakey = input.affiliate;
       if (input.source) headers["X-Source"] = input.source;
       const { data } = await api.POST("/api/id/auth/signup", {
-        body: { email: input.email, password: input.password, username: null, verifyUrl: verifyUrl() },
+        body: {
+          email: input.email ?? null,
+          phone: input.phone ?? null,
+          password: input.password,
+          username: null,
+          // Only an email has a link to land on; a phone is confirmed by the SMS code.
+          verifyUrl: input.email ? verifyUrl() : null,
+          ageConfirmed: input.ageConfirmed,
+        },
         headers,
       });
       return data!;
@@ -101,18 +115,41 @@ export function useSignIn() {
   });
 }
 
+/** One of the two: an email gets the code by mail, a phone by SMS (P3-24). */
+export type ContactInput = { email: string; phone?: never } | { phone: string; email?: never };
+
 export function useForgotPassword() {
-  return useMutation<void, ApiError, { email: string }>({
-    mutationFn: async ({ email }) => {
-      await api.POST("/api/id/auth/forgot-password", { body: { email }, parseAs: "text" });
+  return useMutation<void, ApiError, ContactInput>({
+    mutationFn: async (contact) => {
+      await api.POST("/api/id/auth/forgot-password", { body: { email: contact.email ?? null, phone: contact.phone ?? null }, parseAs: "text" });
     },
   });
 }
 
 export function useResetPassword() {
-  return useMutation<void, ApiError, { email: string; otp: string; newPassword: string }>({
+  return useMutation<void, ApiError, ContactInput & { otp: string; newPassword: string }>({
+    mutationFn: async (input) => {
+      await api.POST("/api/id/auth/reset-password", {
+        body: { email: input.email ?? null, phone: input.phone ?? null, otp: input.otp, newPassword: input.newPassword },
+        parseAs: "text",
+      });
+    },
+  });
+}
+
+/** P3-24: the SMS code that confirms the number sign-up sent to. */
+export function useVerifyPhone() {
+  return useMutation<void, ApiError, { phone: string; code: string }>({
     mutationFn: async (body) => {
-      await api.POST("/api/id/auth/reset-password", { body, parseAs: "text" });
+      await api.POST("/api/id/auth/verify-phone", { body, parseAs: "text" });
+    },
+  });
+}
+
+export function useResendPhoneVerification() {
+  return useMutation<void, ApiError, { phone: string }>({
+    mutationFn: async (body) => {
+      await api.POST("/api/id/auth/resend-phone-verification", { body, parseAs: "text" });
     },
   });
 }

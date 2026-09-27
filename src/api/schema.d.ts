@@ -196,6 +196,80 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/id/auth/verify-phone": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["VerifyPhoneRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/id/auth/resend-phone-verification": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ResendPhoneVerificationRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/id/auth/forgot-password": {
         parameters: {
             query?: never;
@@ -2059,10 +2133,13 @@ export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
         SignUpRequest: {
-            email: string;
+            email: null | string;
             password: string;
             username: null | string;
             verifyUrl: null | string;
+            phone?: null | string;
+            /** @default false */
+            ageConfirmed: boolean;
         };
         SignInRequest: {
             emailOrUsername: string;
@@ -2080,13 +2157,22 @@ export interface components {
             email: string;
             verifyUrl: null | string;
         };
+        VerifyPhoneRequest: {
+            phone: string;
+            code: string;
+        };
+        ResendPhoneVerificationRequest: {
+            phone: string;
+        };
         ForgotPasswordRequest: {
-            email: string;
+            email: null | string;
+            phone?: null | string;
         };
         ResetPasswordRequest: {
-            email: string;
+            email: null | string;
             otp: string;
             newPassword: string;
+            phone?: null | string;
         };
         ChangePasswordRequest: {
             currentPassword: string;

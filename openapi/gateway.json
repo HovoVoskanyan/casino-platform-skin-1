@@ -148,6 +148,52 @@
         "security": []
       }
     },
+    "/api/id/auth/verify-phone": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyPhoneRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/id/auth/resend-phone-verification": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResendPhoneVerificationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": []
+      }
+    },
     "/api/id/auth/forgot-password": {
       "post": {
         "tags": [
@@ -1905,7 +1951,10 @@
         "type": "object",
         "properties": {
           "email": {
-            "type": "string"
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "password": {
             "type": "string"
@@ -1921,6 +1970,16 @@
               "null",
               "string"
             ]
+          },
+          "phone": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "ageConfirmed": {
+            "type": "boolean",
+            "default": false
           }
         }
       },
@@ -1990,6 +2049,32 @@
           }
         }
       },
+      "VerifyPhoneRequest": {
+        "required": [
+          "phone",
+          "code"
+        ],
+        "type": "object",
+        "properties": {
+          "phone": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          }
+        }
+      },
+      "ResendPhoneVerificationRequest": {
+        "required": [
+          "phone"
+        ],
+        "type": "object",
+        "properties": {
+          "phone": {
+            "type": "string"
+          }
+        }
+      },
       "ForgotPasswordRequest": {
         "required": [
           "email"
@@ -1997,7 +2082,16 @@
         "type": "object",
         "properties": {
           "email": {
-            "type": "string"
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "phone": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -2010,13 +2104,22 @@
         "type": "object",
         "properties": {
           "email": {
-            "type": "string"
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "otp": {
             "type": "string"
           },
           "newPassword": {
             "type": "string"
+          },
+          "phone": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
