@@ -8,6 +8,10 @@ import { Button } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/input";
 import { Notice } from "@/components/ui/notice";
 import { useChangePassword, useTotpConfirm, useTotpDisable, useTotpEnroll, type TotpEnrollment } from "@/features/auth/session";
+import { AccountCard } from "./account-card";
+import { accountErrorText, useAccount, useRefreshAccount } from "./api";
+import { ContactsCard } from "./contacts-card";
+import { SignInMethodsCard } from "./sign-in-methods-card";
 
 const passwordSchema = z
   .object({
@@ -19,27 +23,24 @@ const passwordSchema = z
 
 const codeSchema = z.object({ code: z.string().trim().regex(/^\d{6}$/, "auth.validation.totp") });
 
-/** Design (My Account → Security): change password; plus two-factor, which identity has and the design's method list is the home for. */
+/**
+ * Design (My Account → Security): contact details (P3-24: add/change, pending until confirmed), the connected sign-in
+ * methods (a first password, Telegram), change password, and two-factor — all read from identity's account view.
+ */
 export function SecurityTab() {
   const { t } = useTranslation();
-  const errorText = (code: string) => t(`auth.error.${code}`, { defaultValue: t("auth.error.UNKNOWN") });
+  const account = useAccount();
+  const errorText = (code: string) => accountErrorText(t, code);
+  if (account.isPending) return <div aria-hidden className="h-[320px] animate-pulse rounded-cc-xl border border-cc-line bg-cc-surface-raised" />;
+  if (account.isError) return <Notice tone="error">{t("common.loadFailed")}</Notice>;
   return (
     <div className="grid gap-4 md:grid-cols-2">
-      <PasswordCard errorText={errorText} />
-      <TotpCard errorText={errorText} />
+      <ContactsCard account={account.data} errorText={errorText} />
+      <SignInMethodsCard account={account.data} errorText={errorText} />
+      {account.data.hasPassword ? <PasswordCard errorText={errorText} /> : null}
+      {/* keyed on identity's answer: a stale local "enabled" never outlives a re-read of the account */}
+      <TotpCard key={String(account.data.totpEnabled)} errorText={errorText} enabledNow={account.data.totpEnabled} />
     </div>
-  );
-}
-
-function Card({ title, intro, children }: { title: string; intro: string; children: React.ReactNode }) {
-  return (
-    <section className="flex flex-col gap-4 rounded-cc-xl border border-cc-line bg-cc-surface p-5">
-      <div>
-        <h2 className="m-0 text-[18px] font-extrabold tracking-[-0.3px]">{title}</h2>
-        <p className="m-0 mt-1 text-[13px] leading-[1.5] text-cc-lavender">{intro}</p>
-      </div>
-      {children}
-    </section>
   );
 }
 
@@ -64,7 +65,7 @@ function PasswordCard({ errorText }: { errorText: (c: string) => string }) {
   });
 
   return (
-    <Card title={t("account.security.password")} intro={t("account.security.passwordIntro")}>
+    <AccountCard title={t("account.security.password")} intro={t("account.security.passwordIntro")}>
       {open ? (
         <form onSubmit={submit} noValidate className="flex flex-col gap-4">
           {error ? <Notice tone="error">{error}</Notice> : null}
@@ -85,18 +86,19 @@ function PasswordCard({ errorText }: { errorText: (c: string) => string }) {
       ) : (
         <Button variant="secondary" className="self-start" onClick={() => setOpen(true)}>{t("account.security.changePassword")}</Button>
       )}
-    </Card>
+    </AccountCard>
   );
 }
 
-function TotpCard({ errorText }: { errorText: (c: string) => string }) {
+function TotpCard({ errorText, enabledNow }: { errorText: (c: string) => string; enabledNow: boolean }) {
   const { t } = useTranslation();
   const enroll = useTotpEnroll();
   const confirm = useTotpConfirm();
   const disable = useTotpDisable();
+  const refresh = useRefreshAccount();
   const [enrollment, setEnrollment] = useState<TotpEnrollment | null>(null);
   const [disabling, setDisabling] = useState(false);
-  const [enabled, setEnabled] = useState<boolean | null>(null); // identity has no "me" yet (P3-24); the state is what this tab last did
+  const [enabled, setEnabled] = useState<boolean>(enabledNow); // from identity's account view (P3-24), then what this tab did
   const [error, setError] = useState<string | null>(null);
   const form = useForm<z.infer<typeof codeSchema>>({ resolver: zodResolver(codeSchema), defaultValues: { code: "" } });
   const fe = (m?: string) => (m ? t(m) : undefined);
@@ -120,6 +122,7 @@ function TotpCard({ errorText }: { errorText: (c: string) => string }) {
       setEnrollment(null);
       setEnabled(true);
       form.reset();
+      refresh();
     } catch (e) {
       setError(errorText((e as { errorCode?: string }).errorCode ?? "UNKNOWN"));
     }
@@ -133,13 +136,14 @@ function TotpCard({ errorText }: { errorText: (c: string) => string }) {
       setDisabling(false);
       setEnabled(false);
       form.reset();
+      refresh();
     } catch (e) {
       setError(errorText((e as { errorCode?: string }).errorCode ?? "UNKNOWN"));
     }
   });
 
   return (
-    <Card title={t("account.security.totp")} intro={t("account.security.totpIntro")}>
+    <AccountCard title={t("account.security.totp")} intro={t("account.security.totpIntro")}>
       {error ? <Notice tone="error">{error}</Notice> : null}
       {enrollment ? (
         <form onSubmit={submitConfirm} noValidate className="flex flex-col gap-4">
@@ -167,10 +171,10 @@ function TotpCard({ errorText }: { errorText: (c: string) => string }) {
       ) : (
         <div className="flex flex-wrap gap-2">
           {enabled ? <Notice tone="ok" className="w-full">{t("account.security.totpEnabled")}</Notice> : null}
-          <Button variant="secondary" onClick={start} loading={enroll.isPending}>{t("account.security.totpEnable")}</Button>
-          <Button variant="ghost" onClick={() => setDisabling(true)}>{t("account.security.totpDisable")}</Button>
+          {enabled ? null : <Button variant="secondary" onClick={start} loading={enroll.isPending}>{t("account.security.totpEnable")}</Button>}
+          {enabled ? <Button variant="ghost" onClick={() => setDisabling(true)}>{t("account.security.totpDisable")}</Button> : null}
         </div>
       )}
-    </Card>
+    </AccountCard>
   );
 }

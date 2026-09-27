@@ -8,20 +8,21 @@ import { SignInGate } from "@/features/auth/sign-in-gate";
 import { useSession } from "@/features/auth/session";
 import { SecurityTab } from "@/features/account/security-tab";
 import { SessionsTab } from "@/features/account/sessions-tab";
+import { ProfileTab } from "@/features/account/profile-tab";
 
 export const Route = createFileRoute("/account")({ component: AccountPage });
 
-const TABS = ["security", "sessions"] as const;
+const TABS = ["profile", "security", "sessions"] as const;
 
 /**
- * Design (My Account): Profile · Security · Verification · Preferences · Bonuses. This increment ships the two tabs
- * identity already serves — Security (password, two-factor) and Sessions (the design's "Connected login methods"
- * neighbour). Profile, Verification and Preferences wait on P3-24 / P3-25 / P3-12.
+ * Design (My Account): Profile · Security · Verification · Preferences · Bonuses. Profile (P3-24: player number,
+ * display name, city — core), Security (contacts pending until confirmed, sign-in methods, password, two-factor —
+ * identity) and Sessions. Verification is off for ChoCho (owner 2026-09-25); Preferences and Bonuses wait on their cards.
  */
 function AccountPage() {
   const { t } = useTranslation();
   const { signedIn } = useSession();
-  const [tab, setTab] = useState<(typeof TABS)[number]>("security");
+  const [tab, setTab] = useState<(typeof TABS)[number]>("profile");
   return (
     <Shell>
       {signedIn ? (
@@ -36,7 +37,7 @@ function AccountPage() {
             ))}
           </div>
           <div role="tabpanel" id={`panel-${tab}`} aria-labelledby={`tab-${tab}`}>
-            {tab === "security" ? <SecurityTab /> : <SessionsTab />}
+            {tab === "profile" ? <ProfileTab /> : tab === "security" ? <SecurityTab /> : <SessionsTab />}
           </div>
         </>
       ) : (

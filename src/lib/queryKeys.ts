@@ -9,6 +9,10 @@ export const queryKeys = {
     sessions: () => [...queryKeys.session.all, "sessions"] as const,
     /** The player's ♥ list — under the session prefix, so signing out drops it with everything else that is theirs. */
     favourites: () => [...queryKeys.session.all, "favourites"] as const,
+    /** P3-24 — My Account: identity's view of the account (contacts, pending changes, sign-in methods, consent). */
+    account: () => [...queryKeys.session.all, "account"] as const,
+    /** P3-24 — My Account → Profile on core (display name, city, player number). */
+    profile: () => [...queryKeys.session.all, "profile"] as const,
   },
   /**
    * P3-27: the guest's lobby reads. Every key carries the UI language, because core answers each read in the

@@ -11,6 +11,51 @@
     }
   ],
   "paths": {
+    "/api/id/auth/telegram/unlink": {
+      "post": {
+        "tags": [
+          "Telegram"
+        ],
+        "summary": "Disconnect Telegram. 409 LAST_SIGN_IN_METHOD when it is the only way in: set a password first.",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "playerCookie": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/id/auth/confirm-email-change": {
+      "post": {
+        "tags": [
+          "Account"
+        ],
+        "summary": "The link sent to a pending new email: anonymous like verify-email, because it may be opened on another device.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmEmailChangeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": []
+      }
+    },
     "/api/id/auth/signup": {
       "post": {
         "tags": [
@@ -369,6 +414,257 @@
           },
           "required": true
         },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "playerCookie": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/id/auth/account": {
+      "get": {
+        "tags": [
+          "Account"
+        ],
+        "summary": "The signed-in player's contacts, pending changes, sign-in methods and consent.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "playerCookie": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/id/auth/account/email": {
+      "post": {
+        "tags": [
+          "Account"
+        ],
+        "summary": "Add or change the email: a confirmation link goes to the NEW address; the current one stays until it is followed.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeEmailRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "playerCookie": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/id/auth/account/phone": {
+      "post": {
+        "tags": [
+          "Account"
+        ],
+        "summary": "Add or change the phone: an SMS code goes to the NEW number; the current one stays until it is confirmed.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePhoneRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "playerCookie": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/id/auth/account/phone/confirm": {
+      "post": {
+        "tags": [
+          "Account"
+        ],
+        "summary": "The SMS code sent to the pending number; the number becomes the account's.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmPhoneChangeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "playerCookie": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/id/auth/account/{contact}/resend": {
+      "post": {
+        "tags": [
+          "Account"
+        ],
+        "summary": "\"Resend confirmation\" for the pending email or phone change (contact = email | phone).",
+        "parameters": [
+          {
+            "name": "contact",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ResendChangeRequest"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "playerCookie": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/id/auth/account/{contact}/pending": {
+      "delete": {
+        "tags": [
+          "Account"
+        ],
+        "summary": "\"Cancel change\": drops the pending email or phone and its link/code.",
+        "parameters": [
+          {
+            "name": "contact",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "playerCookie": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/id/auth/account/password": {
+      "post": {
+        "tags": [
+          "Account"
+        ],
+        "summary": "A FIRST password, for an account that signs in only through Telegram or Google. 409 if it has one — use change-password.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetPasswordRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "playerCookie": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/id/auth/account/confirm-age": {
+      "post": {
+        "tags": [
+          "Account"
+        ],
+        "summary": "Records the legal-age consent for an account created by a social sign-in (the register form asks it for the rest).",
         "responses": {
           "200": {
             "description": "OK"
@@ -1182,6 +1478,110 @@
         ]
       }
     },
+    "/api/v1/me/profile": {
+      "get": {
+        "tags": [
+          "Profile (player)"
+        ],
+        "summary": "The player's profile on this skin. The player number is assigned on the first read.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlayerProfileResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "playerCookie": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Profile (player)"
+        ],
+        "summary": "Set the display name and city (null or empty clears one). 400 names the rule a value broke.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePlayerProfileRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlayerProfileResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "playerCookie": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/payments/methods/deposit": {
       "get": {
         "tags": [
@@ -1941,6 +2341,21 @@
   },
   "components": {
     "schemas": {
+      "ConfirmEmailChangeRequest": {
+        "required": [
+          "email",
+          "token"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "token": {
+            "type": "string"
+          }
+        }
+      },
       "SignUpRequest": {
         "required": [
           "email",
@@ -2191,6 +2606,163 @@
             "format": "int64"
           },
           "hash": {
+            "type": "string"
+          }
+        }
+      },
+      "AccountResponse": {
+        "required": [
+          "playerId",
+          "username",
+          "email",
+          "emailVerified",
+          "pendingEmail",
+          "phone",
+          "phoneVerified",
+          "pendingPhone",
+          "hasPassword",
+          "totpEnabled",
+          "linkedProviders",
+          "ageConfirmed",
+          "createdAt"
+        ],
+        "type": "object",
+        "properties": {
+          "playerId": {
+            "type": "string"
+          },
+          "username": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "email": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "emailVerified": {
+            "type": "boolean"
+          },
+          "pendingEmail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "phone": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "phoneVerified": {
+            "type": "boolean"
+          },
+          "pendingPhone": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "hasPassword": {
+            "type": "boolean"
+          },
+          "totpEnabled": {
+            "type": "boolean"
+          },
+          "linkedProviders": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "ageConfirmed": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ChangeEmailRequest": {
+        "required": [
+          "email",
+          "password",
+          "verifyUrl"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "verifyUrl": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "ChangePhoneRequest": {
+        "required": [
+          "phone",
+          "password"
+        ],
+        "type": "object",
+        "properties": {
+          "phone": {
+            "type": "string"
+          },
+          "password": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "ConfirmPhoneChangeRequest": {
+        "required": [
+          "code"
+        ],
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          }
+        }
+      },
+      "ResendChangeRequest": {
+        "required": [
+          "verifyUrl"
+        ],
+        "type": "object",
+        "properties": {
+          "verifyUrl": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "SetPasswordRequest": {
+        "required": [
+          "newPassword"
+        ],
+        "type": "object",
+        "properties": {
+          "newPassword": {
             "type": "string"
           }
         }
@@ -2726,6 +3298,53 @@
             "items": {
               "type": "string"
             }
+          }
+        }
+      },
+      "PlayerProfileResponse": {
+        "required": [
+          "displayName",
+          "city",
+          "playerNumber"
+        ],
+        "type": "object",
+        "properties": {
+          "displayName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "city": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "playerNumber": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "UpdatePlayerProfileRequest": {
+        "required": [
+          "displayName",
+          "city"
+        ],
+        "type": "object",
+        "properties": {
+          "displayName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "city": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },

@@ -8,8 +8,17 @@ export const SESSIONS = [
 
 export const cookieSession = () => HttpResponse.json({ expiresAt: new Date(Date.now() + 600_000).toISOString(), sessionId: SESSIONS[0]!.id });
 
+/** P3-24: a signed-in player's account as identity answers it — email, verified, a password, consent on record. */
+export const ACCOUNT = {
+  playerId: "01a07d30-b75c-76a4-8715-75a2ab47e4c0", username: "juan", email: "juan@example.test", emailVerified: true, pendingEmail: null,
+  phone: null, phoneVerified: false, pendingPhone: null, hasPassword: true, totpEnabled: false, linkedProviders: [] as string[],
+  ageConfirmed: true, createdAt: "2026-09-20T09:00:00Z",
+};
+
 /** Default handlers describe a GUEST; tests that need a signed-in player override the sessions probe. */
 export const handlers = [
+  http.get("*/api/id/auth/account", () => HttpResponse.json(ACCOUNT)),
+  http.get("*/api/v1/me/profile", () => HttpResponse.json({ displayName: null, city: null, playerNumber: 4820117 })),
   http.get("*/api/id/sessions", () => problem(401, "UNAUTHORIZED")),
   http.post("*/api/id/auth/refresh", () => problem(401, "REFRESH_TOKEN_INVALID")),
   http.post("*/api/id/sessions/logout", () => new HttpResponse(null, { status: 204 })),

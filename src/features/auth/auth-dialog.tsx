@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 import { authDialog, useAuthDialog, type AuthMode } from "./auth-dialog-state";
 import { readAttribution } from "./attribution";
 import { TelegramButton } from "./telegram-button";
+import { toLogin, type Contact } from "./phone";
 import { useForgotPassword, useGoogleSignIn, useResendPhoneVerification, useResetPassword, useSignIn, useSignUp, useVerifyPhone } from "./session";
 
 /** Design (Registration): 8+ characters with a letter and a number. */
@@ -22,8 +23,6 @@ const email = z.string().trim().min(1, "auth.validation.emailRequired").email("a
 /** Design: the +63 prefix is fixed, the player types the ten digits of a PH mobile (9XXXXXXXXX). */
 const phone = z.string().transform((v) => v.replace(/[\s-]/g, "")).pipe(z.string().min(1, "auth.validation.phoneRequired").regex(/^9\d{9}$/, "auth.validation.phone"));
 const login = (contact: Contact) => (contact === "phone" ? phone : email);
-/** What identity receives for the typed login: the email as-is, or the number in E.164. */
-export const toLogin = (contact: Contact, value: string) => (contact === "phone" ? `+63${value.replace(/[\s-]/g, "")}` : value.trim());
 
 const signInSchema = (c: Contact) => z.object({ login: login(c), password: z.string().min(1, "auth.validation.passwordRequired") });
 const registerSchema = (c: Contact) => z.object({ login: login(c), password: password("auth.validation.passwordCreate"), consent: z.literal(true, { message: "auth.consentRequired" }) });
@@ -37,7 +36,6 @@ type RegisterValues = z.infer<ReturnType<typeof registerSchema>>;
 type ResetValues = z.infer<ReturnType<typeof resetSchema>>;
 type ResetConfirmValues = z.infer<ReturnType<typeof resetConfirmSchema>>;
 
-export type Contact = "phone" | "email";
 type View = AuthMode | "reset-confirm" | "totp" | "verify-phone";
 
 /**
