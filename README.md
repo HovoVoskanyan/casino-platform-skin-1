@@ -39,11 +39,20 @@ npm run dev          # :3002, proxied to the gateway on :5000
 npm run api:sync     # openapi/gateway.json ← the gateway's /openapi/v1.json, then src/api/schema.d.ts
 npm test             # vitest + msw
 npm run e2e          # playwright in the installed Chrome against the laptop stack + dev server
+npm run e2e:lobby    # the lobby pages through the compose skin front (:3003) on a throwaway skin + host
 ```
 
 `e2e/smoke.mjs` signs up a throwaway player through the edge, reads the verification link from identity's staged
 `comms.requests` outbox row (via the compose stack's Postgres), verifies, lists sessions, signs out and back in,
 and proves sign-out-everywhere kills the old cookies.
+
+`e2e/lobby.mjs` (P3-27) seeds a throwaway skin on its own host (`p327-<id>.localhost`) over core's HMAC admin surface —
+games, categories, providers, HOT picks, promotions with terms, a hero banner — waits for the gateway to learn the
+host, then walks Home, Games (category, provider, search, reload, Load More, a stale thumbnail, a hidden game), a
+game page and Promotions as a guest, and the ♥ as a new player. It needs `CORE_HMAC_BACKOFFICE_SECRET` in the
+backend's `deploy/.env` and a rebuilt `skin-front` container; screenshots at 375 and 1280 land in `e2e/shots/`
+(ignored). It signs up one player, so it shares the laptop's signup throttle — restart gateway and identity after a
+burst of runs.
 
 ## What is here, and what waits on other cards
 
@@ -54,4 +63,6 @@ and proves sign-out-everywhere kills the old cookies.
 | `/verify-email`, `/auth/callback` | Player profile, contact changes ([P3-24]); verification ([P3-25]) |
 | My Account → Security (change password, two-factor) and Sessions (per-device sign-out, everywhere) | Profile / Preferences / Bonuses tabs ([P3-24], [P3-12], [P5-07]) |
 | Wallet and My Account sign-in gates | Cashier screens — no design yet (owner) |
-| Home, Games, Promotions, VIP, Info frames | Core's player content read ([P3-23]) |
+| Home (hero, Hot Games, Quick Play, Bonuses), Games (search, pills, providers, sort, favourites, Load More), game page, Promotions (pills, featured, terms) — on core's lobby reads ([P3-27]) | Game launch — the design has no game container (owner); the play buttons are shown disabled |
+| The ♥ on every card, the Favourite Games rail, favourites-only | "My Promotions" (bonus's active list) and the promotions FAQ (owner copy) |
+| VIP, Info frames | VIP benefits and info-page copy (owner) |

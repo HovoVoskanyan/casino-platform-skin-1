@@ -17,5 +17,11 @@
   "auth.registerTitle": "Gumawa ng iyong ChoCho account",
   "auth.submitSignIn": "Mag-sign in",
   "auth.submitRegister": "Gumawa ng account",
-  "shell.playResponsibly": "Maglaro nang Responsable"
+  "shell.playResponsibly": "Maglaro nang Responsable",
+  "home.hotGames": "Mga Patok na Laro",
+  "games.all": "Lahat ng Laro",
+  "games.allGames": "Lahat ng Laro",
+  "game.back": "Bumalik sa Mga Laro",
+  "promotions.viewDetails": "Tingnan ang Detalye",
+  "lobby.viewAll": "Tingnan lahat"
 }

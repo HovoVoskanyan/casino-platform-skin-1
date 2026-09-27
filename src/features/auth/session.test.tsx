@@ -23,4 +23,13 @@ describe("the session probe", () => {
     server.use(http.get("*/api/id/sessions", () => HttpResponse.json([])));
     await expect(fetchState()).resolves.toEqual({ signedIn: false });
   });
+
+  it("no answer at all (identity down, an edge error) is a degraded guest, never a crash", async () => {
+    // P3-27: the root loader awaited this probe and a thrown 502 rendered "Something went wrong" over the whole site —
+    // including the anonymous lobby, which does not need identity at all.
+    server.use(http.get("*/api/id/sessions", () => HttpResponse.json({ status: 502, errorCode: "UPSTREAM_UNAVAILABLE" }, { status: 502 })));
+    await expect(fetchState()).resolves.toEqual({ signedIn: false, degraded: true });
+    server.use(http.get("*/api/id/sessions", () => HttpResponse.json({ status: 404, errorCode: "UNKNOWN_HOST" }, { status: 404 })));
+    await expect(fetchState()).resolves.toEqual({ signedIn: false, degraded: true });
+  });
 });

@@ -10,7 +10,11 @@ import type { components } from "@/api/schema";
  * the session probe is the player's own sessions list: 200 = signed in, 401 = guest. The list also carries what
  * the account page shows. Cookie mode means the page never holds a token — the browser does.
  */
-export type SessionState = { signedIn: true; sessions: PlayerSession[] } | { signedIn: false };
+/**
+ * `degraded` = the probe got no answer (identity down, an edge error): the site carries on as a guest — the lobby is
+ * anonymous and must not go dark with identity — and asks again shortly (P3-27).
+ */
+export type SessionState = { signedIn: true; sessions: PlayerSession[] } | { signedIn: false; degraded?: true };
 
 /** GET /api/id/sessions — identity answers `SessionResponse[]` but its document does not type it (no `.Produces<>`); mirrored here until it does. */
 export interface PlayerSession {
@@ -37,11 +41,13 @@ export const sessionQueryOptions = () =>
         return sessions.some((s) => s.current) ? { signedIn: true, sessions } : { signedIn: false };
       } catch (e) {
         if (toApiError(e).status === 401) return { signedIn: false };
-        throw e;
+        // Not "no session" but "no answer": never take the whole site down for it (a thrown loader error did).
+        return { signedIn: false, degraded: true };
       }
     },
     staleTime: 60_000,
     retry: false,
+    refetchInterval: (query) => (query.state.data && !query.state.data.signedIn && query.state.data.degraded ? 15_000 : false),
   });
 
 export function useSessionState() {

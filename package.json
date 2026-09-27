@@ -16,7 +16,8 @@
     "api:fetch": "node scripts/fetch-openapi.mjs",
     "api:gen": "openapi-typescript openapi/gateway.json -o src/api/schema.d.ts",
     "api:sync": "npm run api:fetch && npm run api:gen",
-    "e2e": "node e2e/smoke.mjs"
+    "e2e": "node e2e/smoke.mjs",
+    "e2e:lobby": "node e2e/lobby.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
