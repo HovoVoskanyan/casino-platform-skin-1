@@ -23,7 +23,8 @@ export default defineConfig({
   ],
   server: {
     proxy: {
-      "/api": { target: API_TARGET, changeOrigin: true },
+      // ws: the balance hub (P3-28) upgrades to a WebSocket under /api/v1/hubs.
+      "/api": { target: API_TARGET, changeOrigin: true, ws: true },
     },
   },
   test: {

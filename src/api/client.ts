@@ -24,17 +24,31 @@ export function setSessionLostHandler(handler: (() => void) | null) {
 
 let refreshInFlight: Promise<boolean> | null = null;
 
-/** One refresh at a time: N parallel 401s collapse into a single refresh call. */
+/** The session lost for good (a refresh that failed): the same path the API middleware takes. */
+export function reportSessionLost() {
+  onSessionLost?.();
+}
+
+/**
+ * One refresh at a time — in this tab (N parallel 401s collapse into one call) AND across tabs: identity rotates the
+ * refresh token on every use and revokes the whole session when a rotated one comes back (reuse detection, no grace
+ * window). Two tabs refreshing in the same instant would present the same cookie and sign the player out
+ * everywhere (P3-28 review B2), so the call runs under a Web Lock: the second tab waits, then refreshes with the
+ * cookie the first one received.
+ */
 export function refreshSession(): Promise<boolean> {
   if (!refreshInFlight) {
-    refreshInFlight = fetch(`${API_ORIGIN}/api/id/auth/refresh`, { method: "POST", credentials: "include" })
-      .then((r) => r.ok)
-      .catch(() => false)
-      .finally(() => {
-        refreshInFlight = null;
-      });
+    const run = () =>
+      fetch(`${API_ORIGIN}/api/id/auth/refresh`, { method: "POST", credentials: "include" })
+        .then((r) => r.ok)
+        .catch(() => false);
+    const locks = typeof navigator !== "undefined" ? navigator.locks : undefined;
+    const pending: Promise<boolean> = locks ? locks.request("chocho-session-refresh", () => run()).then((ok) => ok) : run();
+    refreshInFlight = pending.finally(() => {
+      refreshInFlight = null;
+    });
   }
-  return refreshInFlight;
+  return refreshInFlight as Promise<boolean>;
 }
 
 const isAuthRoute = (url: string) => url.includes("/api/id/auth/");

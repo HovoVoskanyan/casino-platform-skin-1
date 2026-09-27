@@ -10,6 +10,8 @@ export interface ProblemDetails {
   status?: number;
   detail?: string;
   errorCode?: string;
+  /** The kit's live-session check (401 SESSION_NOT_LIVE) names its code here instead of `errorCode`. */
+  code?: string;
   errors?: Record<string, string[]>;
   traceId?: string;
 }
@@ -23,7 +25,7 @@ export class ApiError extends Error {
     super(problem.detail ?? problem.title ?? `Request failed (${status})`);
     this.name = "ApiError";
     this.status = status;
-    this.errorCode = problem.errorCode ?? (status === 0 ? "NETWORK" : "UNKNOWN");
+    this.errorCode = problem.errorCode ?? problem.code ?? (status === 0 ? "NETWORK" : "UNKNOWN");
     this.problem = problem;
   }
 }

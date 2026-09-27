@@ -7,6 +7,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { SessionProvider, sessionQueryOptions, useSessionState } from "@/features/auth/session";
 import { AuthDialog } from "@/features/auth/auth-dialog";
 import { AgeConsentPrompt } from "@/features/account/age-consent-prompt";
+import { BalanceConnection } from "@/features/wallet/balance-connection";
 import { captureAttribution } from "@/features/auth/attribution";
 import { authDialog } from "@/features/auth/auth-dialog-state";
 import { queryKeys } from "@/lib/queryKeys";
@@ -54,6 +55,8 @@ function RootLayout() {
       <Outlet />
       <AuthDialog />
       {state.signedIn ? <AgeConsentPrompt /> : null}
+      {/* one hub connection per signed-in session; unmounting on sign-out closes it and forgets the balance */}
+      {state.signedIn ? <BalanceConnection /> : null}
       <Toaster />
       <Suspense fallback={null}>
         <Devtools />

@@ -13,6 +13,14 @@ export const queryKeys = {
     account: () => [...queryKeys.session.all, "account"] as const,
     /** P3-24 — My Account → Profile on core (display name, city, player number). */
     profile: () => [...queryKeys.session.all, "profile"] as const,
+    /** P3-28 — bonus's catalogue (what can be claimed) and the player's bonuses, for the balance panel's counts. */
+    bonusCatalog: () => [...queryKeys.session.all, "bonus", "catalog"] as const,
+    bonusActive: () => [...queryKeys.session.all, "bonus", "active"] as const,
+    /** P3-28 — whether a launch of this game may be bonus-funded (the "play with your bonus?" prompt). */
+    launchEligibility: (gameId: string) => [...queryKeys.session.all, "bonus", "launch-eligibility", gameId] as const,
+    /** P3-28 — payments: the methods (per direction) and the player's history (per filter). */
+    paymentMethods: (direction: "deposit" | "withdraw") => [...queryKeys.session.all, "payments", "methods", direction] as const,
+    paymentHistory: (type: string) => [...queryKeys.session.all, "payments", "history", type] as const,
   },
   /**
    * P3-27: the guest's lobby reads. Every key carries the UI language, because core answers each read in the

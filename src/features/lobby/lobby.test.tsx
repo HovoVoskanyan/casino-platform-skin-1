@@ -144,13 +144,13 @@ describe("game detail (P3-27)", () => {
     expect(await screen.findByRole("heading", { name: "This game is unavailable" })).toBeInTheDocument();
   });
 
-  it("shows the game with its category and about copy, and does not pretend to launch", async () => {
+  it("shows the game with its category and about copy, and its play modes", async () => {
     server.use(...catalogue(1), http.get("*/api/v1/games/:id", () => HttpResponse.json({ ...game(1), logoUrl: null, description: "Candy and fruit.", rtp: 96.5, volatility: "High" })));
     renderRoute(`/games/${game(1).id}`);
     expect(await screen.findByRole("heading", { name: "Game 1" })).toBeInTheDocument();
     expect(await screen.findByText("Slots")).toBeInTheDocument();
     expect(screen.getByText("Candy and fruit.")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Play for Real" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Play for Real" })).toBeEnabled(); // P3-28: launch is live
   });
 });
 

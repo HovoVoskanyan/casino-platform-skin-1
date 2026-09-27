@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { authDialog } from "@/features/auth/auth-dialog-state";
 import { useSession } from "@/features/auth/session";
 import { Button } from "@/components/ui/button";
+import { BalanceMenu } from "@/features/wallet/balance-menu";
 
 const NAV = [
   { key: "games", to: "/games" },
@@ -15,8 +16,8 @@ const NAV = [
 /**
  * Design (Header): sticky 76px bar — logo, Games | Promotions | VIP | Help, one secondary "Aviator" chip, then either
  * Sign in + gold Register (guest) or Balance + Deposit + avatar (signed in). Collapses to the compact bar under
- * 760px with a burger menu. The live balance is the core hub's (P6-04) and lands in the next P3-16 increment; until
- * then the slot shows "—" rather than a number that could be stale.
+ * 760px with a burger menu. The balance is live from core's hub (P3-28, `BalanceMenu`); "—" while it is unknown,
+ * never a number that could be stale.
  */
 export function Header() {
   const { t } = useTranslation();
@@ -50,12 +51,7 @@ export function Header() {
 
         {signedIn ? (
           <>
-            <span className="flex h-10 flex-none items-center overflow-hidden rounded-cc border border-cc-line-strong bg-white/[.02]">
-              <Link to="/wallet" className="flex h-full items-center gap-[9px] px-3 text-[13.5px] font-bold text-cc-text hover:bg-[rgba(167,139,250,.12)] md:px-[14px] md:text-[14px]">
-                <span className="hidden text-[12px] font-semibold text-cc-lavender md:inline">{t("nav.balance")}</span>
-                <span className="tabular">—</span>
-              </Link>
-            </span>
+            <BalanceMenu />
             <Button asChild variant="primary" size="md" className="hidden md:inline-flex"><Link to="/wallet" hash="deposit">{t("nav.deposit")}</Link></Button>
             <Link to="/account" aria-label={t("nav.myAccount")} className="flex h-10 w-10 flex-none items-center justify-center rounded-cc border border-cc-line-strong bg-white/[.04] text-[13px] font-extrabold text-cc-text">
               <UserGlyph />

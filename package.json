@@ -17,10 +17,12 @@
     "api:gen": "openapi-typescript openapi/gateway.json -o src/api/schema.d.ts",
     "api:sync": "npm run api:fetch && npm run api:gen",
     "e2e": "node e2e/smoke.mjs",
-    "e2e:lobby": "node e2e/lobby.mjs"
+    "e2e:lobby": "node e2e/lobby.mjs",
+    "e2e:play": "node e2e/play-and-pay.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
+    "@microsoft/signalr": "^9.0.19",
     "@phosphor-icons/react": "^2.1.10",
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-slot": "^1.2.3",

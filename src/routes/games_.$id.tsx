@@ -1,4 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { z } from "zod";
 import { useTranslation } from "react-i18next";
 import { Shell } from "@/components/layout/shell";
 import { Button } from "@/components/ui/button";
@@ -7,18 +8,27 @@ import { ApiError } from "@/api/problem";
 import { useCategories, useGame } from "@/features/lobby/api";
 import { GameArt } from "@/features/lobby/game-art";
 import { HeartButton } from "@/features/lobby/heart-button";
+import { PlayPanel } from "@/features/game/play-panel";
 
-export const Route = createFileRoute("/games_/$id")({ component: GamePage });
+/** `?play=real|demo`: the mode a guest chose before signing in — it opens once they are back (P3-28). */
+const searchSchema = z.object({ play: z.enum(["demo", "real"]).optional().catch(undefined) });
+
+export const Route = createFileRoute("/games_/$id")({
+  validateSearch: (search) => searchSchema.parse(search),
+  component: GamePage,
+});
 
 /**
  * Game detail (design: Sweet Bonanza) — art, category, name, provider, about copy, the two play modes, "Before you
  * play". A game this skin does not show (hidden, inactive, another skin's, or a made-up id) is core's 404 and reads
- * as "This game is unavailable". The play buttons are shown but DISABLED: launch exists (P6-04) but answers the
- * provider's HTML fragment and the design has no game container yet (owner question) — P3-27 does not fake it.
+ * as "This game is unavailable". The play modes are the `PlayPanel` (P3-28): launch, the bonus prompt, and the game
+ * container the provider's fragment runs in.
  */
 function GamePage() {
   const { t } = useTranslation();
   const { id } = Route.useParams();
+  const { play } = Route.useSearch();
+  const navigate = useNavigate();
   const game = useGame(id);
   const { data: categories = [] } = useCategories();
 
@@ -72,16 +82,7 @@ function GamePage() {
                 </dl>
               ) : null}
             </div>
-            <div className="flex flex-col gap-3">
-              <h2 className="m-0 text-[15px] font-extrabold text-cc-label">{t("game.playMode")}</h2>
-              <div className="grid gap-3 sm:grid-cols-2">
-                {g.hasDemo ? (
-                  <div className="flex flex-col gap-1"><Button size="lg" disabled>{t("game.playFun")}</Button><span className="text-center text-[12px] text-cc-muted">{t("game.virtualCredits")}</span></div>
-                ) : null}
-                <div className="flex flex-col gap-1"><Button variant="primary" size="lg" disabled>{t("game.playReal")}</Button><span className="text-center text-[12px] text-cc-muted">{t("game.realMoney")}</span></div>
-              </div>
-              <Notice tone="info">{t("game.launchSoon")}</Notice>
-            </div>
+            <PlayPanel game={g} autoPlay={play} onAutoPlayed={() => void navigate({ to: ".", search: {}, replace: true })} />
             <div className="flex items-start gap-3 rounded-cc-lg border border-cc-line bg-white/[.02] p-4">
               <span aria-hidden className="text-cc-gold">★</span>
               <span className="flex flex-col gap-1"><span className="text-[14px] font-extrabold text-cc-ink">{t("game.beforeYouPlay")}</span><span className="text-[13px] text-cc-lavender">{t("game.beforeYouPlayBody")}</span></span>
