@@ -18,7 +18,8 @@
     "api:sync": "npm run api:fetch && npm run api:gen",
     "e2e": "node e2e/smoke.mjs",
     "e2e:lobby": "node e2e/lobby.mjs",
-    "e2e:play": "node e2e/play-and-pay.mjs"
+    "e2e:play": "node e2e/play-and-pay.mjs",
+    "e2e:bonus": "node e2e/bonuses.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

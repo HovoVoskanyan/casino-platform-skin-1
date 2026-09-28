@@ -30,6 +30,8 @@ export interface Balance {
   cashCents: number;
   bonusCents: number;
   withdrawableCents: number;
+  /** P3-29 — the bonus instance the bonus funds belong to (bonus's `playerBonusId`), for "₱a of ₱b remaining". */
+  activeBonusRef: string | null;
 }
 
 /**
@@ -41,9 +43,12 @@ export type BalanceState = { status: "unknown" } | { status: "live"; balance: Ba
 export function toBalance(snapshot: BalanceSnapshot): Balance {
   // A player with no wallet account in the skin's currency yet (never deposited, never played) holds zero — known.
   const account = snapshot.accounts.find((a) => a.currency === SKIN_CURRENCY);
-  if (!account) return { totalCents: 0, cashCents: 0, bonusCents: 0, withdrawableCents: 0 };
+  if (!account) return { totalCents: 0, cashCents: 0, bonusCents: 0, withdrawableCents: 0, activeBonusRef: null };
   const bonus = account.bonusCents + account.lockedCents;
-  return { totalCents: account.realCents + bonus, cashCents: account.realCents, bonusCents: bonus, withdrawableCents: account.withdrawableCents };
+  return {
+    totalCents: account.realCents + bonus, cashCents: account.realCents, bonusCents: bonus,
+    withdrawableCents: account.withdrawableCents, activeBonusRef: account.activeBonusRef ?? null,
+  };
 }
 
 let state: BalanceState = { status: "unknown" };

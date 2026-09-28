@@ -8,6 +8,7 @@ import { SessionProvider, sessionQueryOptions, useSessionState } from "@/feature
 import { AuthDialog } from "@/features/auth/auth-dialog";
 import { AgeConsentPrompt } from "@/features/account/age-consent-prompt";
 import { BalanceConnection } from "@/features/wallet/balance-connection";
+import { BonusDrawer } from "@/features/bonus/bonus-drawer";
 import { captureAttribution } from "@/features/auth/attribution";
 import { authDialog } from "@/features/auth/auth-dialog-state";
 import { queryKeys } from "@/lib/queryKeys";
@@ -57,6 +58,7 @@ function RootLayout() {
       {state.signedIn ? <AgeConsentPrompt /> : null}
       {/* one hub connection per signed-in session; unmounting on sign-out closes it and forgets the balance */}
       {state.signedIn ? <BalanceConnection /> : null}
+      {state.signedIn ? <BonusDrawer /> : null}
       <Toaster />
       <Suspense fallback={null}>
         <Devtools />

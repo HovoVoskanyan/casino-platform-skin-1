@@ -8,6 +8,10 @@ export const SKIN_CURRENCY = "PHP";
 export const peso = (cents: number | string) =>
   "₱" + (Number(cents) / 100).toLocaleString("en-PH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
+/** Terms and offers write round amounts without decimals — "₱500", "up to ₱1,000" — and anything else as `peso`. */
+export const pesoWhole = (cents: number) =>
+  cents % 100 === 0 ? "₱" + (cents / 100).toLocaleString("en-PH") : peso(cents);
+
 /** What a hidden balance reads as (six U+2022), wherever the shared Hide balance setting applies. */
 export const MASKED = "••••••";
 

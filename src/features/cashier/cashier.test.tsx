@@ -32,7 +32,8 @@ describe("the cashier (P3-28)", () => {
     const created: unknown[] = [];
     server.use(signedIn(), ...methods(),
       http.post("*/api/payments/deposits", async ({ request }) => { created.push(await request.json()); return HttpResponse.json(payment()); }),
-      http.get("*/api/payments/history", () => HttpResponse.json(created.length ? [payment({ status })] : [])));
+      // Made just now (P3-29: a fixed createdAt aged past pollEvery's 15-minute window and the fast poll stopped).
+      http.get("*/api/payments/history", () => HttpResponse.json(created.length ? [payment({ status, createdAt: new Date().toISOString() })] : [])));
     renderRoute("/wallet#deposit");
 
     const dialog = await screen.findByRole("dialog", { name: "Add money to your wallet" });

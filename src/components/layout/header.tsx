@@ -1,11 +1,12 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { authDialog } from "@/features/auth/auth-dialog-state";
 import { useSession } from "@/features/auth/session";
 import { Button } from "@/components/ui/button";
 import { BalanceMenu } from "@/features/wallet/balance-menu";
+import { bonusDrawer } from "@/features/bonus/bonus-drawer";
 
 const NAV = [
   { key: "games", to: "/games" },
@@ -24,6 +25,7 @@ export function Header() {
   const { signedIn } = useSession();
   const path = useRouterState({ select: (s) => s.location.pathname });
   const [menuOpen, setMenuOpen] = useState(false);
+  const menuButton = useRef<HTMLButtonElement>(null);
   const current = path + (typeof window !== "undefined" ? window.location.search : "");
 
   return (
@@ -64,7 +66,7 @@ export function Header() {
           </>
         )}
 
-        <button type="button" aria-label="Menu" aria-expanded={menuOpen} onClick={() => setMenuOpen((o) => !o)} className="flex h-10 w-10 flex-none items-center justify-center rounded-cc border border-cc-line-strong bg-white/[.02] text-cc-text md:hidden">☰</button>
+        <button ref={menuButton} type="button" aria-label="Menu" aria-expanded={menuOpen} onClick={() => setMenuOpen((o) => !o)} className="flex h-10 w-10 flex-none items-center justify-center rounded-cc border border-cc-line-strong bg-white/[.02] text-cc-text md:hidden">☰</button>
       </div>
 
       {menuOpen ? (
@@ -74,6 +76,9 @@ export function Header() {
           ))}
           <Link to="/wallet" onClick={() => setMenuOpen(false)} className="flex h-11 items-center rounded-cc px-3 text-[15px] font-semibold text-cc-text hover:bg-white/[.05]">{t("nav.wallet")}</Link>
           <Link to="/account" onClick={() => setMenuOpen(false)} className="flex h-11 items-center rounded-cc px-3 text-[15px] font-semibold text-cc-text hover:bg-white/[.05]">{t("nav.myAccount")}</Link>
+          {signedIn ? (
+            <button type="button" onClick={() => { setMenuOpen(false); bonusDrawer.open(menuButton.current); }} className="flex h-11 items-center rounded-cc px-3 text-left text-[15px] font-semibold text-cc-text hover:bg-white/[.05]">{t("nav.myBonuses")}</button>
+          ) : null}
         </nav>
       ) : null}
     </header>

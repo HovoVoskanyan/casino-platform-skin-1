@@ -2527,6 +2527,42 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/bonus/freebets/claimable": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Free-rounds campaigns the player can claim now — in window, with games, uses left (P3-29). */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ClaimableFreeBetResponse"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/bonus/freebets/claim": {
         parameters: {
             query?: never;
@@ -2921,6 +2957,7 @@ export interface components {
             hasPendingActivation: boolean;
             /** Format: int32 */
             currentStepNumber: null | number;
+            claimable: boolean;
         };
         ActivateBonusRequest: {
             /** Format: uuid */
@@ -3043,6 +3080,23 @@ export interface components {
             /** Format: date-time */
             expiresAt: unknown;
             gameIds: string[];
+        };
+        ClaimableFreeBetResponse: {
+            /** Format: uuid */
+            freeBetId: string;
+            name: string;
+            description: null | string;
+            /** Format: int32 */
+            spinsPerGame: number;
+            /** Format: int32 */
+            betLevel: number;
+            gameIds: string[];
+            /** Format: date-time */
+            startAt: unknown;
+            /** Format: date-time */
+            expireAt: unknown;
+            /** Format: int32 */
+            usesRemaining: number;
         };
         ClaimFreeBetRequest: {
             /** Format: uuid */

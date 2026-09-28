@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { useState } from "react";
 import { Shell } from "@/components/layout/shell";
 import { SectionTitle } from "@/components/ui/section-title";
 import { cn } from "@/lib/utils";
@@ -9,20 +8,34 @@ import { useSession } from "@/features/auth/session";
 import { SecurityTab } from "@/features/account/security-tab";
 import { SessionsTab } from "@/features/account/sessions-tab";
 import { ProfileTab } from "@/features/account/profile-tab";
+import { Bonuses } from "@/features/bonus/bonuses";
 
-export const Route = createFileRoute("/account")({ component: AccountPage });
+const TABS = ["profile", "security", "sessions", "bonuses"] as const;
+type Tab = (typeof TABS)[number];
 
-const TABS = ["profile", "security", "sessions"] as const;
+/** `?tab=bonuses` (the design's FAQ links into My Account name a tab); anything else opens Profile. */
+export const Route = createFileRoute("/account")({
+  component: AccountPage,
+  validateSearch: (search: Record<string, unknown>): { tab?: Tab } => {
+    const tab = String(search.tab ?? "").toLowerCase();
+    return (TABS as readonly string[]).includes(tab) ? { tab: tab as Tab } : {};
+  },
+});
 
 /**
  * Design (My Account): Profile · Security · Verification · Preferences · Bonuses. Profile (P3-24: player number,
  * display name, city — core), Security (contacts pending until confirmed, sign-in methods, password, two-factor —
- * identity) and Sessions. Verification is off for ChoCho (owner 2026-09-25); Preferences and Bonuses wait on their cards.
+ * identity), Sessions and Bonuses (P3-29: the bonuses component, page variant). Verification is off for ChoCho (owner
+ * 2026-09-25); Preferences waits on its card.
  */
 function AccountPage() {
   const { t } = useTranslation();
   const { signedIn } = useSession();
-  const [tab, setTab] = useState<(typeof TABS)[number]>("profile");
+  // The tab IS the URL (review F7): a link to ?tab=bonuses switches it even on this page, and a reload keeps it.
+  const search = Route.useSearch();
+  const navigate = Route.useNavigate();
+  const tab: Tab = search.tab ?? "profile";
+  const setTab = (next: Tab) => void navigate({ search: next === "profile" ? {} : { tab: next }, replace: true });
   return (
     <Shell>
       {signedIn ? (
@@ -37,11 +50,11 @@ function AccountPage() {
             ))}
           </div>
           <div role="tabpanel" id={`panel-${tab}`} aria-labelledby={`tab-${tab}`}>
-            {tab === "profile" ? <ProfileTab /> : tab === "security" ? <SecurityTab /> : <SessionsTab />}
+            {tab === "profile" ? <ProfileTab /> : tab === "security" ? <SecurityTab /> : tab === "bonuses" ? <Bonuses variant="page" /> : <SessionsTab />}
           </div>
         </>
       ) : (
-        <SignInGate title={t("account.gateTitle")} returnTo="/account" />
+        <SignInGate title={t("account.gateTitle")} returnTo={search.tab ? `/account?tab=${search.tab}` : "/account"} />
       )}
     </Shell>
   );

@@ -35,9 +35,16 @@ describe("the live balance (P3-28)", () => {
 
   it("the details panel splits cash and bonus and counts the bonuses", async () => {
     const user = userEvent.setup();
+    const peso = { steps: [{ stepNumber: 1, currency: "PHP", intervals: [] }] };
     server.use(signedIn(),
-      http.get("*/api/bonus", () => HttpResponse.json([{ bonus: {}, hasPendingActivation: false }, { bonus: {}, hasPendingActivation: false }, { bonus: {}, hasPendingActivation: true }])),
-      http.get("*/api/bonus/active", () => HttpResponse.json([{ status: "active" }, { status: "completed" }])));
+      // P3-29: claimable (bonus's answer) in the skin's currency counts; a pending or a EUR-only one does not.
+      http.get("*/api/bonus", () => HttpResponse.json([
+        { bonus: { id: "b1", ...peso }, hasPendingActivation: false, claimable: true },
+        { bonus: { id: "b2", ...peso }, hasPendingActivation: false, claimable: true },
+        { bonus: { id: "b3", ...peso }, hasPendingActivation: true, claimable: false },
+        { bonus: { id: "b4", steps: [{ stepNumber: 1, currency: "EUR", intervals: [] }] }, hasPendingActivation: false, claimable: true },
+      ])),
+      http.get("*/api/bonus/active", () => HttpResponse.json([{ bonusId: "b0", status: "active" }, { bonusId: "b9", status: "completed" }])));
     renderRoute("/vip");
     await waitFor(() => expect(fakeHub.started).toBe(1));
     act(() => fakeHub.push([{ realCents: 948050, bonusCents: 300000 }]));

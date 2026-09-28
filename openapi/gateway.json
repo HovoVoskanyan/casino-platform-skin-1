@@ -2270,6 +2270,37 @@
         ]
       }
     },
+    "/api/bonus/freebets/claimable": {
+      "get": {
+        "tags": [
+          "Bonus (player)"
+        ],
+        "summary": "Free-rounds campaigns the player can claim now — in window, with games, uses left (P3-29).",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ClaimableFreeBetResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "playerCookie": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/bonus/freebets/claim": {
       "post": {
         "tags": [
@@ -3731,7 +3762,8 @@
         "required": [
           "bonus",
           "hasPendingActivation",
-          "currentStepNumber"
+          "currentStepNumber",
+          "claimable"
         ],
         "type": "object",
         "properties": {
@@ -3747,6 +3779,9 @@
               "integer"
             ],
             "format": "int32"
+          },
+          "claimable": {
+            "type": "boolean"
           }
         }
       },
@@ -4137,6 +4172,59 @@
             "items": {
               "type": "string"
             }
+          }
+        }
+      },
+      "ClaimableFreeBetResponse": {
+        "required": [
+          "freeBetId",
+          "name",
+          "description",
+          "spinsPerGame",
+          "betLevel",
+          "gameIds",
+          "startAt",
+          "expireAt",
+          "usesRemaining"
+        ],
+        "type": "object",
+        "properties": {
+          "freeBetId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "spinsPerGame": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "betLevel": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "gameIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "startAt": {
+            "format": "date-time"
+          },
+          "expireAt": {
+            "format": "date-time"
+          },
+          "usesRemaining": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },

@@ -4,13 +4,14 @@ import { useTranslation } from "react-i18next";
 import { MASKED, peso } from "@/lib/money";
 import { cn } from "@/lib/utils";
 import { useBalance, useBalanceHidden } from "./balance-store";
-import { useBonusCounts } from "./bonus-api";
+import { useBonusCounts } from "@/features/bonus/api";
+import { bonusDrawer } from "@/features/bonus/bonus-drawer";
 
 /**
  * Design (Header, signed in): the balance box — "Balance" + the live total (masked when the shared Hide balance
  * setting is on, "—" while unknown) linking to the Wallet — and a chevron opening "Balance details": Cash balance,
  * Bonus balance, the Available to claim / Active bonuses counts and "View my bonuses". Closes on an outside press and
- * on Escape. The bonuses drawer is not built yet (P5-07's panel on the skin), so "View my bonuses" goes to Promotions.
+ * on Escape. "View my bonuses" opens the bonuses drawer in place (P3-29), handing focus back to the chevron on close.
  */
 export function BalanceMenu() {
   const { t } = useTranslation();
@@ -18,6 +19,7 @@ export function BalanceMenu() {
   const [hidden] = useBalanceHidden();
   const [open, setOpen] = useState(false);
   const box = useRef<HTMLSpanElement>(null);
+  const chevron = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -39,16 +41,16 @@ export function BalanceMenu() {
         <span className="hidden text-[12px] font-semibold text-cc-lavender md:inline">{t("nav.balance")}</span>
         <span className="tabular" data-testid="header-balance">{text}</span>
       </Link>
-      <button type="button" aria-label={t("balance.showDetails")} aria-expanded={open} aria-haspopup="dialog" onClick={() => setOpen((o) => !o)}
+      <button ref={chevron} type="button" aria-label={t("balance.showDetails")} aria-expanded={open} aria-haspopup="dialog" onClick={() => setOpen((o) => !o)}
         className="flex h-full w-8 items-center justify-center rounded-r-cc border-l border-[rgba(167,139,250,.2)] text-[10px] text-cc-control hover:bg-[rgba(167,139,250,.12)] md:w-[34px]">
         {open ? "▲" : "▼"}
       </button>
-      {open ? <BalancePanel onClose={() => setOpen(false)} /> : null}
+      {open ? <BalancePanel onClose={() => setOpen(false)} onBonuses={() => { setOpen(false); bonusDrawer.open(chevron.current); }} /> : null}
     </span>
   );
 }
 
-function BalancePanel({ onClose }: { onClose: () => void }) {
+function BalancePanel({ onClose, onBonuses }: { onClose: () => void; onBonuses: () => void }) {
   const { t } = useTranslation();
   const balance = useBalance();
   const [hidden] = useBalanceHidden();
@@ -80,9 +82,9 @@ function BalancePanel({ onClose }: { onClose: () => void }) {
           <Count label={t("balance.activeBonuses")} value={bonuses.isPending ? "—" : String(bonuses.activeBonuses)} />
         </div>
       )}
-      <Link to="/promotions" onClick={onClose} className="flex min-h-[46px] items-center justify-center rounded-cc-lg bg-[image:var(--cc-gold-cta)] text-[14.5px] font-extrabold text-[#2c1400]">
+      <button type="button" onClick={onBonuses} className="flex min-h-[46px] items-center justify-center rounded-cc-lg bg-[image:var(--cc-gold-cta)] text-[14.5px] font-extrabold text-[#2c1400]">
         {t("balance.viewBonuses")}
-      </Link>
+      </button>
     </div>
   );
 }

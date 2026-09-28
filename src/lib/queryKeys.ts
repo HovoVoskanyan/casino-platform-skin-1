@@ -16,6 +16,11 @@ export const queryKeys = {
     /** P3-28 — bonus's catalogue (what can be claimed) and the player's bonuses, for the balance panel's counts. */
     bonusCatalog: () => [...queryKeys.session.all, "bonus", "catalog"] as const,
     bonusActive: () => [...queryKeys.session.all, "bonus", "active"] as const,
+    /** P3-29 — My bonuses: free rounds held, and the free-rounds campaigns a claim would accept now. */
+    bonusFreeBets: () => [...queryKeys.session.all, "bonus", "freebets"] as const,
+    bonusClaimableSpins: () => [...queryKeys.session.all, "bonus", "freebets-claimable"] as const,
+    /** Everything bonus answers for this player — a claim or a grant refreshes it all. */
+    bonusAll: () => [...queryKeys.session.all, "bonus"] as const,
     /** P3-28 — whether a launch of this game may be bonus-funded (the "play with your bonus?" prompt). */
     launchEligibility: (gameId: string) => [...queryKeys.session.all, "bonus", "launch-eligibility", gameId] as const,
     /** P3-28 — payments: the methods (per direction) and the player's history (per filter). */
