@@ -8,6 +8,7 @@ import { queryKeys } from "@/lib/queryKeys";
 import { cn } from "@/lib/utils";
 import { useGame } from "@/features/lobby/api";
 import { useBalance, useBalanceHidden } from "@/features/wallet/balance-store";
+import { SupportButton } from "@/features/support/support-button";
 import {
   bonusQueries, isAwaiting, sections, useBonusData, useClaimBonus, useClaimSpins, type ClaimableFreeBet, type PlayerFreeBet,
 } from "./api";
@@ -210,7 +211,7 @@ export function Bonuses({ variant }: { variant: "page" | "panel" }) {
           <span className="text-[13.5px] leading-[1.55] font-semibold text-[#fca5a5]">{t("bonus.loadFailed")}</span>
           <div className="flex flex-wrap gap-[9px]">
             <button type="button" onClick={() => void bonus.refetch()} className={cn(GOLD, "px-[18px]")}>{t("common.retry")}</button>
-            <a href="/#support" className="flex min-h-11 items-center rounded-cc border border-[rgba(167,139,250,.32)] bg-white/[.04] px-[18px] text-[13.5px] font-bold text-cc-ink hover:bg-white/[.08]">{t("bonus.support")}</a>
+            <SupportButton className="flex min-h-11 items-center rounded-cc border border-[rgba(167,139,250,.32)] bg-white/[.04] px-[18px] text-[13.5px] font-bold text-cc-ink hover:bg-white/[.08]">{t("bonus.support")}</SupportButton>
           </div>
         </div>
       ) : s ? (

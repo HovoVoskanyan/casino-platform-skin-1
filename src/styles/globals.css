@@ -79,8 +79,10 @@
   --radius-cc-2xl: 22px;
   --animate-cc-fade: cc-fade 0.18s ease-out;
   --animate-cc-rise: cc-rise 0.22s ease-out;
+  --animate-cc-ring: cc-ring 2.4s ease-out infinite;
   @keyframes cc-fade { from { opacity: 0; } to { opacity: 1; } }
   @keyframes cc-rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  @keyframes cc-ring { 0% { transform: scale(1); opacity: .8; } 100% { transform: scale(1.35); opacity: 0; } }
 }
 
 @layer base {

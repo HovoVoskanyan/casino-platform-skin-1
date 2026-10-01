@@ -26,6 +26,9 @@ export const queryKeys = {
     /** P3-28 — payments: the methods (per direction) and the player's history (per filter). */
     paymentMethods: (direction: "deposit" | "withdraw") => [...queryKeys.session.all, "payments", "methods", direction] as const,
     paymentHistory: (type: string) => [...queryKeys.session.all, "payments", "history", type] as const,
+    /** P3-31 — the support panel's tappable questions, per language. (The thread itself is the hub-fed support store.) */
+    supportCanned: (language: string) => [...queryKeys.session.all, "support", "canned", language] as const,
+    supportCannedAll: () => [...queryKeys.session.all, "support", "canned"] as const,
   },
   /**
    * P3-27: the guest's lobby reads. Every key carries the UI language, because core answers each read in the

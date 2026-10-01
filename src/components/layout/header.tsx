@@ -7,6 +7,8 @@ import { useSession } from "@/features/auth/session";
 import { Button } from "@/components/ui/button";
 import { BalanceMenu } from "@/features/wallet/balance-menu";
 import { bonusDrawer } from "@/features/bonus/bonus-drawer";
+import { SupportButton, UnreadDot } from "@/features/support/support-button";
+import { useSupportUnread } from "@/features/support/support-store";
 
 const NAV = [
   { key: "games", to: "/games" },
@@ -25,6 +27,7 @@ export function Header() {
   const { signedIn } = useSession();
   const path = useRouterState({ select: (s) => s.location.pathname });
   const [menuOpen, setMenuOpen] = useState(false);
+  const unread = useSupportUnread();
   const menuButton = useRef<HTMLButtonElement>(null);
   const current = path + (typeof window !== "undefined" ? window.location.search : "");
 
@@ -45,7 +48,7 @@ export function Header() {
                 </Link>
               );
             })}
-            <a href="/#support" className="flex h-10 items-center rounded-cc px-[14px] text-[15px] font-semibold text-[#bfaed8] hover:bg-white/[.05] hover:text-cc-ink">{t("nav.help")}</a>
+            <SupportButton className="flex h-10 items-center rounded-cc px-[14px] text-[15px] font-semibold text-[#bfaed8] hover:bg-white/[.05] hover:text-cc-ink">{t("nav.help")}</SupportButton>
           </nav>
         </div>
 
@@ -66,7 +69,11 @@ export function Header() {
           </>
         )}
 
-        <button ref={menuButton} type="button" aria-label="Menu" aria-expanded={menuOpen} onClick={() => setMenuOpen((o) => !o)} className="flex h-10 w-10 flex-none items-center justify-center rounded-cc border border-cc-line-strong bg-white/[.02] text-cc-text md:hidden">☰</button>
+        <button ref={menuButton} type="button" aria-label="Menu" aria-expanded={menuOpen} onClick={() => setMenuOpen((o) => !o)} className="relative flex h-10 w-10 flex-none items-center justify-center rounded-cc border border-cc-line-strong bg-white/[.02] text-cc-text md:hidden">
+          ☰
+          {/* the burger holds Help on phones: support's unread dot shows on it while the menu is shut */}
+          {!menuOpen ? <UnreadDot count={unread} className="absolute -top-[6px] -right-[6px]" /> : null}
+        </button>
       </div>
 
       {menuOpen ? (
@@ -76,6 +83,7 @@ export function Header() {
           ))}
           <Link to="/wallet" onClick={() => setMenuOpen(false)} className="flex h-11 items-center rounded-cc px-3 text-[15px] font-semibold text-cc-text hover:bg-white/[.05]">{t("nav.wallet")}</Link>
           <Link to="/account" onClick={() => setMenuOpen(false)} className="flex h-11 items-center rounded-cc px-3 text-[15px] font-semibold text-cc-text hover:bg-white/[.05]">{t("nav.myAccount")}</Link>
+          <SupportButton className="flex h-11 items-center rounded-cc px-3 text-[15px] font-semibold text-cc-text hover:bg-white/[.05]">{t("nav.help")}</SupportButton>
           {signedIn ? (
             <button type="button" onClick={() => { setMenuOpen(false); bonusDrawer.open(menuButton.current); }} className="flex h-11 items-center rounded-cc px-3 text-left text-[15px] font-semibold text-cc-text hover:bg-white/[.05]">{t("nav.myBonuses")}</button>
           ) : null}

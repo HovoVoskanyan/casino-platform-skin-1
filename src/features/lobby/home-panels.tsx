@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { SectionTitle } from "@/components/ui/section-title";
+import { SupportButton } from "@/features/support/support-button";
 
 /**
  * Design (Home): the GCash / Maya panel and the trust strip. Static marketing copy — the methods themselves are
@@ -37,12 +38,20 @@ export function TrustStrip() {
   ];
   return (
     <section aria-label={t("home.trust")} className="flex flex-wrap items-center gap-2 rounded-cc-xl border border-cc-line bg-white/[.02] px-4 py-[14px] md:gap-4 md:px-6 md:py-5">
-      {items.map((i) => (
-        <div key={i.key} className="flex min-w-full flex-1 items-center gap-3 md:min-w-[170px]">
-          <img src={i.img} alt="" className="h-[38px] w-[38px] object-contain drop-shadow-[0_4px_8px_rgba(0,0,0,.85)]" />
-          <span className="text-[14px] font-extrabold text-cc-ink">{t(`home.trust.${i.key}`)}</span>
-        </div>
-      ))}
+      {items.map((i) => {
+        const tile = (
+          <>
+            <img src={i.img} alt="" className="h-[38px] w-[38px] object-contain drop-shadow-[0_4px_8px_rgba(0,0,0,.85)]" />
+            <span className="text-[14px] font-extrabold text-cc-ink">{t(`home.trust.${i.key}`)}</span>
+          </>
+        );
+        // The support tile opens the support panel (P3-31); the other two are statements.
+        return i.key === "support" ? (
+          <SupportButton key={i.key} className="flex min-w-full flex-1 items-center gap-3 rounded-cc hover:bg-white/[.03] md:min-w-[170px]">{tile}</SupportButton>
+        ) : (
+          <div key={i.key} className="flex min-w-full flex-1 items-center gap-3 md:min-w-[170px]">{tile}</div>
+        );
+      })}
     </section>
   );
 }

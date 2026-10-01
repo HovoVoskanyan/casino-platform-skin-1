@@ -2,7 +2,8 @@ import "@testing-library/jest-dom/vitest";
 import { afterAll, afterEach, beforeAll } from "vitest";
 import { server } from "./server";
 import i18n from "@/i18n";
-import { fakeHub, installFakeHub } from "./fake-hub";
+import { fakeHub, fakeSupportHub, installFakeHub } from "./fake-hub";
+import { supportPanel, supportStore } from "@/features/support/support-store";
 import { balanceStore } from "@/features/wallet/balance-store";
 
 installFakeHub();
@@ -14,6 +15,9 @@ beforeAll(async () => {
 afterEach(() => {
   server.resetHandlers();
   fakeHub.reset();
+  fakeSupportHub.reset();
+  supportPanel.close();
+  supportStore.reset();
   balanceStore.set({ status: "unknown" });
   localStorage.clear();
 });

@@ -27,6 +27,9 @@ export const handlers = [
   http.get("*/api/bonus/active", () => HttpResponse.json([])),
   http.get("*/api/bonus/freebets", () => HttpResponse.json([])),
   http.get("*/api/bonus/freebets/claimable", () => HttpResponse.json([])),
+  // P3-31: a signed-in player's support thread before the first line, and no canned questions.
+  http.get("*/api/v1/support/conversation", () => HttpResponse.json({ conversation: null, messages: [], hasMore: false })),
+  http.get("*/api/v1/support/canned", () => HttpResponse.json([])),
   http.get("*/api/id/sessions", () => problem(401, "UNAUTHORIZED")),
   http.post("*/api/id/auth/refresh", () => problem(401, "REFRESH_TOKEN_INVALID")),
   http.post("*/api/id/sessions/logout", () => new HttpResponse(null, { status: 204 })),

@@ -2630,6 +2630,206 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/support/conversation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Open the panel: my conversation on this skin (null before my first message) and its latest messages, oldest first. */
+        get: {
+            parameters: {
+                query?: {
+                    limit?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PlayerChatResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/support/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Older history: the messages before `before` (a message id), oldest first. */
+        get: {
+            parameters: {
+                query?: {
+                    before?: string;
+                    limit?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PlayerMessagePageResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        /** Write to support: `text`, or tap a canned question (`cannedAnswerId` — the answer comes back as a system line). The same `clientMessageId` sent twice lands once and answers the same lines. Rate-limited per conversation (429). */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["PlayerSendRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PlayerSendResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Too Many Requests */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/support/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** I've seen everything support wrote — my unread count goes to zero. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/support/canned": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The questions I can tap for an instant answer, for this skin (and `language`, e.g. en), in display order. */
+        get: {
+            parameters: {
+                query?: {
+                    language?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["CannedQuestionResponse"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -3176,6 +3376,55 @@ export interface components {
             bonusPercent: number;
             /** Format: int64 */
             maxBonusCents: null | number;
+        };
+        PlayerChatResponse: {
+            conversation: null | components["schemas"]["PlayerConversationResponse"];
+            messages: components["schemas"]["PlayerMessageResponse"][];
+            hasMore: boolean;
+        };
+        PlayerMessagePageResponse: {
+            items: components["schemas"]["PlayerMessageResponse"][];
+            hasMore: boolean;
+        };
+        PlayerSendRequest: {
+            /** Format: uuid */
+            clientMessageId: string;
+            text: null | string;
+            /** Format: uuid */
+            cannedAnswerId: null | string;
+        };
+        PlayerSendResponse: {
+            conversation: components["schemas"]["PlayerConversationResponse"];
+            messages: components["schemas"]["PlayerMessageResponse"][];
+        };
+        CannedQuestionResponse: {
+            /** Format: uuid */
+            id: string;
+            question: string;
+        };
+        PlayerConversationResponse: {
+            /** Format: uuid */
+            id: string;
+            status: string;
+            /** Format: int32 */
+            unread: number;
+            /** Format: date-time */
+            lastMessageAt: null | string;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        PlayerMessageResponse: {
+            /** Format: uuid */
+            id: string;
+            author: string;
+            authorName: null | string;
+            body: string;
+            /** Format: uuid */
+            cannedAnswerId: null | string;
+            /** Format: uuid */
+            clientMessageId: null | string;
+            /** Format: date-time */
+            createdAt: string;
         };
         CookieSessionResponse: {
             /** Format: date-time */

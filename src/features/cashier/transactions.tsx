@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { peso } from "@/lib/money";
 import { cn } from "@/lib/utils";
+import { SupportButton } from "@/features/support/support-button";
 import { chipOf, useHistory, useMethods, type HistoryFilter, type Payment } from "./api";
 import { StatusChip } from "./status-chip";
 
@@ -144,7 +145,7 @@ function TransactionDialog({ payment, method, onClose }: { payment: Payment | nu
         </div>
       </dl>
       {explain ? <p className="m-0 text-[13.5px] leading-[1.55] text-cc-text">{t(explain)}</p> : null}
-      <p className="m-0 text-[13px] text-cc-lavender">{t("shell.needHelp")} <a href="/#support" className="font-bold text-cc-gold">{t("shell.support")}</a></p>
+      <p className="m-0 text-[13px] text-cc-lavender">{t("shell.needHelp")} <SupportButton dot={false} className="inline font-bold text-cc-gold">{t("shell.support")}</SupportButton></p>
     </Dialog>
   );
 }

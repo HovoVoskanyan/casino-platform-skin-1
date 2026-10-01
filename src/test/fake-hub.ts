@@ -1,5 +1,7 @@
 import type { HubConnection } from "@microsoft/signalr";
 import { hubFactory } from "@/features/wallet/balance-connection";
+import { supportHubFactory } from "@/features/support/support-connection";
+import type { PlayerConversation, PlayerMessage } from "@/features/support/support-store";
 import type { BalanceSnapshot, WalletAccount } from "@/features/wallet/balance-store";
 
 /**
@@ -39,27 +41,57 @@ export const fakeHub = {
   },
 };
 
+/**
+ * P3-31 — chat's support hub in vitest, the same kind of fake: `message(...)` / `conversation(...)` deliver chat's two
+ * pushes; `reconnected()` is SignalR back after a drop (the panel re-reads the thread).
+ */
+export const fakeSupportHub = {
+  handlers: new Map<string, Handler>(),
+  reconnected: null as Handler | null,
+  closed: null as Handler | null,
+  started: 0,
+  stopped: 0,
+  failNextStarts: [] as Error[],
+  message(message: PlayerMessage) {
+    this.handlers.get("message")?.(message);
+  },
+  conversation(conversation: PlayerConversation) {
+    this.handlers.get("conversation")?.(conversation);
+  },
+  reset() {
+    this.handlers.clear();
+    this.reconnected = null;
+    this.closed = null;
+    this.started = 0;
+    this.stopped = 0;
+    this.failNextStarts = [];
+  },
+};
+
+function fakeConnection(hub: { handlers: Map<string, Handler>; started: number; stopped: number; failNextStarts: Error[]; closed: Handler | null }, extra: Partial<Record<"onreconnecting" | "onreconnected", (h: Handler) => void>>) {
+  let state = "Disconnected";
+  return {
+    get state() {
+      return state;
+    },
+    on: (name: string, handler: Handler) => void hub.handlers.set(name, handler),
+    onreconnecting: extra.onreconnecting ?? (() => {}),
+    onreconnected: extra.onreconnected ?? (() => {}),
+    onclose: (handler: Handler) => void (hub.closed = handler),
+    start: async () => {
+      hub.started++;
+      const failure = hub.failNextStarts.shift();
+      if (failure) throw failure;
+      state = "Connected";
+    },
+    stop: async () => {
+      state = "Disconnected";
+      hub.stopped++;
+    },
+  } as unknown as HubConnection;
+}
+
 export function installFakeHub() {
-  hubFactory.create = () => {
-    let state = "Disconnected";
-    return {
-      get state() {
-        return state;
-      },
-      on: (name: string, handler: Handler) => void fakeHub.handlers.set(name, handler),
-      onreconnecting: (handler: Handler) => void (fakeHub.reconnecting = handler),
-      onreconnected: () => {},
-      onclose: (handler: Handler) => void (fakeHub.closed = handler),
-      start: async () => {
-        fakeHub.started++;
-        const failure = fakeHub.failNextStarts.shift();
-        if (failure) throw failure;
-        state = "Connected";
-      },
-      stop: async () => {
-        state = "Disconnected";
-        fakeHub.stopped++;
-      },
-    } as unknown as HubConnection;
-  };
+  hubFactory.create = () => fakeConnection(fakeHub, { onreconnecting: (handler) => void (fakeHub.reconnecting = handler) });
+  supportHubFactory.create = () => fakeConnection(fakeSupportHub, { onreconnected: (handler) => void (fakeSupportHub.reconnected = handler) });
 }

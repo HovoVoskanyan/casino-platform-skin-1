@@ -1,6 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
+import { SupportButton } from "@/features/support/support-button";
 
 const LINKS = ["responsible-gaming", "faq", "terms", "privacy"] as const;
 
@@ -26,7 +27,7 @@ export function Footer() {
             </Link>
           );
         })}
-        <a href="#support" className="flex min-h-11 items-center text-[13px] font-medium text-cc-lavender hover:text-cc-ink md:min-h-0">{t("shell.support")}</a>
+        <SupportButton className="flex min-h-11 items-center text-[13px] font-medium text-cc-lavender hover:text-cc-ink md:min-h-0">{t("shell.support")}</SupportButton>
       </div>
       <span className="w-full font-brand text-[19px] font-bold leading-[1.15] text-[#f4b83d] md:ml-auto md:w-auto md:text-right" dangerouslySetInnerHTML={{ __html: `${t("shell.footerTagline")} <span style="font-size:14px;color:#ff5d7d">♥</span>` }} />
     </footer>
