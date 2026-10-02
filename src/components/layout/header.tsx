@@ -9,6 +9,7 @@ import { BalanceMenu } from "@/features/wallet/balance-menu";
 import { bonusDrawer } from "@/features/bonus/bonus-drawer";
 import { SupportButton, UnreadDot } from "@/features/support/support-button";
 import { useSupportUnread } from "@/features/support/support-store";
+import { NotificationsBell } from "@/features/notifications/notifications-bell";
 
 const NAV = [
   { key: "games", to: "/games" },
@@ -58,6 +59,8 @@ export function Header() {
           <>
             <BalanceMenu />
             <Button asChild variant="primary" size="md" className="hidden md:inline-flex"><Link to="/wallet" hash="deposit">{t("nav.deposit")}</Link></Button>
+            {/* P3-30: the bell sits with the account button */}
+            <NotificationsBell />
             <Link to="/account" aria-label={t("nav.myAccount")} className="flex h-10 w-10 flex-none items-center justify-center rounded-cc border border-cc-line-strong bg-white/[.04] text-[13px] font-extrabold text-cc-text">
               <UserGlyph />
             </Link>

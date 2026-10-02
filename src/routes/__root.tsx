@@ -11,6 +11,8 @@ import { BalanceConnection } from "@/features/wallet/balance-connection";
 import { BonusDrawer } from "@/features/bonus/bonus-drawer";
 import { SupportConnection } from "@/features/support/support-connection";
 import { SupportPanel } from "@/features/support/support-panel";
+import { NotificationsConnection } from "@/features/notifications/notifications-connection";
+import { NotificationsDrawer } from "@/features/notifications/notifications-drawer";
 import { captureAttribution } from "@/features/auth/attribution";
 import { authDialog } from "@/features/auth/auth-dialog-state";
 import { queryKeys } from "@/lib/queryKeys";
@@ -64,6 +66,9 @@ function RootLayout() {
       {/* P3-31: chat's push hub while signed in (replies light the Help dot with the panel closed); the panel for everyone */}
       {state.signedIn ? <SupportConnection /> : null}
       <SupportPanel />
+      {/* P3-30: the notifications push hub and drawer, signed-in players only */}
+      {state.signedIn ? <NotificationsConnection /> : null}
+      {state.signedIn ? <NotificationsDrawer /> : null}
       <Toaster />
       <Suspense fallback={null}>
         <Devtools />

@@ -2579,6 +2579,215 @@
           }
         ]
       }
+    },
+    "/api/v1/notifications": {
+      "get": {
+        "tags": [
+          "Notifications (player)"
+        ],
+        "summary": "My notices, newest first (dismissed ones left out), with my unread count. Pass `nextCursor` back as `cursor` for older ones.",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlayerNoticePageResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "playerCookie": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/notifications/unread-count": {
+      "get": {
+        "tags": [
+          "Notifications (player)"
+        ],
+        "summary": "The bell's badge: how many of my notices I haven't read.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnreadCountResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "playerCookie": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/notifications/{id}/read": {
+      "post": {
+        "tags": [
+          "Notifications (player)"
+        ],
+        "summary": "I've read this one (idempotent). Answers my new unread count.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnreadCountResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "playerCookie": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/notifications/read-all": {
+      "post": {
+        "tags": [
+          "Notifications (player)"
+        ],
+        "summary": "I've seen everything — my unread count goes to zero.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnreadCountResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "playerCookie": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/notifications/{id}/dismiss": {
+      "post": {
+        "tags": [
+          "Notifications (player)"
+        ],
+        "summary": "Remove this one from my list (it counts as read). Answers my new unread count.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnreadCountResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "playerCookie": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -4914,6 +5123,154 @@
           },
           "createdAt": {
             "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "PlayerNoticePageResponse": {
+        "required": [
+          "items",
+          "nextCursor",
+          "unreadCount"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlayerNoticeResponse"
+            }
+          },
+          "nextCursor": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "unreadCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "UnreadCountResponse": {
+        "required": [
+          "unreadCount"
+        ],
+        "type": "object",
+        "properties": {
+          "unreadCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "PlayerNoticeResponse": {
+        "required": [
+          "id",
+          "kind",
+          "category",
+          "title",
+          "body",
+          "link",
+          "template",
+          "params",
+          "publishedAt",
+          "readAt"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "body": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "link": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "template": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "params": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/NoticeParamsResponse"
+              }
+            ]
+          },
+          "publishedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "readAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          }
+        }
+      },
+      "NoticeParamsResponse": {
+        "required": [
+          "amountCents",
+          "currency",
+          "count",
+          "expiresAt"
+        ],
+        "type": "object",
+        "properties": {
+          "amountCents": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int64"
+          },
+          "currency": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "count": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "expiresAt": {
+            "type": [
+              "null",
+              "string"
+            ],
             "format": "date-time"
           }
         }

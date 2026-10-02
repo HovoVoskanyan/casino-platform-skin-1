@@ -30,6 +30,9 @@ export const handlers = [
   // P3-31: a signed-in player's support thread before the first line, and no canned questions.
   http.get("*/api/v1/support/conversation", () => HttpResponse.json({ conversation: null, messages: [], hasMore: false })),
   http.get("*/api/v1/support/canned", () => HttpResponse.json([])),
+  // P3-30: a signed-in player with no notices.
+  http.get("*/api/v1/notifications/unread-count", () => HttpResponse.json({ unreadCount: 0 })),
+  http.get("*/api/v1/notifications", () => HttpResponse.json({ items: [], nextCursor: null, unreadCount: 0 })),
   http.get("*/api/id/sessions", () => problem(401, "UNAUTHORIZED")),
   http.post("*/api/id/auth/refresh", () => problem(401, "REFRESH_TOKEN_INVALID")),
   http.post("*/api/id/sessions/logout", () => new HttpResponse(null, { status: 204 })),

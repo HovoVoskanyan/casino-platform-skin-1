@@ -29,6 +29,10 @@ export const queryKeys = {
     /** P3-31 — the support panel's tappable questions, per language. (The thread itself is the hub-fed support store.) */
     supportCanned: (language: string) => [...queryKeys.session.all, "support", "canned", language] as const,
     supportCannedAll: () => [...queryKeys.session.all, "support", "canned"] as const,
+    /** P3-30 — in-site notifications: the drawer's pages and the bell's count (both fed live by the notifications hub). */
+    notificationsAll: () => [...queryKeys.session.all, "notifications"] as const,
+    notifications: () => [...queryKeys.session.all, "notifications", "list"] as const,
+    notificationsUnread: () => [...queryKeys.session.all, "notifications", "unread"] as const,
   },
   /**
    * P3-27: the guest's lobby reads. Every key carries the UI language, because core answers each read in the
