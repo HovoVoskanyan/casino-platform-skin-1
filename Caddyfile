@@ -1,22 +1,33 @@
 # The skin front container: SPA on / (history fallback), /api/* → the gateway, prefix KEPT (the gateway serves
-# /api/* itself; only the BO front strips). GATEWAY_UPSTREAM defaults to the compose service name. On a real
-# deployment the platform's edge Caddy already routes /api/* to the gateway on the skin domain (Caddyfile.staging),
-# so there this container only serves the static files.
+# /api/* itself; only the BO front strips). GATEWAY_UPSTREAM defaults to the compose service name. On the server the
+# host's nginx sends /api/* and /r/* on a skin domain straight to the gateway (deploy/SERVER.md), so there this
+# container only serves the static files; its own proxying is the laptop's path.
 {
 	admin off
 	auto_https off
+	# Behind the server's nginx (a private-range hop on the docker bridge): {client_ip} is the visitor from the
+	# X-Forwarded-For nginx sets. Strict = the right-most address that is not a trusted proxy, so a chain a client forged
+	# in front of the real one is ignored. On a laptop the browser connects directly and there is no header to believe.
+	servers {
+		trusted_proxies static private_ranges
+		trusted_proxies_strict
+	}
 }
 
 :80 {
 	encode gzip
 
 	handle /api/* {
-		reverse_proxy {$GATEWAY_UPSTREAM:gateway:8080}
+		reverse_proxy {$GATEWAY_UPSTREAM:gateway:8080} {
+			header_up X-Forwarded-For {client_ip}
+		}
 	}
 
 	# P7-03: tracking links are the gateway's too (the click, the 90-day cookie, the redirect) — never the SPA's fallback.
 	handle /r/* {
-		reverse_proxy {$GATEWAY_UPSTREAM:gateway:8080}
+		reverse_proxy {$GATEWAY_UPSTREAM:gateway:8080} {
+			header_up X-Forwarded-For {client_ip}
+		}
 	}
 
 	handle {
