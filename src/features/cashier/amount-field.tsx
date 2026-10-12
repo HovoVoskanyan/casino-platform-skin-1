@@ -21,7 +21,7 @@ export function AmountField({ id, label, value, onChange, error, minCents, maxCe
         <div className="flex flex-wrap gap-2">
           {quick.map((pesos) => (
             <button key={pesos} type="button" onClick={() => onChange(String(pesos))}
-              className="h-9 rounded-full border border-[rgba(167,139,250,.24)] bg-white/[.03] px-4 text-[13px] font-bold text-[#bfaed8] hover:text-cc-ink">
+              className="tap-44 relative h-9 rounded-full border border-[rgba(167,139,250,.24)] bg-white/[.03] px-4 text-[13px] font-bold text-[#bfaed8] hover:text-cc-ink">
               {peso(pesos * 100).replace(".00", "")}
             </button>
           ))}

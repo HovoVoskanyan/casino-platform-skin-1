@@ -117,7 +117,7 @@ function AuthDialogContent({ initialMode }: { initialMode: AuthMode }) {
       <DialogPrimitive.Overlay className="fixed inset-0 z-[200] flex items-stretch justify-center overflow-auto bg-cc-canvas-base p-0 animate-cc-fade sm:items-center sm:bg-cc-scrim sm:p-6">
         <DialogPrimitive.Content
           aria-describedby={undefined}
-          className="relative flex w-full max-w-full flex-col gap-[18px] bg-[image:var(--cc-dialog)] px-5 pb-[calc(40px+env(safe-area-inset-bottom))] shadow-[0_30px_80px_rgba(4,1,9,.7)] outline-none animate-cc-rise sm:w-[476px] sm:max-h-[calc(100vh-48px)] sm:overflow-auto sm:rounded-cc-2xl sm:border sm:border-cc-line-strong sm:px-7 sm:pb-6"
+          className="relative flex w-full max-w-full flex-col gap-[18px] bg-[image:var(--cc-dialog)] px-5 pb-[calc(40px+env(safe-area-inset-bottom))] shadow-[0_30px_80px_rgba(4,1,9,.7)] outline-none animate-cc-rise sm:w-[476px] sm:max-h-[calc(100dvh-48px)] sm:overflow-auto sm:rounded-cc-2xl sm:border sm:border-cc-line-strong sm:px-7 sm:pb-6"
         >
           <div className="sticky top-0 z-[2] -mx-5 flex items-start justify-between gap-3 border-b border-[rgba(167,139,250,.14)] bg-[#2a1049] px-5 pb-[14px] pt-[18px] sm:-mx-7 sm:px-7 sm:pt-[22px]">
             <img src="/chocho-logo-cut.png" alt="ChoCho" className="block h-11 w-[62px] flex-none object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,.5)]" />

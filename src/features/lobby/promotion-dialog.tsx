@@ -20,7 +20,7 @@ export function PromotionDialog({ id, onClose }: { id: string | null; onClose: (
     <DialogPrimitive.Root open={id !== null} onOpenChange={(open) => { if (!open) onClose(); }}>
       <DialogPrimitive.Portal>
         <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-cc-scrim backdrop-blur-[2px] data-[state=open]:animate-cc-fade" />
-        <DialogPrimitive.Content className="fixed inset-0 z-50 flex flex-col gap-4 overflow-y-auto bg-[image:var(--cc-dialog)] p-5 outline-none sm:inset-auto sm:top-1/2 sm:left-1/2 sm:max-h-[86vh] sm:w-[min(560px,calc(100vw-32px))] sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-cc-2xl sm:border sm:border-cc-line-strong sm:p-7 sm:shadow-[0_30px_80px_rgba(0,0,0,.6)]">
+        <DialogPrimitive.Content className="fixed inset-0 z-50 flex flex-col gap-4 overflow-y-auto bg-[image:var(--cc-dialog)] p-5 outline-none sm:inset-auto sm:top-1/2 sm:left-1/2 sm:max-h-[86dvh] sm:w-[min(560px,calc(100vw-32px))] sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-cc-2xl sm:border sm:border-cc-line-strong sm:p-7 sm:shadow-[0_30px_80px_rgba(0,0,0,.6)]">
           <div className="flex items-start gap-3">
             <span className="flex h-[52px] w-[52px] flex-none items-center justify-center rounded-cc-lg border border-[rgba(255,201,60,.28)] bg-[rgba(255,201,60,.08)]"><PromotionMark category={data?.category} /></span>
             <div className="flex min-w-0 flex-1 flex-col gap-1">

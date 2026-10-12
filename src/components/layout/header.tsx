@@ -33,11 +33,11 @@ export function Header() {
   const current = path + (typeof window !== "undefined" ? window.location.search : "");
 
   return (
-    <header className="sticky top-0 z-40 border-b border-[rgba(167,139,250,.16)] bg-[linear-gradient(180deg,rgba(29,12,53,.96)_0%,rgba(15,6,27,.96)_100%)] shadow-[0_10px_30px_rgba(6,3,11,.55)] backdrop-blur-xl">
-      <div className="mx-auto flex min-h-[66px] max-w-[1024px] items-center gap-2 px-4 py-[10px] md:min-h-[76px] md:px-[22px] md:py-3">
+    <header className="sticky top-0 z-40 short:static border-b border-[rgba(167,139,250,.16)] bg-[linear-gradient(180deg,rgba(29,12,53,.96)_0%,rgba(15,6,27,.96)_100%)] shadow-[0_10px_30px_rgba(6,3,11,.55)] backdrop-blur-xl">
+      <div className="mx-auto flex min-h-[66px] max-w-[1024px] items-center gap-[6px] px-4 py-[10px] min-[400px]:gap-2 md:min-h-[76px] md:px-[22px] md:py-3">
         <div className="flex min-w-0 items-center gap-2">
           <Link to="/" aria-label={t("nav.home")} className="block flex-none">
-            <img src="/chocho-logo-cut.png" alt="ChoCho" className="block h-10 w-[58px] object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,.5)] md:h-[50px] md:w-[72px]" />
+            <img src="/chocho-logo-cut.png" alt="ChoCho" className="block h-10 w-[48px] object-contain min-[400px]:w-[58px] drop-shadow-[0_4px_12px_rgba(0,0,0,.5)] md:h-[50px] md:w-[72px]" />
           </Link>
           <nav className="hidden items-center gap-[2px] md:flex" aria-label="Primary">
             {NAV.map((item) => {
@@ -53,7 +53,7 @@ export function Header() {
           </nav>
         </div>
 
-        <div className="min-w-2 flex-1" />
+        <div className="min-w-0 flex-1" />
 
         {signedIn ? (
           <>
@@ -61,7 +61,8 @@ export function Header() {
             <Button asChild variant="primary" size="md" className="hidden md:inline-flex"><Link to="/wallet" hash="deposit">{t("nav.deposit")}</Link></Button>
             {/* P3-30: the bell sits with the account button */}
             <NotificationsBell />
-            <Link to="/account" aria-label={t("nav.myAccount")} className="flex h-10 w-10 flex-none items-center justify-center rounded-cc border border-cc-line-strong bg-white/[.04] text-[13px] font-extrabold text-cc-text">
+            {/* under 400px the account button makes room for a long balance; My Account is in the burger menu */}
+            <Link to="/account" aria-label={t("nav.myAccount")} className="hidden h-10 w-10 flex-none min-[400px]:flex items-center justify-center rounded-cc border border-cc-line-strong bg-white/[.04] text-[13px] font-extrabold text-cc-text">
               <UserGlyph />
             </Link>
           </>
@@ -80,7 +81,7 @@ export function Header() {
       </div>
 
       {menuOpen ? (
-        <nav aria-label="Menu" className="mx-auto grid max-w-[1024px] gap-1 px-4 pb-4 md:hidden">
+        <nav aria-label="Menu" className="mx-auto grid max-w-[1024px] grid-cols-1 gap-1 px-4 pb-4 md:hidden">
           {NAV.map((item) => (
             <Link key={item.key} to={item.to} onClick={() => setMenuOpen(false)} className="flex h-11 items-center rounded-cc px-3 text-[15px] font-semibold text-cc-text hover:bg-white/[.05]">{t(`nav.${item.key}`)}</Link>
           ))}

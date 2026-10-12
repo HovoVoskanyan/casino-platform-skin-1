@@ -34,11 +34,11 @@ export function BalanceCard({ onDeposit, onWithdraw, onRetry }: { onDeposit: () 
       <div className="flex flex-wrap items-center gap-3">
         <span className="text-[11.5px] font-extrabold tracking-[1.3px] text-cc-lavender uppercase">{t("wallet.balanceLabel")}</span>
         <button type="button" aria-pressed={hidden} onClick={() => setHidden(!hidden)}
-          className="h-7 rounded-full border border-cc-line-strong bg-white/[.04] px-3 text-[12px] font-bold text-cc-control">
+          className="tap-44 relative h-7 rounded-full border border-cc-line-strong bg-white/[.04] px-3 text-[12px] font-bold text-cc-control">
           {t(hidden ? "wallet.showBalance" : "wallet.hideBalance")}
         </button>
       </div>
-      <span aria-live="polite" className="tabular text-[38px] leading-none font-extrabold tracking-[-1px] text-cc-ink" data-testid="wallet-total">{show(b.totalCents)}</span>
+      <span aria-live="polite" className="tabular text-[clamp(28px,9vw,38px)] leading-none font-extrabold tracking-[-1px] text-cc-ink" data-testid="wallet-total">{show(b.totalCents)}</span>
       {!hidden ? (
         <div className="flex flex-wrap gap-x-8 gap-y-3">
           <Figure label={t("wallet.availableToWithdraw")} value={peso(b.withdrawableCents)} />
@@ -46,8 +46,8 @@ export function BalanceCard({ onDeposit, onWithdraw, onRetry }: { onDeposit: () 
         </div>
       ) : null}
       <div className="flex flex-wrap gap-3">
-        <Button variant="primary" className="h-[52px] min-w-[132px] rounded-cc-lg text-[15px]" onClick={onDeposit}>{t("wallet.deposit")}</Button>
-        <Button variant="secondary" className="h-[52px] min-w-[132px] rounded-cc-lg border-[rgba(167,139,250,.42)] text-[15px]" onClick={onWithdraw}>{t("wallet.withdraw")}</Button>
+        <Button variant="primary" className="h-[52px] min-w-[120px] flex-1 rounded-cc-lg text-[15px] sm:flex-none sm:min-w-[132px]" onClick={onDeposit}>{t("wallet.deposit")}</Button>
+        <Button variant="secondary" className="h-[52px] min-w-[120px] flex-1 rounded-cc-lg sm:flex-none sm:min-w-[132px] border-[rgba(167,139,250,.42)] text-[15px]" onClick={onWithdraw}>{t("wallet.withdraw")}</Button>
       </div>
     </section>
   );

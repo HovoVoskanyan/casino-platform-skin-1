@@ -6,7 +6,7 @@ import { Footer } from "./footer";
 /** Design (UI Foundations): the canvas gradient behind a 1024px column, 26–30px between sections, 150px of room at the end for the bottom nav. */
 export function Shell({ children }: { children: ReactNode }) {
   return (
-    <div className="flex min-h-screen justify-center">
+    <div className="flex min-h-dvh justify-center">
       <div className="flex w-full max-w-[1024px] min-w-0 flex-col gap-[clamp(26px,4vw,30px)]">
         <Header />
         <main className="flex flex-col gap-[clamp(26px,4vw,30px)] px-4 md:px-[22px]">{children}</main>

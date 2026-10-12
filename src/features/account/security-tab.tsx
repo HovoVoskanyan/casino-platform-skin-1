@@ -34,7 +34,7 @@ export function SecurityTab() {
   if (account.isPending) return <div aria-hidden className="h-[320px] animate-pulse rounded-cc-xl border border-cc-line bg-cc-surface-raised" />;
   if (account.isError) return <Notice tone="error">{t("common.loadFailed")}</Notice>;
   return (
-    <div className="grid gap-4 md:grid-cols-2">
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
       <ContactsCard account={account.data} errorText={errorText} />
       <SignInMethodsCard account={account.data} errorText={errorText} />
       {account.data.hasPassword ? <PasswordCard errorText={errorText} /> : null}

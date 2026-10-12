@@ -30,7 +30,7 @@ export function Dialog({
           style={{ ["--cc-dialog-w" as string]: `${width}px` }}
           className={cn(
             "fixed inset-0 z-[200] flex flex-col gap-4 overflow-y-auto bg-[image:var(--cc-dialog)] px-5 pb-[calc(24px+env(safe-area-inset-bottom))] outline-none data-[state=open]:animate-cc-rise",
-            "sm:inset-auto sm:top-1/2 sm:left-1/2 sm:max-h-[calc(100vh-48px)] sm:w-[min(var(--cc-dialog-w),calc(100vw-32px))] sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-cc-2xl sm:border sm:border-[rgba(167,139,250,.26)] sm:px-[26px] sm:pb-[26px] sm:shadow-[0_30px_80px_rgba(4,1,9,.7)]",
+            "sm:inset-auto sm:top-1/2 sm:left-1/2 sm:max-h-[calc(100dvh-48px)] sm:w-[min(var(--cc-dialog-w),calc(100vw-32px))] sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-cc-2xl sm:border sm:border-[rgba(167,139,250,.26)] sm:px-[26px] sm:pb-[26px] sm:shadow-[0_30px_80px_rgba(4,1,9,.7)]",
           )}
         >
           <div className="sticky top-0 z-10 -mx-5 flex items-start justify-between gap-3 border-b border-[rgba(167,139,250,.14)] bg-[#2a1049] px-5 pt-[18px] pb-[14px] sm:-mx-[26px] sm:px-[26px] sm:pt-[22px]">

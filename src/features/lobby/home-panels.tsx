@@ -15,7 +15,7 @@ export function PaymentsPanel() {
   return (
     <section className="flex flex-col gap-4" aria-labelledby="payments-title">
       <span id="payments-title"><SectionTitle>{t("home.payments")}</SectionTitle></span>
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {wallets.map((w) => (
           <div key={w.key} className="flex items-center gap-4 rounded-cc-xl border border-cc-line bg-[linear-gradient(180deg,#23103f_0%,#180a2c_100%)] p-4">
             <img src={w.img} alt={w.name} className="h-14 w-14 flex-none rounded-cc-lg object-cover" />

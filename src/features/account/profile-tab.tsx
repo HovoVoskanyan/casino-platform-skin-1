@@ -47,7 +47,7 @@ function ProfileForm({ profile }: { profile: Profile }) {
   });
 
   return (
-    <div className="grid gap-4 md:grid-cols-2">
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
       <AccountCard title={t("account.profile.title")} intro={t("account.profile.intro")}>
         <div className="flex flex-col gap-1 rounded-cc-lg border border-cc-line bg-white/[.02] px-4 py-3">
           <span className="text-[11.5px] font-bold tracking-[.8px] text-cc-muted uppercase">{t("account.profile.playerId")}</span>

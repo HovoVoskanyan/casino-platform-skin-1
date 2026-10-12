@@ -52,7 +52,7 @@ export function BonusDrawer() {
               returnFocus.focus();
             }
           }}
-          className="fixed inset-x-0 bottom-0 z-[300] flex max-h-[88vh] flex-col overflow-hidden rounded-t-[20px] bg-[linear-gradient(170deg,#2a1049_0%,#1a0930_45%,#160726_100%)] shadow-[0_30px_80px_rgba(4,1,9,.75)] outline-none data-[state=open]:animate-cc-rise min-[760px]:inset-x-auto min-[760px]:top-1/2 min-[760px]:bottom-auto min-[760px]:left-1/2 min-[760px]:max-h-[calc(100vh-48px)] min-[760px]:w-[min(620px,calc(100vw-48px))] min-[760px]:-translate-x-1/2 min-[760px]:-translate-y-1/2 min-[760px]:rounded-[20px] min-[760px]:border min-[760px]:border-[rgba(167,139,250,.26)]"
+          className="fixed inset-x-0 bottom-0 z-[300] flex max-h-[88dvh] flex-col overflow-hidden rounded-t-[20px] bg-[linear-gradient(170deg,#2a1049_0%,#1a0930_45%,#160726_100%)] shadow-[0_30px_80px_rgba(4,1,9,.75)] outline-none data-[state=open]:animate-cc-rise min-[760px]:inset-x-auto min-[760px]:top-1/2 min-[760px]:bottom-auto min-[760px]:left-1/2 min-[760px]:max-h-[calc(100dvh-48px)] min-[760px]:w-[min(620px,calc(100vw-48px))] min-[760px]:-translate-x-1/2 min-[760px]:-translate-y-1/2 min-[760px]:rounded-[20px] min-[760px]:border min-[760px]:border-[rgba(167,139,250,.26)]"
         >
           <div className="flex flex-none items-start justify-between gap-3 border-b border-[rgba(167,139,250,.14)] px-5 pt-[18px] pb-[14px]">
             <span className="flex min-w-0 flex-col gap-[3px]">

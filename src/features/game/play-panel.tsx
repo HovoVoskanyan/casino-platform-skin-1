@@ -100,7 +100,7 @@ export function PlayPanel({ game, autoPlay, onAutoPlayed }: { game: GameDetail; 
   return (
     <div className="flex flex-col gap-3">
       <h2 className="m-0 text-[12.5px] font-bold tracking-[1px] text-cc-label uppercase">{t("game.playMode")}</h2>
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div className="flex flex-col gap-1">
           <Button size="lg" disabled={!game.hasDemo || launching} onClick={() => choose("Demo")}
             className="h-[50px] rounded-[13px] border-[rgba(167,139,250,.45)] bg-[linear-gradient(180deg,#2b1350,#1c0b33)] text-[#efe6ff] disabled:border-[rgba(167,139,250,.22)] md:h-14 md:rounded-cc-lg">

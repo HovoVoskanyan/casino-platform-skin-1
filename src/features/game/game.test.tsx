@@ -5,6 +5,7 @@ import { renderRoute } from "@/test/route";
 import { problem, server, signedIn } from "@/test/server";
 import { catalogue, game } from "@/test/lobby-fixtures";
 import { authDialog } from "@/features/auth/auth-dialog-state";
+import { frameDocument } from "./game-container";
 
 const G = game(1, { name: "Sweet Bonanza" });
 const detail = (extra: object = {}) => http.get("*/api/v1/games/:id", () => HttpResponse.json({ ...G, logoUrl: null, description: null, rtp: null, volatility: null, ...extra }));
@@ -51,7 +52,7 @@ describe("game launch (P3-28)", () => {
 
     await user.click(await screen.findByRole("button", { name: "Play for Fun" }));
     const frame = await screen.findByTestId("game-frame");
-    expect(frame).toHaveAttribute("srcdoc", '<div id="provider">Demo</div>');
+    expect(frame).toHaveAttribute("srcdoc", frameDocument('<div id="provider">Demo</div>')); // full-bleed reset first
     expect(frame.getAttribute("sandbox")).not.toContain("allow-same-origin"); // the fragment never reaches the skin's origin
     expect(frame.getAttribute("sandbox")).not.toContain("allow-top-navigation");
     expect(frame.getAttribute("sandbox")).not.toContain("allow-popups-to-escape-sandbox"); // an escaped popup keeps its opener

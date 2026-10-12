@@ -231,7 +231,7 @@ function Composer({ onSend }: { onSend: (body: string) => void }) {
           aria-label={t("support.message")}
           aria-describedby={draft.length >= COUNTER_FROM ? "support-counter" : undefined}
           placeholder={t("support.placeholder")}
-          className="max-h-[120px] min-h-[46px] min-w-0 flex-1 resize-none rounded-cc-md border border-white/[.13] bg-black/40 px-4 py-[12px] text-[16px] font-medium leading-[1.4] text-cc-ink outline-none [field-sizing:content] placeholder:text-[#7c689b] focus:border-[rgba(255,201,60,.6)] min-[600px]:text-[14px]"
+          className="max-h-[120px] min-h-[46px] min-w-0 flex-1 resize-none rounded-cc-md border border-white/[.13] bg-black/40 px-4 py-[12px] text-[16px] font-medium leading-[1.4] text-cc-ink outline-none [field-sizing:content] placeholder:text-[#7c689b] focus:border-[rgba(255,201,60,.6)]"
         />
         <button type="submit" disabled={!ready} className="h-[46px] flex-none self-end rounded-cc-md bg-[image:var(--cc-gold-cta)] px-4 text-[14px] font-extrabold text-[#2c1400] hover:brightness-105 disabled:opacity-60 min-[600px]:px-[22px]">
           {t("support.send")}

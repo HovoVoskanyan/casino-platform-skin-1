@@ -36,13 +36,13 @@ export function BalanceMenu() {
   const text = balance.status !== "live" ? "—" : hidden ? MASKED : peso(balance.balance.totalCents);
 
   return (
-    <span ref={box} className="relative flex h-10 flex-none items-center rounded-cc border border-[rgba(167,139,250,.26)] bg-white/[.02]">
-      <Link to="/wallet" className="flex h-full items-center gap-[9px] rounded-l-cc px-3 text-[13.5px] font-bold text-cc-text hover:bg-[rgba(167,139,250,.12)] md:px-[14px] md:text-[14px]">
+    <span ref={box} className="relative flex h-10 min-w-0 flex-initial items-center rounded-cc border border-[rgba(167,139,250,.26)] bg-white/[.02]">
+      <Link to="/wallet" className="flex h-full min-w-0 items-center gap-[9px] rounded-l-cc px-2 text-[13px] min-[400px]:px-3 min-[400px]:text-[13.5px] font-bold text-cc-text hover:bg-[rgba(167,139,250,.12)] md:px-[14px] md:text-[14px]">
         <span className="hidden text-[12px] font-semibold text-cc-lavender md:inline">{t("nav.balance")}</span>
-        <span className="tabular" data-testid="header-balance">{text}</span>
+        <span className="tabular truncate" title={text} data-testid="header-balance">{text}</span>
       </Link>
       <button ref={chevron} type="button" aria-label={t("balance.showDetails")} aria-expanded={open} aria-haspopup="dialog" onClick={() => setOpen((o) => !o)}
-        className="flex h-full w-8 items-center justify-center rounded-r-cc border-l border-[rgba(167,139,250,.2)] text-[10px] text-cc-control hover:bg-[rgba(167,139,250,.12)] md:w-[34px]">
+        className="flex h-full w-8 flex-none items-center justify-center rounded-r-cc border-l border-[rgba(167,139,250,.2)] text-[10px] text-cc-control hover:bg-[rgba(167,139,250,.12)] md:w-[34px]">
         {open ? "▲" : "▼"}
       </button>
       {open ? <BalancePanel onClose={() => setOpen(false)} onBonuses={() => { setOpen(false); bonusDrawer.open(chevron.current); }} /> : null}
@@ -59,7 +59,7 @@ function BalancePanel({ onClose, onBonuses }: { onClose: () => void; onBonuses: 
 
   return (
     <div role="dialog" aria-label={t("balance.details")}
-      className="fixed left-[10px] right-[10px] top-[72px] z-50 flex max-h-[min(420px,calc(100vh-120px))] flex-col gap-3 overflow-auto rounded-cc-xl border border-cc-line-strong bg-[linear-gradient(170deg,#2a1049_0%,#1a0930_100%)] p-4 shadow-[0_24px_60px_rgba(4,1,9,.7)] md:absolute md:left-auto md:right-0 md:top-[calc(100%+6px)] md:w-[296px] md:rounded-cc-lg">
+      className="fixed left-[10px] right-[10px] top-[72px] z-50 flex max-h-[min(420px,calc(100dvh-120px))] flex-col gap-3 overflow-auto rounded-cc-xl border border-cc-line-strong bg-[linear-gradient(170deg,#2a1049_0%,#1a0930_100%)] p-4 shadow-[0_24px_60px_rgba(4,1,9,.7)] md:absolute md:left-auto md:right-0 md:top-[calc(100%+6px)] md:w-[296px] md:rounded-cc-lg">
       <div className="flex items-center justify-between">
         <span className="text-[11px] font-extrabold tracking-[1.1px] text-cc-muted uppercase">{t("balance.details")}</span>
         <button type="button" aria-label={t("balance.closeDetails")} onClick={onClose} className="flex h-[30px] w-[30px] items-center justify-center rounded-[9px] border border-cc-line-strong bg-white/[.06] text-[#cbb6e6]">✕</button>

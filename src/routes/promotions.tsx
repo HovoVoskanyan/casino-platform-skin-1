@@ -84,14 +84,14 @@ function PromotionsPage() {
             {search.category ? <Button size="sm" className="mt-2" onClick={() => setCategory(undefined)}>{t("promotions.showAll")}</Button> : null}
           </div>
         ) : null}
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {isPending ? Array.from({ length: 3 }, (_, i) => <div key={i} aria-hidden className="h-[220px] animate-pulse rounded-cc-xl border border-cc-line bg-cc-surface-raised" />) : shown.map((p) => <PromotionCard key={p.id} promotion={p} openedHere />)}
         </div>
       </section>
 
       <section className="flex flex-col gap-4" aria-labelledby="how-it-works">
         <span id="how-it-works"><SectionTitle>{t("promotions.howItWorks")}</SectionTitle></span>
-        <ol className="m-0 grid list-none gap-3 p-0 sm:grid-cols-2 lg:grid-cols-4">
+        <ol className="m-0 grid list-none grid-cols-1 gap-3 p-0 sm:grid-cols-2 lg:grid-cols-4">
           {[1, 2, 3, 4].map((n) => (
             <li key={n} className="flex flex-col gap-2 rounded-cc-xl border border-cc-line bg-white/[.02] p-4">
               <span className="text-[11px] font-extrabold tracking-[1.2px] text-[#c4b5fd]">{t("promotions.step", { n })}</span>

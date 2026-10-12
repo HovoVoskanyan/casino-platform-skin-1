@@ -22,7 +22,7 @@ export function Footer() {
         {LINKS.map((key) => {
           const on = path === `/info/${key}`;
           return (
-            <Link key={key} to="/info/$page" params={{ page: key }} aria-current={on ? "page" : undefined} className={cn("flex min-h-11 items-center text-[13px] underline-offset-[5px] decoration-[rgba(255,201,60,.55)] hover:text-cc-ink md:min-h-0", on ? "font-bold text-cc-ink underline" : "font-medium text-cc-lavender")}>
+            <Link key={key} to="/info/$page" params={{ page: key }} aria-current={on ? "page" : undefined} className={cn("flex min-h-11 items-center text-[13px] underline-offset-[5px] decoration-[rgba(255,201,60,.55)] hover:text-cc-ink pointer-fine:md:min-h-0", on ? "font-bold text-cc-ink underline" : "font-medium text-cc-lavender")}>
               {t(`info.${key}`)}
             </Link>
           );

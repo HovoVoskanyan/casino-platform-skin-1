@@ -22,6 +22,16 @@ export function providerFrameUrl(html: string): string | null {
 }
 
 /**
+ * The fragment as the `srcdoc` document: a frame's document is 8px-margined, white and only as tall as its content,
+ * so the provider's `height="100%"` frame collapsed to the browser's 150px default under a white page. This sheet
+ * comes first, so anything the fragment styles itself still wins; srcdoc documents are always standards mode.
+ */
+const FRAME_RESET =
+  "<style>html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#000}" +
+  "iframe,object,embed{display:block;width:100%;height:100%;border:0}</style>";
+export const frameDocument = (html: string) => FRAME_RESET + html;
+
+/**
  * P3-28 — the game container the design does not have (P3-22 gap 2). Core answers the provider's HTML fragment.
  * - A fragment that is a single frame onto the provider's https URL (the usual shape) → we frame THAT URL. It keeps
  *   its own origin (cross-origin to the skin, so `allow-same-origin` grants it nothing of ours), which the game needs
@@ -31,6 +41,7 @@ export function providerFrameUrl(html: string): string | null {
  *   the skin's cookies, storage or DOM. The real Fundist fragment must be checked in the P6-02 sandbox.
  * - Never `allow-top-navigation`; and no `allow-popups-to-escape-sandbox` — an escaped popup keeps its opener and
  *   could navigate the casino tab (review S2). Popups (rules, help) still open, sandboxed like their opener.
+ * The page sets `viewport-fit=cover`, so the safe-area insets keep the bar and the game clear of a phone's notch.
  * Closing returns to the game page; the header balance keeps updating underneath from the hub. Radix gives the
  * focus trap, Escape and focus return.
  */
@@ -42,7 +53,7 @@ export function GameContainer({ launch, gameName, onClose }: { launch: Launch; g
   return (
     <DialogPrimitive.Root open onOpenChange={(open) => !open && onClose()}>
       <DialogPrimitive.Portal>
-        <DialogPrimitive.Content aria-describedby={undefined} className="fixed inset-0 z-[250] flex flex-col bg-[#0b0414] outline-none">
+        <DialogPrimitive.Content aria-describedby={undefined} className="fixed inset-0 z-[250] flex flex-col bg-[#0b0414] pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] outline-none">
           <DialogPrimitive.Title className="sr-only">{label}</DialogPrimitive.Title>
           <div className="flex h-12 flex-none items-center justify-between gap-3 border-b border-[rgba(167,139,250,.16)] bg-[#150726] px-3">
             <span className="flex min-w-0 items-center gap-2">
@@ -72,7 +83,7 @@ export function GameContainer({ launch, gameName, onClose }: { launch: Launch; g
             <iframe
               key={launch.launchId}
               title={gameName}
-              srcDoc={launch.html}
+              srcDoc={frameDocument(launch.html)}
               sandbox="allow-scripts allow-forms allow-popups"
               allow="autoplay; fullscreen"
               allowFullScreen

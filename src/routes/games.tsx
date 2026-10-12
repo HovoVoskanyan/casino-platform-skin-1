@@ -90,7 +90,7 @@ function SearchBox({ value, onChange }: { value: string; onChange: (q: string) =
         maxLength={64}
         onChange={(e) => setText(e.target.value)}
         placeholder={t("games.searchPlaceholder")}
-        className="h-[52px] w-full rounded-cc-lg border border-cc-line-strong bg-[rgba(9,3,16,.45)] pr-3 pl-[42px] text-[16px] font-medium text-cc-ink placeholder:text-cc-muted focus:border-[rgba(255,201,60,.55)] focus:outline-none md:pl-[46px] md:text-[14.5px]"
+        className="h-[52px] w-full rounded-cc-lg border border-cc-line-strong bg-[rgba(9,3,16,.45)] pr-3 pl-[42px] text-[16px] font-medium text-cc-ink placeholder:text-cc-muted focus:border-[rgba(255,201,60,.55)] focus:outline-none md:pl-[46px]"
       />
     </label>
   );

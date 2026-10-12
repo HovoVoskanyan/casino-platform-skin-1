@@ -85,6 +85,23 @@
   @keyframes cc-ring { 0% { transform: scale(1); opacity: .8; } 100% { transform: scale(1.35); opacity: 0; } }
 }
 
+/* Mobile-first tap targets: a control drawn smaller than 44px keeps its look but answers a 44×44 touch area
+   (WCAG 2.5.5 / Apple HIG). The element must be positioned — add `relative` unless it is already absolute. */
+@utility tap-44 {
+  &::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: max(100%, 44px);
+    height: max(100%, 44px);
+    transform: translate(-50%, -50%);
+  }
+}
+
+/* A phone on its side: ≥768px wide (so `md:` applies) but under 500px tall — the sticky chrome must give way. */
+@custom-variant short (@media (max-height: 500px));
+
 @layer base {
   * { box-sizing: border-box; }
   html { height: 100%; background: var(--cc-canvas-base); }

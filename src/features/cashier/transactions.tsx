@@ -98,7 +98,9 @@ function Row({ payment, method, onOpen }: { payment: Payment; method: string; on
         deposit ? "border-[rgba(74,222,128,.28)] bg-[rgba(74,222,128,.1)] text-[#86efac]" : "border-[rgba(167,139,250,.26)] bg-[rgba(167,139,250,.12)] text-[#c4b5fd]")}>{deposit ? "↓" : "↑"}</span>
       <span className="flex min-w-0 flex-col">
         <span className="text-[14.5px] font-bold text-cc-ink">{t(deposit ? "wallet.typeDeposit" : "wallet.typeWithdrawal")}</span>
-        <span className="truncate text-[12px] text-cc-muted"><span className="sr-only">{t("wallet.srMethod")}</span>{method}<span className="md:hidden"> · {when(payment.createdAt)}</span></span>
+        <span className="truncate text-[12px] text-cc-muted"><span className="sr-only">{t("wallet.srMethod")}</span>{method}</span>
+        {/* own line on a phone: next to the method a 320px row cut the year off */}
+        <span className="text-[12px] text-cc-muted md:hidden">{when(payment.createdAt)}</span>
       </span>
       <span className="hidden text-[13px] text-cc-lavender md:inline"><span className="sr-only">{t("wallet.srDate")}</span>{when(payment.createdAt)}</span>
       <span className={cn("text-right text-[14.5px] font-extrabold tabular md:text-left", deposit ? "text-[#86efac]" : "text-cc-label")}>
