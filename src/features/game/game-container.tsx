@@ -23,12 +23,19 @@ export function providerFrameUrl(html: string): string | null {
 
 /**
  * The fragment as the `srcdoc` document: a frame's document is 8px-margined, white and only as tall as its content,
- * so the provider's `height="100%"` frame collapsed to the browser's 150px default under a white page. This sheet
- * comes first, so anything the fragment styles itself still wins; srcdoc documents are always standards mode.
+ * so the provider's `height="100%"` frame collapsed to the browser's 150px default under a white page. Fundist's
+ * desktop fragment wraps the game frame in its own container(s), which are as tall as their content too — so every
+ * element holding a frame (`:has`) is stretched to the full frame as well, over whatever the fragment says (the game
+ * filling the container is the one layout we want). srcdoc documents are always standards mode.
  */
+// A frame drawn 0–1px or hidden is a tracker, not the game: it keeps its size and never pushes the game out of view.
+const GAME_FRAME = ':is(iframe,object,embed):not([width="0"],[width="1"],[height="0"],[height="1"],[hidden])';
 const FRAME_RESET =
-  "<style>html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#000}" +
-  "iframe,object,embed{display:block;width:100%;height:100%;border:0}</style>";
+  "<style>html,body{margin:0!important;padding:0!important;width:100%!important;height:100%!important;overflow:hidden;background:#000}" +
+  `body :has(${GAME_FRAME}){width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;` +
+  "margin:0!important;padding:0!important}" +
+  `${GAME_FRAME}{display:block;width:100%!important;height:100%!important;border:0}` +
+  ':is(iframe,object,embed):is([width="0"],[width="1"],[height="0"],[height="1"]){position:absolute}</style>';
 export const frameDocument = (html: string) => FRAME_RESET + html;
 
 /**
