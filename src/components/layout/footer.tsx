@@ -6,14 +6,17 @@ import { LanguageSelect } from "./language-select";
 
 const LINKS = ["responsible-gaming", "faq", "terms", "privacy"] as const;
 
-/** Design (Footer): 18+, Play Responsibly, PAGCOR badge, the four info links + Support, the language switcher (when the site
- * offers more than one language), and the brand phrase in Caveat. */
+/**
+ * Design (Footer): the age badge (21+ — PAGCOR's minimum, owner 2026-10-14; the design drew 18+), Play Responsibly,
+ * PAGCOR badge, the four info links + Support, the language switcher (when the site offers more than one language),
+ * and the brand phrase in Caveat.
+ */
 export function Footer() {
   const { t } = useTranslation();
   const path = useRouterState({ select: (s) => s.location.pathname });
   return (
     <footer className="mx-4 mb-[150px] flex flex-wrap items-center gap-[14px] border-t border-[rgba(167,139,250,.14)] pb-1 pt-6 md:mx-[22px] md:gap-[18px] md:pt-7">
-      <span className="flex h-10 w-10 flex-none items-center justify-center rounded-full border border-cc-line-strong text-[13px] font-extrabold text-[#cbb6e6]">18+</span>
+      <span className="flex h-10 w-10 flex-none items-center justify-center rounded-full border border-cc-line-strong text-[13px] font-extrabold text-[#cbb6e6]" role="img" aria-label={t("shell.ageBadgeLabel")}>{t("shell.ageBadge")}</span>
       <span className="flex flex-col gap-[3px]">
         <span className="text-[13.5px] font-bold text-cc-label">{t("shell.playResponsibly")}</span>
         <span className="text-[12px] font-medium text-cc-muted">{t("shell.gamingShouldBeFun")}</span>

@@ -20,6 +20,7 @@ describe("the site's languages and currency come from the back office (owner 202
     const primary = await screen.findByRole("banner"); // the header
     expect(within(primary).getByRole("link", { name: "Mga Laro" })).toBeInTheDocument(); // Filipino: the site's default
     const footer = screen.getByRole("contentinfo");
+    expect(within(footer).getByRole("img", { name: "Para lamang sa 21 taong gulang pataas" })).toHaveTextContent("21+"); // PAGCOR: 21, not 18
     const select = within(footer).getByRole("combobox", { name: "Wika" });
     expect(within(select).getAllByRole("option").map((o) => o.textContent)).toEqual(["English", "Filipino"]);
 

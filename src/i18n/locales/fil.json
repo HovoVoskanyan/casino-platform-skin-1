@@ -1189,5 +1189,7 @@
   "promotions.available": "Mga available na bonus",
   "promotions.availableCount_one": "{{count}} aktibong offer",
   "promotions.availableCount_other": "{{count}} aktibong offer",
-  "shell.language": "Wika"
+  "shell.language": "Wika",
+  "shell.ageBadge": "21+",
+  "shell.ageBadgeLabel": "Para lamang sa 21 taong gulang pataas"
 }

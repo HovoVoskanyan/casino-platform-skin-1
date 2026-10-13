@@ -1189,5 +1189,7 @@
   "promotions.available": "Available bonuses",
   "promotions.availableCount_one": "{{count}} active offer",
   "promotions.availableCount_other": "{{count}} active offers",
-  "shell.language": "Language"
+  "shell.language": "Language",
+  "shell.ageBadge": "21+",
+  "shell.ageBadgeLabel": "21 and over only"
 }
