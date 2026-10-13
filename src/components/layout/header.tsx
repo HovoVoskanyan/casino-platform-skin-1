@@ -33,7 +33,7 @@ export function Header() {
   const current = path + (typeof window !== "undefined" ? window.location.search : "");
 
   return (
-    <header className="sticky top-0 z-40 short:static border-b border-[rgba(167,139,250,.16)] bg-[linear-gradient(180deg,rgba(29,12,53,.96)_0%,rgba(15,6,27,.96)_100%)] shadow-[0_10px_30px_rgba(6,3,11,.55)] backdrop-blur-xl">
+    <header className="sticky top-0 z-40 short:relative border-b border-[rgba(167,139,250,.16)] bg-[linear-gradient(180deg,rgba(29,12,53,.96)_0%,rgba(15,6,27,.96)_100%)] shadow-[0_10px_30px_rgba(6,3,11,.55)] backdrop-blur-xl">
       <div className="mx-auto flex min-h-[66px] max-w-[1024px] items-center gap-[6px] px-4 py-[10px] min-[400px]:gap-2 md:min-h-[76px] md:px-[22px] md:py-3">
         <div className="flex min-w-0 items-center gap-2">
           <Link to="/" aria-label={t("nav.home")} className="block flex-none">

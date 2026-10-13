@@ -53,8 +53,8 @@ describe("the live balance (P3-28)", () => {
     const panel = screen.getByRole("dialog", { name: "Balance details" });
     expect(within(panel).getByText("Cash balance").nextSibling).toHaveTextContent("₱9,480.50");
     expect(within(panel).getByText("Bonus balance").nextSibling).toHaveTextContent("₱3,000.00");
-    await waitFor(() => expect(within(panel).getByText("Available to claim").nextSibling).toHaveTextContent("2"));
-    expect(within(panel).getByText("Active bonuses").nextSibling).toHaveTextContent("1");
+    await waitFor(() => expect(within(panel).getByText("Available to claim").previousSibling).toHaveTextContent("2")); // design: the number first, its label under it
+    expect(within(panel).getByText("Active bonuses").previousSibling).toHaveTextContent("1");
 
     await user.keyboard("{Escape}");
     expect(screen.queryByRole("dialog", { name: "Balance details" })).toBeNull();
