@@ -158,7 +158,6 @@
   "info.faq": "FAQ",
   "info.terms": "Terms",
   "info.privacy": "Privacy",
-  "info.draft": "This page holds proposed copy that has not been approved yet.",
   "common.close": "Close",
   "common.loading": "Loading…",
   "common.loadFailed": "We couldn’t load this right now. Please try again in a moment.",
@@ -692,5 +691,485 @@
   "games.noFavouritesHint": "Tap ♡ on any game to save it here.",
   "games.clearFilters": "Clear filters",
   "games.loadMoreLabel": "Load More Games ({{shown}} of {{total}})",
-  "games.filter.providers": "Providers"
+  "games.filter.providers": "Providers",
+  "info.breadcrumb": "Breadcrumb",
+  "info.home": "Home",
+  "info.toc.doc": "ON THIS PAGE",
+  "info.toc.docLabel": "On this page",
+  "info.toc.faq": "TOPICS",
+  "info.toc.faqLabel": "FAQ topics",
+  "info.toc.empty": "No matching topics.",
+  "info.required": "REQUIRED",
+  "info.opensNewTab": "(opens in a new tab)",
+  "info.contactSupport": "Contact support",
+  "info.faq.search": "Search FAQs",
+  "info.faq.searchPlaceholder": "Search by question or keyword",
+  "info.faq.clear": "Clear search",
+  "info.faq.count_one": "{{count}} question",
+  "info.faq.count_other": "{{count}} questions",
+  "info.faq.matches_one": "{{count}} question matches.",
+  "info.faq.matches_other": "{{count}} questions match.",
+  "info.faq.noMatches": "No matching questions.",
+  "info.faq.noResultsTitle": "No matching questions",
+  "info.faq.noResultsHint": "Try a different keyword or clear your search to see all questions.",
+  "info.faq.stillTitle": "Still need help?",
+  "info.faq.stillHint": "Open the support panel without leaving this page.",
+  "info.page.responsible-gaming": {
+    "title": "Responsible Gaming",
+    "intro": "Practical information to help you recognise risk, take breaks and find support.",
+    "draftLabel": "INTERNAL REVIEW · CONTENT DRAFT",
+    "draftNote": "Guidance copy added. ChoCho’s account controls and restriction procedure still require confirmation.",
+    "sections": [
+      {
+        "id": "responsible-play",
+        "title": "Responsible play",
+        "blocks": [
+          {
+            "t": "p",
+            "text": "Set a time limit and a spending limit before you play. Never borrow money to gamble or try to win back losses. Keep gambling from interfering with family, work and other activities."
+          },
+          {
+            "t": "p",
+            "text": "Spending more than planned, rising debt or difficulty stopping are signs to pause and seek support."
+          }
+        ]
+      },
+      {
+        "id": "account-controls",
+        "title": "Account controls",
+        "blocks": [
+          {
+            "t": "p",
+            "text": "Before relying on an account control, check what it covers, when it takes effect and how changes are handled."
+          },
+          {
+            "t": "req",
+            "text": "Describe only the protection tools ChoCho actually provides. For each, supply its name, location, effect, activation timing and rules for changing it. If there are no player-operated controls, supply the approved alternative process."
+          }
+        ]
+      },
+      {
+        "id": "taking-a-break",
+        "title": "Taking a break or restricting access",
+        "blocks": [
+          {
+            "t": "p",
+            "text": "For information about the external exclusion process, PAGCOR provides an official online self-exclusion application portal. Read the current instructions there before applying."
+          },
+          {
+            "t": "link",
+            "text": "PAGCOR self-exclusion application portal",
+            "href": "https://osea.pagcor.ph/"
+          },
+          {
+            "t": "req",
+            "text": "Add ChoCho’s confirmed process for requesting a break, self-exclusion or account closure, including the correct contact route, when restrictions start, their scope and any reopening rules. Distinguish ordinary account closure from self-exclusion."
+          }
+        ]
+      },
+      {
+        "id": "getting-help",
+        "title": "Getting help",
+        "blocks": [
+          {
+            "t": "p",
+            "text": "Talk with someone you trust. PAGCOR’s responsible gaming page lists support resources in the Philippines."
+          },
+          {
+            "t": "link",
+            "text": "Responsible gaming information and support resources",
+            "href": "https://www.pagcor.ph/regulatory/responsible-gaming.php"
+          },
+          {
+            "t": "p",
+            "text": "For questions about navigating your ChoCho account, open the support panel using the button below."
+          },
+          {
+            "t": "support"
+          }
+        ]
+      }
+    ]
+  },
+  "info.page.terms": {
+    "title": "Terms",
+    "intro": "Read the conditions that apply to your account, games, payments and offers on ChoCho.",
+    "draftLabel": "INTERNAL REVIEW — POLICY DRAFT",
+    "draftNote": "Draft copy for internal review. Marked company details and policy wording must be confirmed before publication.",
+    "sections": [
+      {
+        "id": "overview",
+        "title": "Overview",
+        "blocks": [
+          {
+            "t": "p",
+            "text": "These Terms describe the conditions for using ChoCho. Read them alongside the Privacy page, Responsible Gaming information and any rules that apply to a particular game or offer."
+          },
+          {
+            "t": "req",
+            "label": "Operator",
+            "text": "Legal entity name, registered address and relevant registration details."
+          },
+          {
+            "t": "req",
+            "label": "Regulatory information",
+            "text": "Verified licensing or regulatory status, relevant licence details and authorised service/domain information."
+          },
+          {
+            "t": "req",
+            "label": "Scope and acceptance",
+            "text": "Services and territories covered, how these Terms are accepted, the relationship with game/offer rules, and how changes are communicated."
+          },
+          {
+            "t": "req",
+            "label": "Effective date and version",
+            "text": "Operator-approved date and version."
+          }
+        ]
+      },
+      {
+        "id": "account-use",
+        "title": "Account use",
+        "blocks": [
+          {
+            "t": "p",
+            "text": "Review the eligibility and verification requirements before creating an account. Keep your sign-in details private and check that the information you provide is accurate."
+          },
+          {
+            "t": "req",
+            "label": "Eligibility",
+            "text": "Confirmed minimum age, permitted territories and other prohibited or restricted categories."
+          },
+          {
+            "t": "req",
+            "label": "Registration and verification",
+            "text": "Approved account requirements, identity checks, when checks occur, and what happens if information cannot be verified."
+          },
+          {
+            "t": "req",
+            "label": "Account responsibilities",
+            "text": "Approved rules covering account ownership, duplicate accounts, access by other people, account-information changes and reporting unauthorised access."
+          }
+        ]
+      },
+      {
+        "id": "games-and-wallet",
+        "title": "Games and wallet",
+        "blocks": [
+          {
+            "t": "p",
+            "text": "Check the rules for the game you intend to play and review payment conditions before submitting a transaction. Wallet provides the account’s balance and transaction views; the conditions below explain how funds are handled."
+          },
+          {
+            "t": "req",
+            "label": "Game rules and issues",
+            "text": "Applicable game rules, interrupted play, technical errors, settlement and the process for reviewing a disputed result."
+          },
+          {
+            "t": "req",
+            "label": "Deposits and withdrawals",
+            "text": "Supported currencies and methods, ownership checks, limits, fees, timing, verification conditions, failed transactions and cancellation or refund rules."
+          },
+          {
+            "t": "req",
+            "label": "Balances",
+            "text": "How cash, bonus funds and withdrawable funds are distinguished; treatment of pending funds; any applicable deductions or other conditions."
+          }
+        ]
+      },
+      {
+        "id": "offers-and-bonuses",
+        "title": "Offers and bonuses",
+        "blocks": [
+          {
+            "t": "p",
+            "text": "Read the conditions of each offer before taking part. Check eligibility, any required action, time limits and restrictions on using or withdrawing bonus funds. My Account → Bonuses is the place to review the bonuses displayed for your account."
+          },
+          {
+            "t": "req",
+            "label": "General bonus rules",
+            "text": "Approved activation and eligibility rules, permitted participation, use of cash and bonus funds, wagering requirements, expiry, cancellation and treatment of winnings."
+          },
+          {
+            "t": "req",
+            "label": "Offer-specific conditions",
+            "text": "Identify the reviewed conditions for each available offer and explain how they relate to these Terms."
+          }
+        ]
+      },
+      {
+        "id": "restrictions-and-closure",
+        "title": "Account restrictions or closure",
+        "blocks": [
+          {
+            "t": "p",
+            "text": "Account closure, temporary restrictions and self-exclusion can have different effects. Review the relevant process before making a request. Responsible Gaming provides guidance and external support information."
+          },
+          {
+            "t": "req",
+            "label": "Player requests",
+            "text": "Confirmed contact route, identity checks, timing, effect on access and outstanding funds, and any reopening conditions."
+          },
+          {
+            "t": "req",
+            "label": "Operator restrictions",
+            "text": "Approved grounds and process for restriction or closure, notice and review arrangements, and treatment of balances and pending transactions."
+          }
+        ]
+      },
+      {
+        "id": "questions-and-disputes",
+        "title": "Questions and disputes",
+        "blocks": [
+          {
+            "t": "p",
+            "text": "For general help navigating ChoCho, open the support panel. When raising an account or transaction issue, give a clear description and include the relevant reference, if available. Keep passwords and one-time codes private."
+          },
+          {
+            "t": "req",
+            "label": "Formal complaints",
+            "text": "Actual complaints channel, information required, acknowledgement and response process, and escalation options."
+          },
+          {
+            "t": "req",
+            "label": "Governing law and dispute process",
+            "text": "Operator-approved wording appropriate to the verified service and jurisdiction."
+          }
+        ]
+      }
+    ]
+  },
+  "info.page.privacy": {
+    "title": "Privacy",
+    "intro": "How personal information is handled in connection with ChoCho, and where to ask questions or exercise your rights.",
+    "draftLabel": "INTERNAL REVIEW — POLICY DRAFT",
+    "draftNote": "Draft copy for internal review. Marked company details and policy wording must be confirmed before publication.",
+    "sections": [
+      {
+        "id": "overview",
+        "title": "Overview",
+        "blocks": [
+          {
+            "t": "p",
+            "text": "This notice explains the personal information covered by ChoCho’s service, the purposes for which it is used, who may receive it and the choices and rights available to you."
+          },
+          {
+            "t": "req",
+            "label": "Responsible organisation",
+            "text": "Legal identity and contact details of the personal information controller and any relevant representative."
+          },
+          {
+            "t": "req",
+            "label": "Scope",
+            "text": "Actual websites, services and activities covered, and the distinction between ChoCho’s handling of information and third-party services."
+          },
+          {
+            "t": "req",
+            "label": "Effective date and version",
+            "text": "Approved date and version."
+          }
+        ]
+      },
+      {
+        "id": "information-handled",
+        "title": "Information handled by the service",
+        "blocks": [
+          {
+            "t": "p",
+            "text": "The information involved depends on the services you use and your interactions with ChoCho."
+          },
+          {
+            "t": "req",
+            "text": "Insert the verified data inventory. For each category, state the information involved, where it comes from, whether providing it is required or optional, and the consequence of not providing required information."
+          },
+          {
+            "t": "req",
+            "label": "Cookies and similar technologies",
+            "text": "Actual technologies used, their purposes, relevant providers, duration and available choices. State a negative only if verified."
+          }
+        ]
+      },
+      {
+        "id": "purposes",
+        "title": "Purposes of use",
+        "blocks": [
+          {
+            "t": "req",
+            "text": "Explain the actual purpose and applicable legal basis for each processing activity. Keep account access, payments, verification, support, security, marketing and analytics distinct where they actually apply. Do not treat consent as the basis for every activity."
+          },
+          {
+            "t": "req",
+            "label": "Automated decisions or profiling",
+            "text": "Confirm whether either occurs. Where applicable, explain the processing, significance, consequences and relevant rights using approved wording."
+          }
+        ]
+      },
+      {
+        "id": "sharing-and-retention",
+        "title": "Sharing and retention",
+        "blocks": [
+          {
+            "t": "req",
+            "text": "Identify the recipients or recipient categories that actually receive information, why they receive it, and any relevant processing outside the Philippines. Describe the real safeguards and arrangements where applicable."
+          },
+          {
+            "t": "req",
+            "text": "State retention periods or meaningful criteria for each relevant record category, including the effect of account closure and any required retention. Describe deletion or anonymisation only as actually implemented."
+          },
+          {
+            "t": "req",
+            "label": "Protection of information",
+            "text": "A factual, approved description of the safeguards used. Do not invent encryption claims, certifications or guarantees."
+          }
+        ]
+      },
+      {
+        "id": "preferences-and-requests",
+        "title": "Preferences and requests",
+        "blocks": [
+          {
+            "t": "p",
+            "text": "Where the Philippine Data Privacy Act applies, rights include being informed, access, correction, objection, erasure or blocking, data portability, filing a complaint and seeking damages, subject to applicable conditions and limitations. The National Privacy Commission explains these rights on its website."
+          },
+          {
+            "t": "link",
+            "text": "Your data privacy rights",
+            "href": "https://privacy.gov.ph/data-subject-rights/"
+          },
+          {
+            "t": "req",
+            "label": "Making a request",
+            "text": "The verified privacy-request channel, how identity is checked, how requests are handled and any applicable response periods or limitations."
+          },
+          {
+            "t": "req",
+            "label": "Marketing choices and consent",
+            "text": "Actual choices and withdrawal methods where relevant, their effect and any distinction between promotional and essential service communications."
+          }
+        ]
+      },
+      {
+        "id": "contact",
+        "title": "Contact",
+        "blocks": [
+          {
+            "t": "p",
+            "text": "For questions about this notice or the handling of your personal information, contact:"
+          },
+          {
+            "t": "req",
+            "label": "Organisation",
+            "text": "Legal entity name."
+          },
+          {
+            "t": "req",
+            "label": "Privacy contact",
+            "text": "Confirmed privacy contact or Data Protection Officer details, as applicable."
+          },
+          {
+            "t": "req",
+            "label": "Contact channel",
+            "text": "Monitored email, form or postal address, as applicable."
+          },
+          {
+            "t": "p",
+            "text": "Information about privacy rights and complaints is available from the National Privacy Commission."
+          }
+        ]
+      }
+    ]
+  },
+  "info.page.faq": {
+    "title": "FAQ",
+    "intro": "Find your way around ChoCho, review your account information and learn where to get help.",
+    "draftLabel": "INTERNAL REVIEW · CONTENT DRAFT",
+    "draftNote": "Answers describe where features sit in the current interface. Payment methods, fees, limits, processing times, verification documents, wagering, eligibility, support availability and account closure are held until the actual rules are supplied."
+  },
+  "info.faq.groups": [
+    {
+      "id": "wallet",
+      "title": "Wallet",
+      "items": [
+        {
+          "id": "balance",
+          "q": "Where can I view my balance?",
+          "a": "Sign in and open Wallet to review the balance information shown for your account. You can also select the balance in the header to open its summary.",
+          "link": "Go to Wallet",
+          "to": "wallet"
+        },
+        {
+          "id": "transactions",
+          "q": "Where can I view my deposits and withdrawals?",
+          "a": "Open Wallet and go to Recent transactions. Use All, Deposits or Withdrawals to filter the list. Select View details on a transaction to see the information available for that entry.",
+          "link": "Go to Wallet",
+          "to": "wallet"
+        }
+      ]
+    },
+    {
+      "id": "bonuses",
+      "title": "Bonuses",
+      "items": [
+        {
+          "id": "my-bonuses",
+          "q": "Where can I find my available and active bonuses?",
+          "a": "Open My Account and choose Bonuses. When you are signed in, you can also select your balance in the header and choose View my bonuses.",
+          "link": "Open My Account → Bonuses",
+          "to": "account-bonuses"
+        },
+        {
+          "id": "promotions",
+          "q": "Where can I find promotions and offer details?",
+          "a": "Open Promotions to browse the offers displayed on ChoCho. Review an offer’s own details and conditions before taking part. For bonuses linked to your account, open My Account → Bonuses.",
+          "link": "Open Promotions",
+          "to": "promotions"
+        }
+      ]
+    },
+    {
+      "id": "account",
+      "title": "Account",
+      "items": [
+        {
+          "id": "profile",
+          "q": "Where can I review my profile?",
+          "a": "Sign in, open My Account and select Profile to review the profile information shown for your account.",
+          "link": "Open My Account → Profile",
+          "to": "account-profile"
+        },
+        {
+          "id": "security",
+          "q": "Where can I find security settings?",
+          "a": "Open My Account → Security to review the security options shown for your account. Keep your password and one-time sign-in codes private.",
+          "link": "Open My Account → Security",
+          "to": "account-security"
+        }
+      ]
+    },
+    {
+      "id": "support",
+      "title": "Support",
+      "items": [
+        {
+          "id": "open-support",
+          "q": "How do I open support?",
+          "a": "Select Help in the header, Support in the footer or a Contact support button. The support panel opens without leaving the page you are viewing.",
+          "support": true
+        },
+        {
+          "id": "report-problem",
+          "q": "What information is useful when reporting a problem?",
+          "a": "Describe what you were trying to do, what happened and when it happened. Include the page name and exact error message, if there is one. For a payment issue, include the transaction reference if available. If you share a screenshot, cover personal information that is not needed to explain the issue. Do not send passwords, one-time codes or full payment credentials.",
+          "support": true
+        },
+        {
+          "id": "responsible-gaming",
+          "q": "Where can I find responsible gaming information?",
+          "a": "Select Responsible Gaming in the footer for practical guidance and links to external support resources.",
+          "link": "Open Responsible Gaming",
+          "to": "responsible-gaming"
+        }
+      ]
+    }
+  ]
 }
