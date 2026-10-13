@@ -99,6 +99,48 @@ export function useBonusCounts() {
   };
 }
 
+/**
+ * Where a player stands with one open bonus — what its tile on Home / Promotions offers: a guest and a claimable
+ * bonus offer Activate; an activated one waits for a deposit ("Deposit to claim"); a granted one is running; one whose
+ * uses are spent is used.
+ */
+export type OfferState = "guest" | "claimable" | "awaiting" | "running" | "used";
+export interface Offer { bonus: BonusDefinition; state: OfferState }
+
+export function offerState(summary: BonusSummary, rows: PlayerBonus[]): OfferState {
+  const mine = rows.filter((r) => r.bonusId === summary.bonus.id);
+  if (mine.some(isRunning)) return "running";
+  if (summary.hasPendingActivation || mine.some(isAwaiting)) return "awaiting";
+  return summary.claimable ? "claimable" : "used";
+}
+
+/**
+ * The bonuses an operator has switched on in the back office (Active, inside their dates) for this skin, in its
+ * currency — what Home's Bonuses and the Promotions page list. A guest reads bonus's catalog anonymously (the
+ * gateway opens that one read); a player reads it with their own standing, plus their bonuses, from the same
+ * session reads My bonuses uses, so a claim anywhere updates every tile.
+ */
+export function useOffers() {
+  const { signedIn } = useSession();
+  const guest = useQuery({
+    queryKey: queryKeys.lobby.bonuses(),
+    queryFn: async () => (await api.GET("/api/bonus")).data ?? [],
+    staleTime: 30_000,
+    enabled: !signedIn,
+  });
+  const catalog = useQuery({ ...bonusQueries.catalog(), enabled: signedIn });
+  const active = useQuery({ ...bonusQueries.active(), enabled: signedIn });
+
+  let data: Offer[] | undefined;
+  if (!signedIn && guest.data) data = guest.data.filter((s) => offeredHere(s.bonus)).map((s) => ({ bonus: s.bonus, state: "guest" }));
+  if (signedIn && catalog.data && active.data) {
+    const rows = active.data;
+    data = catalog.data.filter((s) => offeredHere(s.bonus)).map((s) => ({ bonus: s.bonus, state: offerState(s, rows) }));
+  }
+  const reads = signedIn ? [catalog, active] : [guest];
+  return { data, isPending: !data && reads.some((q) => q.isPending), isError: !data && reads.some((q) => q.isError) };
+}
+
 const useRefreshBonus = () => {
   const qc = useQueryClient();
   return () => qc.invalidateQueries({ queryKey: queryKeys.session.bonusAll() });

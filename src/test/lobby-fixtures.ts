@@ -1,5 +1,6 @@
 import { http, HttpResponse } from "msw";
-import type { Category, GameCard, Promotion, PromotionDetail, Provider } from "@/features/lobby/api";
+import type { Category, GameCard, Promotion, Provider } from "@/features/lobby/api";
+import type { BonusDefinition, BonusSummary } from "@/features/bonus/api";
 
 export const game = (n: number, extra: Partial<GameCard> = {}): GameCard => ({
   id: `00000000-0000-7000-8000-${String(n).padStart(12, "0")}`,
@@ -24,6 +25,21 @@ export const PROMOTIONS: Promotion[] = [
   { id: "22222222-2222-7222-8222-222222222222", category: "reload", title: "Reload Bonus", value: "50% up to ₱3,000", body: "More value on your next deposit.", imageUrl: null, endsAt: null },
 ];
 
+/** Bonus definitions switched on in the back office (bonus's catalog), as Home and Promotions list them. */
+const definition = (id: string, name: string, type: BonusDefinition["type"], percent: number, capCents: number, currency = "PHP"): BonusDefinition => ({
+  id, skinId: "chocho", name, code: null, type, status: "active", description: null, sticky: false, wageringMultiplier: 20,
+  startAt: null, endAt: null, maxUsesPerPlayer: 1, totalSteps: 1,
+  steps: [{ id: `${id}-s1`, stepNumber: 1, currency, maxBonusAmountCents: capCents, freeSpins: null, wageringMultiplier: null,
+    intervals: [{ minDepositCents: 50_000, maxDepositCents: null, bonusPercent: percent, maxBonusCents: capCents }], freeSpinGameIds: [] }],
+  allowedGameIds: [], gameContributions: [], minQualifyingStakeCents: null, maxQualifyingStakeCents: null,
+  createdAt: "2026-09-01T00:00:00Z", updatedAt: "2026-09-01T00:00:00Z",
+} as BonusDefinition);
+export const WELCOME = definition("0192b0a0-0000-7000-8000-0000000000a1", "Welcome Bonus", "welcome", 100, 500_000);
+export const RELOAD = definition("0192b0a0-0000-7000-8000-0000000000a2", "Weekly Reload", "reload", 50, 200_000);
+export const EURO = definition("0192b0a0-0000-7000-8000-0000000000a3", "Euro Welcome", "welcome", 100, 500_000, "EUR");
+export const summary = (bonus: BonusDefinition, claimable = true, hasPendingActivation = false): BonusSummary =>
+  ({ bonus, hasPendingActivation, currentStepNumber: null, claimable }) as BonusSummary;
+
 /**
  * A catalogue of `total` games served the way core pages it, recording every query it was asked so a test can pin
  * what the page sent (filters, page, language).
@@ -44,11 +60,7 @@ export function catalogue(total: number, seen: URL[] = [], languages: (string | 
     http.get("*/api/v1/providers", () => HttpResponse.json(PROVIDERS)),
     http.get("*/api/v1/banners", () => HttpResponse.json([])),
     http.get("*/api/v1/promotions", () => HttpResponse.json(PROMOTIONS)),
-    http.get("*/api/v1/promotions/:id", ({ params }) => {
-      const p = PROMOTIONS.find((x) => x.id === params.id);
-      if (!p) return HttpResponse.json({ status: 404, errorCode: "NOT_FOUND" }, { status: 404 });
-      const detail: PromotionDetail = { ...p, terms: `Terms for ${p.title}: wager 30x within 7 days.` };
-      return HttpResponse.json(detail);
-    }),
+    // the guest's catalog read: two PHP bonuses and one in another currency (never shown on ChoCho)
+    http.get("*/api/bonus", () => HttpResponse.json([summary(WELCOME, false), summary(RELOAD, false), summary(EURO, false)])),
   ];
 }

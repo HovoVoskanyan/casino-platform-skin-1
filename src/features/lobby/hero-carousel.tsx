@@ -3,17 +3,18 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { useBanners, usePromotions, type Banner, type Promotion } from "./api";
-import { splitPromotionValue } from "./promotion-card";
+import { splitPromotionValue } from "./promotion-value";
 
 const ROTATE_MS = 7000;
 
 /**
  * Design (Home hero): the `home-hero` placement at 2.360:1 (1956×829 desktop, 1134×480 phone — the preset P3-22
  * set), rotating every 7 s. Under the frame: the dots, ‹ › from 600px and a pause toggle (WCAG 2.2.2); swipe on
- * phones. A banner linked to a promotion opens that promotion's terms. Rotation stops for reduced motion.
+ * phones. A banner linked to a promotion opens Promotions, where the back office's bonuses are activated. Rotation
+ * stops for reduced motion.
  *
  * With no banner live, the design's own welcome artwork stands in — but only while the skin runs a `welcome`
- * promotion, whose amount fills the artwork's pill and whose terms the slide opens. Neither = no hero at all.
+ * promotion, whose amount fills the artwork's pill; the slide opens Promotions. Neither = no hero at all.
  */
 export function HeroCarousel() {
   const { t } = useTranslation();
@@ -88,7 +89,7 @@ function Slide({ banner, active, position }: { banner: Banner; active: boolean; 
   return (
     <div role="group" aria-roledescription="slide" aria-label={position} aria-hidden={!active} className={cn("absolute inset-0 transition-opacity duration-[550ms]", active ? "z-[2] opacity-100" : "pointer-events-none z-[1] opacity-0")}>
       {banner.promotionId ? (
-        <Link to="/promotions" search={{ promo: banner.promotionId }} tabIndex={active ? 0 : -1} aria-label={banner.title ?? position} className="block h-full w-full">
+        <Link to="/promotions" tabIndex={active ? 0 : -1} aria-label={banner.title ?? position} className="block h-full w-full">
           {picture}
         </Link>
       ) : (
@@ -104,7 +105,7 @@ function WelcomeSlide({ promotion }: { promotion: Promotion }) {
   const { amount } = promotion.value ? splitPromotionValue(promotion.value) : { amount: "" };
   const peso = amount.startsWith("₱");
   return (
-    <Link to="/promotions" search={{ promo: promotion.id }} aria-label={[promotion.title, promotion.value].filter(Boolean).join(" — ")} className="absolute inset-0 block">
+    <Link to="/promotions" aria-label={[promotion.title, promotion.value].filter(Boolean).join(" — ")} className="absolute inset-0 block">
       <picture>
         <source media="(max-width: 599px)" srcSet="/home-hero-welcome-sm.webp" />
         <img src="/home-hero-welcome.webp" alt="" width={1926} height={816} className="h-full w-full object-cover" />

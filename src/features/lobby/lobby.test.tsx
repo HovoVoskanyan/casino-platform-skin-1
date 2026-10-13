@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { renderRoute } from "@/test/route";
 import { problem, server, signedIn } from "@/test/server";
-import { catalogue, game, PROMOTIONS } from "@/test/lobby-fixtures";
+import { catalogue, game, PROMOTIONS, RELOAD, summary, WELCOME } from "@/test/lobby-fixtures";
 import { authDialog } from "@/features/auth/auth-dialog-state";
 
 afterEach(() => authDialog.close());
@@ -154,44 +154,68 @@ describe("game detail (P3-27)", () => {
   });
 });
 
-describe("Promotions (P3-27)", () => {
-  it("pills are the live promotions' own categories, and one filters the list", async () => {
+describe("Bonuses switched on in the back office (owner 2026-10-13)", () => {
+  it("a guest sees them on Promotions in the skin's currency, and Activate asks them to sign in first", async () => {
     const user = userEvent.setup();
-    server.use(...catalogue(0));
+    const activate = vi.fn();
+    server.use(...catalogue(0), http.post("*/api/bonus/activate", () => { activate(); return HttpResponse.json({}); }));
     renderRoute("/promotions");
-
-    const pills = await screen.findByRole("navigation", { name: "Promotion categories" });
-    expect(within(pills).getAllByRole("button").map((b) => b.textContent)).toEqual(["All", "WELCOME BONUS", "RELOAD"]);
-    await user.click(within(pills).getByRole("button", { name: "RELOAD" }));
-    const all = screen.getByRole("region", { name: /All Promotions/ });
-    await waitFor(() => expect(within(all).getAllByRole("article")).toHaveLength(1));
-    expect(within(all).getByText("Reload Bonus")).toBeInTheDocument();
+    const list = await screen.findByRole("region", { name: /Available bonuses/ });
+    expect((await within(list).findAllByRole("article")).map((a) => a.getAttribute("aria-label"))).toEqual(["Welcome Bonus", "Weekly Reload"]);
+    const welcome = within(list).getByRole("article", { name: "Welcome Bonus" });
+    expect(within(welcome).getByText("₱5,000")).toBeInTheDocument();
+    expect(within(welcome).getByText("100% up to")).toBeInTheDocument();
+    await user.click(within(welcome).getByRole("button", { name: "Activate" }));
+    expect(authDialog.get().mode).toBe("signin");
+    expect(activate).not.toHaveBeenCalled();
   });
 
-  it("?promo= opens the terms, and an ended offer says so", async () => {
-    server.use(...catalogue(0));
-    renderRoute(`/promotions?promo=${PROMOTIONS[1]!.id}`);
-    const dialog = await screen.findByRole("dialog");
-    expect(await within(dialog).findByText(/wager 30x within 7 days/)).toBeInTheDocument();
-  });
-
-  it("an ended offer's link says it has ended", async () => {
-    server.use(...catalogue(0));
-    renderRoute("/promotions?promo=99999999-9999-7999-8999-999999999999");
-    expect(await within(await screen.findByRole("dialog")).findByText("This offer has ended or is no longer available.")).toBeInTheDocument();
-  });
-
-  it("closing terms opened on the page steps Back — no dead history entry", async () => {
+  it("a player activates only after ticking the terms, then is offered Deposit to claim", async () => {
     const user = userEvent.setup();
-    server.use(...catalogue(0));
+    const activated: unknown[] = [];
+    let pending = false;
+    // msw prefers the earlier handler: the player's catalog first, ahead of the fixtures' guest one
+    server.use(signedIn(),
+      http.get("*/api/bonus", () => HttpResponse.json([summary(WELCOME, !pending, pending), summary(RELOAD)])),
+      http.get("*/api/bonus/active", () => HttpResponse.json([])),
+      http.post("*/api/bonus/activate", async ({ request }) => { activated.push(await request.json()); pending = true; return HttpResponse.json({ activationId: "a1" }); }),
+      ...catalogue(0));
     const { router } = renderRoute("/promotions");
-    const start = router.state.location.state.__TSR_index;
-    const all = await screen.findByRole("region", { name: /All Promotions/ });
-    await user.click((await within(all).findAllByRole("link", { name: /View Details/ }))[0]!);
-    await user.click(await within(await screen.findByRole("dialog")).findByRole("button", { name: "Close" }));
-    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
-    expect(router.state.location.state.__TSR_index).toBe(start);
-    expect(router.state.location.search).toEqual({});
+    const welcome = await screen.findByRole("article", { name: "Welcome Bonus" });
+    await user.click(await within(welcome).findByRole("button", { name: "Activate" }));
+
+    const dialog = await screen.findByRole("dialog", { name: "Welcome Bonus" });
+    expect(within(dialog).getByText(/20× the bonus amount/)).toBeInTheDocument(); // the terms, built from the definition
+    const confirm = within(dialog).getByRole("button", { name: "Activate bonus" });
+    expect(confirm).toBeDisabled(); // never on the first press
+    await user.click(within(dialog).getByRole("checkbox"));
+    await user.click(confirm);
+    expect(activated).toEqual([{ bonusId: WELCOME.id, code: null }]);
+    expect(await within(dialog).findByRole("status")).toHaveTextContent("Activated!");
+
+    await user.click(within(dialog).getByRole("button", { name: "Deposit to claim" }));
+    await waitFor(() => expect(router.state.location.href).toBe("/wallet#deposit"));
+  });
+
+  it("an activated bonus's tile says Deposit to claim; a running one points to My bonuses", async () => {
+    server.use(signedIn(),
+      http.get("*/api/bonus", () => HttpResponse.json([summary(WELCOME, false, true), summary(RELOAD, false)])),
+      http.get("*/api/bonus/active", () => HttpResponse.json([{ bonusId: RELOAD.id, bonusName: "Weekly Reload", playerBonusId: "pb-1", status: "active", isInUse: true, hasPendingActivation: false, currentStepNumber: 1, totalSteps: 1, currency: "PHP", grantedCents: 1, wageringRequiredCents: 1, wageringCompletedCents: 0, wageringRemainingCents: 1, progressPercent: 0, grantedAt: null, expiresAt: null, closedAt: null, closeReason: null }])),
+      ...catalogue(0));
+    renderRoute("/promotions");
+    expect(await within(await screen.findByRole("article", { name: "Welcome Bonus" })).findByRole("button", { name: "Deposit to claim" })).toBeInTheDocument();
+    expect(within(screen.getByRole("article", { name: "Weekly Reload" })).getByRole("button", { name: "In progress — view" })).toBeInTheDocument();
+  });
+
+  it("none switched on: Promotions says so, and Home leaves its Bonuses section out", async () => {
+    server.use(http.get("*/api/bonus", () => HttpResponse.json([])), ...catalogue(0));
+    const { unmount } = renderRoute("/promotions");
+    expect(await screen.findByText("0 active offers")).toBeInTheDocument();
+    unmount();
+    server.use(http.get("*/api/bonus", () => HttpResponse.json([])), ...catalogue(3));
+    renderRoute("/");
+    expect(await screen.findByRole("region", { name: "Hot Games" })).toBeInTheDocument();
+    expect(screen.queryByRole("region", { name: "Bonuses" })).toBeNull();
   });
 });
 
@@ -203,10 +227,11 @@ describe("Home (P3-27)", () => {
     expect(await screen.findByRole("link", { name: "Slots, 30 games" })).toHaveAttribute("href", "/games?category=slots");
     expect(screen.getByRole("link", { name: "All Games" })).toHaveAttribute("href", "/games");
     const bonuses = await screen.findByRole("region", { name: "Bonuses" });
-    expect(within(bonuses).getByRole("link", { name: "Welcome Bonus: view in Promotions" })).toHaveAttribute("href", `/promotions?promo=${PROMOTIONS[0]!.id}`);
-    expect(within(bonuses).getByText("₱5,000")).toBeInTheDocument(); // the headline number on its own line
+    const welcome = await within(bonuses).findByRole("article", { name: "Welcome Bonus" }); // the back office's bonus
+    expect(within(welcome).getByText("₱5,000")).toBeInTheDocument(); // the headline number on its own line
+    expect(within(welcome).getByRole("button", { name: "Activate" })).toBeInTheDocument();
     const hero = await screen.findByRole("region", { name: "Promotions" });
-    expect(within(hero).getByRole("link", { name: "Welcome Bonus — 100% up to ₱5,000" })).toHaveAttribute("href", `/promotions?promo=${PROMOTIONS[0]!.id}`);
+    expect(within(hero).getByRole("link", { name: "Welcome Bonus — 100% up to ₱5,000" })).toHaveAttribute("href", "/promotions");
     expect(within(hero).queryByRole("button", { name: /Show banner/ })).toBeNull(); // one slide: no controls
   });
 
@@ -217,7 +242,7 @@ describe("Home (P3-27)", () => {
     expect(screen.queryByRole("region", { name: "Promotions" })).toBeNull(); // the hero carousel
   });
 
-  it("rotates live banners with dots, and a banner linked to a promotion opens its terms", async () => {
+  it("rotates live banners with dots, and a banner linked to a promotion opens Promotions", async () => {
     // msw prefers the earlier handler in one use() call: the banners come first, ahead of the catalogue's empty list
     server.use(http.get("*/api/v1/banners", () => HttpResponse.json([
       { id: "b1", placement: "home-hero", title: "Welcome", imageUrl: "https://cdn.example/1.png", imageWidth: 1956, imageHeight: 829, mobileImageUrl: null, mobileImageWidth: null, mobileImageHeight: null, fit: "Cover", promotionId: PROMOTIONS[0]!.id },
@@ -226,7 +251,7 @@ describe("Home (P3-27)", () => {
     renderRoute("/");
     const hero = await screen.findByRole("region", { name: "Promotions" });
     expect(within(hero).getAllByRole("button", { name: /Show banner/ })).toHaveLength(2);
-    expect(within(hero).getByRole("link", { name: "Welcome" })).toHaveAttribute("href", `/promotions?promo=${PROMOTIONS[0]!.id}`);
+    expect(within(hero).getByRole("link", { name: "Welcome" })).toHaveAttribute("href", "/promotions");
     expect(within(hero).getByRole("button", { name: "Pause banner rotation" })).toBeInTheDocument();
   });
 });

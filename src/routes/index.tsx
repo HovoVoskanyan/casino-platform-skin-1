@@ -6,23 +6,25 @@ import { Notice } from "@/components/ui/notice";
 import { HeroCarousel } from "@/features/lobby/hero-carousel";
 import { GameCardSkeleton, GameCardTile } from "@/features/lobby/game-card";
 import { AllGamesTile, CategoryTile } from "@/features/lobby/category-tile";
-import { BonusTile } from "@/features/lobby/promotion-card";
 import { PaymentsPanel, TrustStrip } from "@/features/lobby/home-panels";
-import { useCategories, useGames, usePromotions } from "@/features/lobby/api";
+import { useCategories, useGames } from "@/features/lobby/api";
+import { useOffers } from "@/features/bonus/api";
+import { OfferTiles } from "@/features/bonus/offer-list";
 
 export const Route = createFileRoute("/")({ component: HomePage });
 
 /**
- * Home (design: hero carousel, Hot Games, Quick Play, Bonuses, Payments, trust strip), every section on core's
- * reads (P3-23): the `home-hero` banners, the skin's HOT games, its categories with counts, its live promotions.
- * The design's rails carry no "View all": Quick Play ends on an All Games tile instead. A section whose data is
- * empty is left out rather than framed empty. The Lucky Wheel is P5-04's.
+ * Home (design: hero carousel, Hot Games, Quick Play, Bonuses, Payments, trust strip): the `home-hero` banners, the
+ * skin's HOT games and its categories with counts on core's reads (P3-23); Bonuses = the bonuses switched on in the
+ * back office (bonus's catalog), each with Activate / Deposit to claim. The design's rails carry no "View all": Quick
+ * Play ends on an All Games tile instead. A section whose data is empty is left out rather than framed empty. The
+ * Lucky Wheel is P5-04's.
  */
 function HomePage() {
   const { t } = useTranslation();
   const hot = useGames({ badge: "hot" }, 12);
   const categories = useCategories();
-  const promotions = usePromotions();
+  const offers = useOffers();
   const hotGames = hot.data?.pages.flatMap((p) => p.items) ?? [];
 
   return (
@@ -43,9 +45,9 @@ function HomePage() {
         </Rail>
       ) : null}
 
-      {promotions.data && promotions.data.length > 0 ? (
+      {offers.data && offers.data.length > 0 ? (
         <Rail title={t("home.bonuses")} label={t("home.bonuses")} phoneGrid>
-          {promotions.data.map((p) => <BonusTile key={p.id} promotion={p} />)}
+          <OfferTiles offers={offers.data} />
         </Rail>
       ) : null}
 

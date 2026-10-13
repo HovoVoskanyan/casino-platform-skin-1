@@ -1171,5 +1171,22 @@
         }
       ]
     }
-  ]
+  ],
+  "bonus.tile.eyebrow": "BONUS",
+  "bonus.tile.percentUpTo": "{{percent}}% up to",
+  "bonus.tile.depositBonus": "deposit bonus",
+  "bonus.tile.freeSpins_one": "free spin",
+  "bonus.tile.freeSpins_other": "free spins",
+  "bonus.tile.activate": "Activate",
+  "bonus.tile.activateBonus": "Activate bonus",
+  "bonus.tile.activating": "Activating…",
+  "bonus.tile.signInToActivate": "Sign in to activate",
+  "bonus.tile.depositToClaim": "Deposit to claim",
+  "bonus.tile.inProgress": "In progress — view",
+  "bonus.tile.claimed": "Claimed",
+  "bonus.tile.activated": "Activated — make a qualifying deposit to get it.",
+  "bonus.tile.activatedLong": "Activated! Your bonus is added when your next qualifying deposit completes.",
+  "promotions.available": "Available bonuses",
+  "promotions.availableCount_one": "{{count}} active offer",
+  "promotions.availableCount_other": "{{count}} active offers"
 }

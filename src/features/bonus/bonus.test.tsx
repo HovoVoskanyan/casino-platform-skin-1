@@ -104,6 +104,7 @@ describe("My bonuses (P3-29)", () => {
     expect(within(card).getByText("Awaiting activation")).toBeInTheDocument();
     expect(within(card).getByText("Activates on your next deposit of ₱500 or more.")).toBeInTheDocument();
     expect(within(card).getByRole("status")).toHaveTextContent("Claimed. This bonus is added on your next qualifying deposit.");
+    expect(within(card).getByRole("link", { name: "Deposit to claim" })).toHaveAttribute("href", "/wallet#deposit");
     expect(within(screen.getByRole("region", { name: "Available to claim" })).queryByRole("article", { name: "Weekend Reload" })).toBeNull();
   });
 

@@ -33,13 +33,6 @@ declare module "@tanstack/react-router" {
   }
 }
 
-declare module "@tanstack/history" {
-  interface HistoryState {
-    /** Set when the Promotions page itself opened `?promo=` — closing the dialog then steps Back instead of leaving a dead entry. */
-    promoOpenedHere?: boolean;
-  }
-}
-
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>

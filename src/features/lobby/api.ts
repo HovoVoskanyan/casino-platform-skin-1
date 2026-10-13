@@ -17,7 +17,6 @@ export type Category = components["schemas"]["LobbyCategoryResponse"];
 export type Provider = components["schemas"]["LobbyProviderResponse"];
 export type Banner = components["schemas"]["LobbyBannerResponse"];
 export type Promotion = components["schemas"]["LobbyPromotionResponse"];
-export type PromotionDetail = components["schemas"]["LobbyPromotionDetailResponse"];
 
 export const SORTS = ["popular", "newest", "name", "provider"] as const;
 export type Sort = (typeof SORTS)[number];
@@ -105,16 +104,6 @@ export function usePromotions() {
   return useQuery(queryOptions({
     queryKey: queryKeys.lobby.promotions(i18n.language),
     queryFn: () => unwrap<Promotion[]>(api.GET("/api/v1/promotions", { headers: lang(i18n.language) })),
-    staleTime: STALE,
-  }));
-}
-
-export function usePromotion(id: string | null) {
-  const { i18n } = useTranslation();
-  return useQuery(queryOptions({
-    queryKey: queryKeys.lobby.promotion(i18n.language, id ?? ""),
-    queryFn: () => unwrap<PromotionDetail>(api.GET("/api/v1/promotions/{id}", { params: { path: { id: id! } }, headers: lang(i18n.language) })),
-    enabled: id !== null,
     staleTime: STALE,
   }));
 }

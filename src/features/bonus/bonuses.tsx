@@ -166,7 +166,8 @@ export function Bonuses({ variant }: { variant: "page" | "panel" }) {
             const current = s.running.find((r) => r.status === "active" && r.bonusId !== row.bonusId);
             const c = awaitingCopy(t, definition, current?.bonusName ?? null);
             return <ActiveCard key={key} id={key} name={row.bonusName} reward={c.reward} status="awaiting" remaining={c.remaining} expiry={c.expiry} details={c.details}
-              open={!!open[key]} onDetails={() => toggle(key)} message={messages[key]} />;
+              open={!!open[key]} onDetails={() => toggle(key)} message={messages[key]}
+              extra={<Link to="/wallet" hash="deposit" className={cn(GOLD, "flex flex-[1_1_150px] items-center justify-center px-[18px] whitespace-nowrap")}>{t("bonus.tile.depositToClaim")}</Link>} />;
           }
           const key = `running:${row.playerBonusId ?? row.bonusId}`;
           const c = runningCopy(t, row, definition, live, hidden);

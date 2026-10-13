@@ -46,6 +46,7 @@ export const queryKeys = {
     providers: () => [...queryKeys.lobby.all, "providers"] as const,
     banners: (lang: string, placement: string) => [...queryKeys.lobby.all, lang, "banners", placement] as const,
     promotions: (lang: string) => [...queryKeys.lobby.all, lang, "promotions"] as const,
-    promotion: (lang: string, id: string) => [...queryKeys.lobby.all, lang, "promotion", id] as const,
+    /** The bonuses switched on in the back office, as a guest sees them (a player's own standing is bonus's session read). */
+    bonuses: () => [...queryKeys.lobby.all, "bonuses"] as const,
   },
 } as const;

@@ -168,3 +168,20 @@ export function heldSpinsCopy(t: TFunction, f: PlayerFreeBet, gameName: string |
     ].filter((x): x is string => !!x),
   };
 }
+
+/**
+ * A tile's headline, the design's Home Bonuses form ("50% up to" / "₱1,000"): the first band's cap when it has one,
+ * else its percentage; free spins alone headline their count. Nothing → the tile shows the reward line instead.
+ */
+export function offerHeadline(t: TFunction, b: BonusDefinition): { lead: string; amount: string } {
+  const step = firstStep(b);
+  const band = bands(step)[0];
+  if (band && band.bonusPercent > 0) {
+    const cap = band.maxBonusCents ?? step?.maxBonusAmountCents ?? null;
+    return cap
+      ? { lead: t("bonus.tile.percentUpTo", { percent: band.bonusPercent }), amount: pesoWhole(cap) }
+      : { lead: t("bonus.tile.depositBonus"), amount: `${band.bonusPercent}%` };
+  }
+  if (step?.freeSpins) return { lead: t("bonus.tile.freeSpins", { count: step.freeSpins }), amount: String(step.freeSpins) };
+  return { lead: "", amount: "" };
+}
