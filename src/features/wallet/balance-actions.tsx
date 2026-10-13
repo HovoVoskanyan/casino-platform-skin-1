@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
  * The phone balance panel's action row (owner reference, 2026-10-13): a gold Deposit — the primary action — beside a
  * purple "View my bonuses", ~41/59, 52px tall. Each button's floor is its own content (icon, one-line label, arrow),
  * so when both cannot sit on one line they stack, full width, Deposit first (side by side from a 390px phone up,
- * stacked on 320–360px). Desktop keeps its single button.
+ * stacked on 320–360px); the desktop panel is wide enough for one line.
  */
 export function BalanceActions({ onDeposit, onBonuses }: { onDeposit: () => void; onBonuses: () => void }) {
   const { t } = useTranslation();

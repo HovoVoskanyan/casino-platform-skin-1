@@ -5,18 +5,16 @@ import { MASKED, peso } from "@/lib/money";
 import { cn } from "@/lib/utils";
 import { useBalance, useBalanceHidden } from "./balance-store";
 import { useBonusCounts } from "@/features/bonus/api";
-import { bonusDrawer } from "@/features/bonus/bonus-drawer";
 import { BalanceActions } from "./balance-actions";
 
 /**
  * Design (Header, signed in): the balance box — "Balance" + the live total (masked when the shared Hide balance
  * setting is on, "—" while unknown) linking to the Wallet — and a chevron opening "Balance details": Cash balance,
- * Bonus balance, the Available to claim / Active bonuses counts and "View my bonuses". Closes on an outside press and
- * on Escape. "View my bonuses" opens the bonuses drawer in place (P3-29), handing focus back to the chevron on close.
- * The panel hangs from the sticky header, not the box: under its right edge (22px in) on desktop, edge to edge
- * (10px in) on phones — the design's placement. On phones the panel ends with the Deposit + "View my bonuses" row
- * (`BalanceActions`): Deposit opens the wallet's deposit dialog (#deposit — nothing is requested until the player
- * submits it), "View my bonuses" goes to My Account → Bonuses. Desktop keeps its one button and the drawer.
+ * Bonus balance, the Available to claim / Active bonuses counts, then the Deposit + "View my bonuses" row
+ * (`BalanceActions`, the owner's reference): Deposit opens the wallet's deposit dialog (#deposit — nothing is
+ * requested until the player submits it), "View my bonuses" goes to My Account → Bonuses. Closes on an outside press
+ * and on Escape. The panel hangs from the sticky header, not the box: under its right edge (22px in) on desktop —
+ * 372px wide, so the two buttons share a line — edge to edge (10px in) on phones.
  */
 export function BalanceMenu() {
   const { t } = useTranslation();
@@ -24,7 +22,6 @@ export function BalanceMenu() {
   const [hidden] = useBalanceHidden();
   const [open, setOpen] = useState(false);
   const box = useRef<HTMLSpanElement>(null);
-  const chevron = useRef<HTMLButtonElement>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -47,23 +44,22 @@ export function BalanceMenu() {
         <span className="hidden text-[12px] font-semibold text-cc-lavender md:inline">{t("nav.balance")}</span>
         <span className="tabular truncate" title={text} data-testid="header-balance">{text}</span>
       </Link>
-      <button ref={chevron} type="button" aria-label={t("balance.showDetails")} aria-expanded={open} aria-haspopup="dialog" onClick={() => setOpen((o) => !o)}
+      <button type="button" aria-label={t("balance.showDetails")} aria-expanded={open} aria-haspopup="dialog" onClick={() => setOpen((o) => !o)}
         className="flex h-full w-8 flex-none items-center justify-center border-l border-[rgba(167,139,250,.2)] bg-white/[.03] text-[11px] text-[#cbb6e6] hover:bg-[rgba(167,139,250,.16)] hover:text-white md:w-[34px]">
         {open ? "▲" : "▼"}
       </button>
       {open ? (
         <BalancePanel
           onClose={() => setOpen(false)}
-          onBonuses={() => { setOpen(false); bonusDrawer.open(chevron.current); }}
           onDeposit={() => { setOpen(false); void navigate({ to: "/wallet", hash: "deposit" }); }}
-          onAccountBonuses={() => { setOpen(false); void navigate({ to: "/account", search: { tab: "bonuses" } }); }}
+          onBonuses={() => { setOpen(false); void navigate({ to: "/account", search: { tab: "bonuses" } }); }}
         />
       ) : null}
     </span>
   );
 }
 
-function BalancePanel({ onClose, onBonuses, onDeposit, onAccountBonuses }: { onClose: () => void; onBonuses: () => void; onDeposit: () => void; onAccountBonuses: () => void }) {
+function BalancePanel({ onClose, onDeposit, onBonuses }: { onClose: () => void; onDeposit: () => void; onBonuses: () => void }) {
   const { t } = useTranslation();
   const balance = useBalance();
   const [hidden] = useBalanceHidden();
@@ -72,7 +68,7 @@ function BalancePanel({ onClose, onBonuses, onDeposit, onAccountBonuses }: { onC
 
   return (
     <div role="dialog" aria-label={t("balance.details")}
-      className="absolute top-[calc(100%+6px)] right-[10px] left-[10px] z-[120] flex max-h-[calc(100dvh-120px)] animate-cc-rise flex-col gap-3 overflow-y-auto rounded-cc-xl border border-cc-line-strong bg-[linear-gradient(170deg,#2a1049_0%,#1a0930_100%)] p-4 shadow-[0_24px_60px_rgba(4,1,9,.7)] md:right-[22px] md:left-auto md:max-h-[min(420px,calc(100dvh-120px))] md:w-[296px] md:rounded-cc-lg">
+      className="absolute top-[calc(100%+6px)] right-[10px] left-[10px] z-[120] flex max-h-[calc(100dvh-120px)] animate-cc-rise flex-col gap-3 overflow-y-auto rounded-cc-xl border border-cc-line-strong bg-[linear-gradient(170deg,#2a1049_0%,#1a0930_100%)] p-4 shadow-[0_24px_60px_rgba(4,1,9,.7)] md:right-[22px] md:left-auto md:max-h-[min(420px,calc(100dvh-120px))] md:w-[372px] md:rounded-cc-lg">
       <div className="flex items-start justify-between gap-3">
         <span className="text-[11px] font-extrabold tracking-[1.1px] text-cc-muted uppercase">{t("balance.details")}</span>
         <button type="button" aria-label={t("balance.closeDetails")} onClick={onClose} className="-mt-1 -mr-1 flex h-[30px] w-[30px] flex-none items-center justify-center rounded-[9px] border border-[rgba(167,139,250,.26)] bg-white/[.05] text-[12px] font-extrabold text-[#cbb6e6] hover:bg-white/[.12] hover:text-white">✕</button>
@@ -95,12 +91,7 @@ function BalancePanel({ onClose, onBonuses, onDeposit, onAccountBonuses }: { onC
           <Count label={t("balance.activeBonuses")} value={bonuses.isPending ? "—" : String(bonuses.activeBonuses)} />
         </div>
       )}
-      <div className="md:hidden">
-        <BalanceActions onDeposit={onDeposit} onBonuses={onAccountBonuses} />
-      </div>
-      <button type="button" onClick={onBonuses} className="hidden min-h-[46px] items-center justify-center md:flex rounded-cc-md bg-[image:var(--cc-gold-cta)] text-[14px] font-extrabold text-[#2c1400] shadow-[0_8px_20px_rgba(235,156,13,.3)] hover:brightness-105">
-        {t("balance.viewBonuses")}
-      </button>
+      <BalanceActions onDeposit={onDeposit} onBonuses={onBonuses} />
     </div>
   );
 }

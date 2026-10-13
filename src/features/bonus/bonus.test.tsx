@@ -218,15 +218,14 @@ describe("My bonuses (P3-29)", () => {
     expect(await screen.findByRole("region", { name: "Available to claim" })).toBeInTheDocument();
   });
 
-  it("View my bonuses opens the same component in place, and closing hands focus back to the chevron", async () => {
+  it("the menu's My Bonuses opens the same component in place, and closing hands focus back to the menu button", async () => {
     const user = userEvent.setup();
     server.use(signedIn(), ...bonusApi());
     renderRoute("/vip");
     await waitFor(() => expect(fakeHub.started).toBe(1));
-    const chevron = screen.getByRole("button", { name: "Show balance details" });
-    await user.click(chevron);
-    // jsdom applies no media queries: the phone row's button comes first in the panel, desktop's (the drawer) last
-    await user.click(screen.getAllByRole("button", { name: "View my bonuses" }).at(-1)!);
+    const menu = screen.getByRole("button", { name: "Menu" });
+    await user.click(menu);
+    await user.click(screen.getByRole("button", { name: "My Bonuses" }));
 
     const drawer = await screen.findByRole("dialog", { name: "My bonuses" });
     expect(await within(drawer).findByRole("article", { name: "Weekend Reload" })).toBeInTheDocument();
@@ -234,11 +233,11 @@ describe("My bonuses (P3-29)", () => {
 
     await user.keyboard("{Escape}");
     await waitFor(() => expect(screen.queryByRole("dialog", { name: "My bonuses" })).toBeNull());
-    expect(chevron).toHaveFocus();
+    expect(menu).toHaveFocus();
   });
 
-  // The phone panel's action row (jsdom applies no media queries, so the row and desktop's one button both render).
-  it("the phone panel's Deposit closes the panel and opens the wallet's deposit (#deposit — the dialog only)", async () => {
+  // The balance panel's action row (owner's reference): the same two buttons on phones and desktop.
+  it("the balance panel's Deposit closes the panel and opens the wallet's deposit (#deposit — the dialog only)", async () => {
     const user = userEvent.setup();
     server.use(signedIn(), ...bonusApi());
     const { router } = renderRoute("/vip");
@@ -249,13 +248,13 @@ describe("My bonuses (P3-29)", () => {
     expect(screen.queryByRole("dialog", { name: "Balance details" })).toBeNull();
   });
 
-  it("the phone panel's View my bonuses goes to My Account → Bonuses, not the drawer", async () => {
+  it("the balance panel's View my bonuses goes to My Account → Bonuses, not the drawer", async () => {
     const user = userEvent.setup();
     server.use(signedIn(), ...bonusApi());
     const { router } = renderRoute("/vip");
     await waitFor(() => expect(fakeHub.started).toBe(1));
     await user.click(screen.getByRole("button", { name: "Show balance details" }));
-    await user.click(screen.getAllByRole("button", { name: "View my bonuses" })[0]!); // the row's comes first
+    await user.click(screen.getByRole("button", { name: "View my bonuses" }));
     await waitFor(() => expect(router.state.location.href).toBe("/account?tab=bonuses"));
     expect(screen.queryByRole("dialog", { name: "My bonuses" })).toBeNull();
     expect(await screen.findByRole("article", { name: "Weekend Reload" })).toBeInTheDocument();
@@ -272,8 +271,8 @@ describe("My bonuses (P3-29)", () => {
       server.use(signedIn(), ...bonusApi({ freebets: [holding] }));
       const { router, unmount } = renderRoute("/vip");
       await waitFor(() => expect(fakeHub.started).toBe(1));
-      await user.click(screen.getByRole("button", { name: "Show balance details" }));
-      await user.click(screen.getAllByRole("button", { name: "View my bonuses" }).at(-1)!); // desktop's: the drawer
+      await user.click(screen.getByRole("button", { name: "Menu" }));
+      await user.click(screen.getByRole("button", { name: "My Bonuses" }));
       const drawer = await screen.findByRole("dialog", { name: "My bonuses" });
       await user.click(await within(drawer).findByRole("link", { name: "Play Sweet Bonanza" }));
       await waitFor(() => expect(router.state.location.pathname).toBe("/games/g-sweet"));
