@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import { PageHero, Shell } from "@/components/layout/shell";
-import { Rail } from "@/components/ui/rail";
+import { Rail, RailViewAll } from "@/components/ui/rail";
 import { Button } from "@/components/ui/button";
 import { Notice } from "@/components/ui/notice";
 import { SectionTitle } from "@/components/ui/section-title";
@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { authDialog } from "@/features/auth/auth-dialog-state";
 import { useSession } from "@/features/auth/session";
 import { GameCardSkeleton, GameCardTile } from "@/features/lobby/game-card";
+import { TrustStrip } from "@/features/lobby/home-panels";
 import { SORTS, useCategories, useFavourites, useGames, useProviders, type GameCard, type GameFilters, type Sort } from "@/features/lobby/api";
 
 /**
@@ -37,8 +38,8 @@ export const Route = createFileRoute("/games")({
 });
 
 /**
- * Games (design: hero + search, category pills, Favourite Games, Popular, Providers, the grid with sort, the
- * favourites-only toggle and Load More). The catalogue is core's (P3-23) — only games this skin shows.
+ * Games (design: hero + search, category pills, the filter row, Favourite Games, Popular, Game Providers, the grid
+ * with sort and Load More, the trust strip). The catalogue is core's (P3-23) — only games this skin shows.
  */
 function GamesPage() {
   const { t } = useTranslation();
@@ -47,17 +48,27 @@ function GamesPage() {
   const set = (patch: Partial<GamesSearch>) => void navigate({ search: (prev) => clean({ ...prev, ...patch }), replace: true });
   const { signedIn } = useSession();
   const filtered = Boolean(search.q || search.category || search.provider || search.badge || (search.fav && signedIn));
+  const toGrid = () => document.getElementById("all-games")?.scrollIntoView({ behavior: "smooth", block: "start" });
 
   return (
     <Shell>
-      <PageHero title={t("games.title")} subtitle={t("games.subtitle")}>
+      <PageHero title={<>{t("games.titleLead")} <span className="text-cc-gold">{t("games.titleAccent")}</span></>} subtitle={t("games.subtitle")} logoWidth={172}>
         <SearchBox value={search.q ?? ""} onChange={(q) => set({ q: q || undefined })} />
       </PageHero>
-      <CategoryPills category={search.category} badge={search.badge} onPick={(category, badge) => set({ category, badge })} />
-      {!filtered ? <FavouritesRail onViewAll={() => set({ fav: true })} /> : null}
-      {!filtered ? <PopularRail onViewAll={() => set({ sort: "popular" })} /> : null}
+      <section aria-label={t("games.filters")} className="-mb-[6px] flex flex-col gap-[14px] min-[600px]:gap-[18px]">
+        <CategoryPills category={search.category} badge={search.badge} onPick={(category, badge) => set({ category, badge })} />
+        <FilterRow
+          favourites={Boolean(search.fav && signedIn)}
+          onProviders={() => document.getElementById("game-providers")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+          onSort={(sort) => { set({ sort: sort === "popular" ? undefined : sort }); toGrid(); }}
+          onFavourites={() => (signedIn ? set({ fav: !search.fav || undefined }) : authDialog.open("signin", window.location.pathname + window.location.search))}
+        />
+      </section>
+      {!filtered ? <FavouritesRail onViewAll={() => { set({ fav: true }); toGrid(); }} /> : null}
+      {!filtered ? <PopularRail onViewAll={() => { set({ sort: undefined, fav: undefined }); toGrid(); }} /> : null}
       <ProvidersRail selected={search.provider} onPick={(provider) => set({ provider: provider === search.provider ? undefined : provider })} />
       <GameGrid search={search} set={set} />
+      <TrustStrip variant="games" className="-mt-4 min-[600px]:mt-0" />
     </Shell>
   );
 }
@@ -81,20 +92,34 @@ function SearchBox({ value, onChange }: { value: string; onChange: (q: string) =
     return () => window.clearTimeout(id);
   }, [text, value, onChange]);
   return (
-    <label className="relative block">
+    <label className="relative block max-w-[560px]">
       <span className="sr-only">{t("games.search")}</span>
-      <svg aria-hidden width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--cc-lavender)" strokeWidth="2" strokeLinecap="round" className="absolute top-1/2 left-[14px] -translate-y-1/2 md:left-4"><circle cx="11" cy="11" r="7" /><path d="M20 20l-3.5-3.5" /></svg>
+      <svg aria-hidden width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="var(--cc-lavender)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="pointer-events-none absolute top-1/2 left-[14px] -translate-y-1/2 min-[600px]:left-4"><circle cx="11" cy="11" r="6.5" /><path d="M16 16l4.5 4.5" /></svg>
       <input
         type="search"
         value={text}
         maxLength={64}
         onChange={(e) => setText(e.target.value)}
         placeholder={t("games.searchPlaceholder")}
-        className="h-[52px] w-full rounded-cc-lg border border-cc-line-strong bg-[rgba(9,3,16,.45)] pr-3 pl-[42px] text-[16px] font-medium text-cc-ink placeholder:text-cc-muted focus:border-[rgba(255,201,60,.55)] focus:outline-none md:pl-[46px]"
+        // 16px on phones: anything smaller and iOS zooms the page on focus
+        className="h-[52px] w-full rounded-cc-lg border border-cc-line-strong bg-[rgba(8,4,16,.6)] pr-3 pl-[42px] text-[16px] font-medium text-cc-ink placeholder:text-cc-muted focus:border-[rgba(255,201,60,.6)] focus:shadow-[0_0_0_3px_rgba(255,201,60,.14)] focus:outline-none min-[600px]:pr-4 min-[600px]:pl-[46px] min-[600px]:text-[14.5px]"
       />
     </label>
   );
 }
+
+/** The design's pill marks, by category code; a code it did not draw gets the star. */
+const PILL_MARKS: Record<string, string> = {
+  all: "M4 5h6v6H4zM14 5h6v6h-6zM4 13h6v6H4zM14 13h6v6h-6z",
+  slots: "M5 4h14v16H5zM9 8v8M15 8v8",
+  live: "M4 6h12v9H4zM20 8v9M8 19h8",
+  blackjack: "M7 5h7l4 5-7 9-4-5z",
+  roulette: "M12 3a9 9 0 100 18 9 9 0 000-18zm0 6a3 3 0 100 6 3 3 0 000-6z",
+  crash: "M4 19l6-6 3 3 7-9",
+  table: "M4 8h16l-2 9H6zM9 8V5h6v3",
+  hot: "M12 3c1 3.5 5 5.5 5 10a5 5 0 01-10 0c0-2.2 1.2-3.6 2.4-4.6.3 1.6 1.1 2.6 2.1 2.6 0-2.8-.6-5.3.5-8z",
+};
+const STAR = "M12 4l2.2 4.6 5 .7-3.6 3.5.8 5-4.4-2.3-4.4 2.3.8-5L4.8 9.3l5-.7z";
 
 function CategoryPills({ category, badge, onPick }: { category?: string; badge?: "hot" | "new"; onPick: (category?: string, badge?: "hot" | "new") => void }) {
   const { t } = useTranslation();
@@ -106,9 +131,10 @@ function CategoryPills({ category, badge, onPick }: { category?: string; badge?:
     { key: "new", label: t("games.new"), on: badge === "new" && !category, pick: () => onPick(undefined, "new") },
   ];
   return (
-    <nav aria-label={t("games.categories")} className="-mx-4 flex gap-2 overflow-x-auto px-4 py-1 [scrollbar-width:none] md:mx-0 md:flex-wrap md:px-0">
+    <nav aria-label={t("games.categories")} className="-mx-4 -my-1 flex gap-[10px] overflow-x-auto overscroll-x-contain px-4 py-1 [scrollbar-width:none] min-[600px]:mx-[-2px] min-[600px]:px-[2px]">
       {pills.map((p) => (
-        <button key={p.key} type="button" aria-pressed={p.on} onClick={p.pick} className={cn("flex h-10 flex-none items-center rounded-full border px-4 text-[13.5px] font-bold whitespace-nowrap transition-colors", p.on ? "border-[rgba(255,201,60,.6)] bg-[image:var(--cc-gold-cta)] text-[#2c1400] shadow-[0_8px_22px_rgba(235,156,13,.32)]" : "border-cc-line bg-white/[.03] text-cc-text hover:border-cc-line-strong")}>
+        <button key={p.key} type="button" aria-pressed={p.on} onClick={p.pick} className={cn("flex h-[42px] flex-none items-center gap-2 rounded-cc-md border px-4 text-[13.5px] font-bold whitespace-nowrap transition-[border-color,background-color]", p.on ? "border-[rgba(255,201,60,.6)] bg-[image:var(--cc-gold-cta)] text-[#2c1400] shadow-[0_8px_22px_rgba(235,156,13,.32)]" : "border-cc-line bg-white/[.03] text-cc-text hover:border-cc-line-strong")}>
+          <svg aria-hidden width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={p.on ? "#2c1400" : "#c4b5fd"} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d={PILL_MARKS[p.key] ?? STAR} /></svg>
           {p.label}
         </button>
       ))}
@@ -116,14 +142,46 @@ function CategoryPills({ category, badge, onPick }: { category?: string; badge?:
   );
 }
 
+/** Design: Providers (jumps to the rail) / Popularity / Newest (sort the grid and jump to it) and the ♥ Favourites toggle — one scrolling row on phones. */
+function FilterRow({ favourites, onProviders, onSort, onFavourites }: { favourites: boolean; onProviders: () => void; onSort: (sort: Sort) => void; onFavourites: () => void }) {
+  const { t } = useTranslation();
+  const chip = "flex h-[46px] flex-none items-center gap-[9px] rounded-cc-md border px-[18px] text-[13.5px] whitespace-nowrap transition-[border-color,background-color,color]";
+  const quiet = "border-cc-line bg-white/[.035] font-semibold text-cc-control hover:border-[rgba(167,139,250,.38)] hover:bg-white/[.06] hover:text-white";
+  const caret = <span aria-hidden className="text-[10px] text-[#9c88bb]">▾</span>;
+  return (
+    <div className="-mx-4 -my-1 flex items-center gap-[10px] overflow-x-auto overscroll-x-contain px-4 py-1 [scrollbar-width:none] min-[600px]:mx-[-2px] min-[600px]:flex-wrap min-[600px]:overflow-visible min-[600px]:px-[2px]">
+      <button type="button" onClick={onProviders} className={cn(chip, quiet)}>{t("games.filter.providers")}{caret}</button>
+      {(["popular", "newest"] as const).map((s) => (
+        <button key={s} type="button" onClick={() => onSort(s)} className={cn(chip, quiet)}>{t(`games.sort.${s}`)}{caret}</button>
+      ))}
+      <span className="hidden min-w-2 flex-1 min-[600px]:block" />
+      <button type="button" aria-pressed={favourites} onClick={onFavourites} className={cn(chip, "px-5 font-bold", favourites ? "border-[rgba(255,93,125,.5)] bg-[rgba(255,93,125,.16)] text-[#ff8da3]" : "border-[rgba(167,139,250,.16)] bg-white/[.025] text-[#b7a5d3] hover:text-white")}>
+        <span aria-hidden className="text-[14px]">♥</span>{t("games.favouritesOnly")}
+      </button>
+    </div>
+  );
+}
+
 function FavouritesRail({ onViewAll }: { onViewAll: () => void }) {
   const { t } = useTranslation();
   const { signedIn } = useSession();
   const { data = [] } = useFavourites();
-  if (!signedIn || data.length === 0) return null;
+  if (!signedIn || data.length === 0) {
+    // Design: the section stays, with an invitation to use the ♥ (a guest's ♥ opens sign-in first).
+    return (
+      <section aria-label={t("games.favourites")} className="flex flex-col gap-[clamp(16px,2.4vw,22px)]">
+        <SectionTitle>{t("games.favourites")}</SectionTitle>
+        <div className="flex flex-col items-center gap-2 rounded-cc-xl border border-dashed border-[rgba(167,139,250,.26)] bg-white/[.02] px-[22px] py-[34px] text-center">
+          <span aria-hidden className="flex h-12 w-12 items-center justify-center rounded-full border border-[rgba(255,93,125,.35)] bg-[rgba(255,93,125,.1)] text-[19px] text-[#ff8da3]">♡</span>
+          <span className="text-[17px] font-extrabold text-cc-ink">{t("games.noFavouritesTitle")}</span>
+          <span className="text-[13px] font-medium text-cc-lavender">{t("games.noFavouritesHint")}</span>
+        </div>
+      </section>
+    );
+  }
   return (
-    <Rail title={t("games.favourites")} label={t("games.favourites")} action={<Button variant="ghost" size="sm" className="text-cc-gold" onClick={onViewAll}>{t("lobby.viewAll")}</Button>}>
-      {data.map((g) => <GameCardTile key={g.id} game={g} variant="rail" />)}
+    <Rail title={t("games.favourites")} label={t("games.favourites")} arrows="games" action={<RailViewAll onClick={onViewAll}>{t("lobby.viewAll")}</RailViewAll>}>
+      {data.map((g) => <GameCardTile key={g.id} game={g} variant="row" />)}
     </Rail>
   );
 }
@@ -134,8 +192,8 @@ function PopularRail({ onViewAll }: { onViewAll: () => void }) {
   const games = popular.data?.pages[0]?.items ?? [];
   if (!popular.isPending && games.length === 0) return null;
   return (
-    <Rail title={t("games.popular")} label={t("games.popular")} action={<Button variant="ghost" size="sm" className="text-cc-gold" onClick={onViewAll}>{t("lobby.viewAll")}</Button>}>
-      {popular.isPending ? Array.from({ length: 5 }, (_, i) => <GameCardSkeleton key={i} variant="rail" />) : games.map((g) => <GameCardTile key={g.id} game={g} variant="rail" />)}
+    <Rail title={t("games.popular")} label={t("games.popular")} arrows="games" action={<RailViewAll onClick={onViewAll}>{t("lobby.viewAll")}</RailViewAll>}>
+      {popular.isPending ? Array.from({ length: 5 }, (_, i) => <GameCardSkeleton key={i} variant="row" />) : games.map((g) => <GameCardTile key={g.id} game={g} variant="row" />)}
     </Rail>
   );
 }
@@ -145,17 +203,25 @@ function ProvidersRail({ selected, onPick }: { selected?: string; onPick: (code:
   const { data: providers = [] } = useProviders();
   if (providers.length === 0) return null;
   return (
-    <Rail title={t("games.providers")} label={t("games.providers")}>
+    <Rail id="game-providers" title={t("games.providers")} label={t("games.providers")} arrows="games">
       {providers.map((p) => {
         const on = selected === p.code;
         const mark = p.name.replace(/[^A-Za-z ]/g, "").split(" ").filter(Boolean).slice(0, 2).map((w) => w[0]!.toUpperCase()).join("");
         return (
-          <button key={p.code} type="button" aria-pressed={on} onClick={() => onPick(p.code)} className={cn("flex h-[76px] w-[184px] flex-none snap-start items-center gap-3 rounded-cc-xl border px-4 text-left transition-colors", on ? "border-[rgba(255,201,60,.42)] bg-[linear-gradient(180deg,#2b1350_0%,#1c0b33_100%)]" : "border-cc-line bg-[linear-gradient(180deg,#23103f_0%,#180a2c_100%)] hover:border-cc-line-strong")}>
-            {p.thumbnailUrl ? <img src={p.thumbnailUrl} alt="" className="h-10 w-10 flex-none rounded-cc object-contain" /> : <span aria-hidden className="flex h-10 w-10 flex-none items-center justify-center rounded-cc bg-white/[.06] text-[13px] font-extrabold text-cc-control">{mark}</span>}
-            <span className="flex min-w-0 flex-col gap-[2px]">
-              <span className={cn("truncate text-[14px] font-extrabold", on ? "text-cc-gold-hover" : "text-cc-text")}>{p.name}</span>
-              <span className={cn("text-[12px] font-semibold", on ? "text-[#d6bd8e]" : "text-cc-lavender")}>{t("lobby.gameCount", { count: p.gameCount })}</span>
-            </span>
+          <button
+            key={p.code}
+            type="button"
+            aria-pressed={on}
+            aria-label={t("lobby.categoryLabel", { name: p.name, count: p.gameCount })}
+            onClick={() => onPick(p.code)}
+            className={cn("flex h-[108px] min-w-[176px] flex-[1_1_176px] snap-start flex-col items-center justify-center gap-[7px] rounded-cc-xl border px-[18px] py-[14px] transition-[transform,border-color,box-shadow] duration-200 hover:-translate-y-[2px] hover:border-[rgba(167,139,250,.42)] hover:shadow-[0_12px_26px_rgba(0,0,0,.4)]", on ? "border-[rgba(255,201,60,.42)] bg-[linear-gradient(180deg,#2b1350_0%,#1c0b33_100%)]" : "border-cc-line bg-[linear-gradient(180deg,#23103f_0%,#180a2c_100%)]")}
+          >
+            {p.thumbnailUrl ? (
+              <img src={p.thumbnailUrl} alt="" className="h-[30px] max-w-[120px] flex-none object-contain" />
+            ) : (
+              <span aria-hidden className="flex h-[30px] w-[30px] flex-none items-center justify-center rounded-[9px] border border-[rgba(167,139,250,.22)] bg-white/[.05] text-[11px] font-extrabold tracking-[.4px] text-[#b7a5d3]">{mark}</span>
+            )}
+            <span className={cn("text-[14.5px] leading-[1.15] font-extrabold tracking-[-0.2px] whitespace-nowrap", on ? "text-cc-gold-hover" : "text-cc-text")}>{p.name}</span>
           </button>
         );
       })}
@@ -172,6 +238,7 @@ function GameGrid({ search, set }: { search: GamesSearch; set: (patch: Partial<G
   const sort: Sort = search.sort ?? "popular";
   const nextSort = SORTS[(SORTS.indexOf(sort) + 1) % SORTS.length]!;
   const showFavourites = Boolean(search.fav && signedIn);
+  const filtered = Boolean(search.q || search.category || search.provider || search.badge || showFavourites);
 
   // The favourites-only view is the player's ♥ list (≤ 200, newest first) narrowed by the same filters, client-side.
   const favouriteCards = useMemo(() => (showFavourites ? filterFavourites(favourites.data ?? [], search) : []), [showFavourites, favourites.data, search]);
@@ -180,35 +247,46 @@ function GameGrid({ search, set }: { search: GamesSearch; set: (patch: Partial<G
   const pending = showFavourites ? favourites.isPending : games.isPending;
 
   return (
-    <section className="flex flex-col gap-4" aria-labelledby="all-games">
+    <section className="flex flex-col gap-[clamp(16px,2.4vw,22px)]" aria-labelledby="all-games">
       <div className="flex flex-wrap items-center gap-3">
-        <span id="all-games"><SectionTitle count={pending ? undefined : t("games.count", { count: total })}>{showFavourites ? t("games.favourites") : search.badge === "hot" ? t("games.hotGames") : search.badge === "new" ? t("games.newGames") : t("games.allGames")}</SectionTitle></span>
+        <span id="all-games" className="scroll-mt-24"><SectionTitle count={pending ? undefined : t("games.count", { count: total })}>{showFavourites ? t("games.favourites") : search.badge === "hot" ? t("games.hotGames") : search.badge === "new" ? t("games.newGames") : t("games.allGames")}</SectionTitle></span>
         <span className="min-w-2 flex-1" />
-        <Button size="sm" aria-label={t("games.sortLabel", { sort: t(`games.sort.${sort}`) })} onClick={() => set({ sort: nextSort === "popular" ? undefined : nextSort })} disabled={showFavourites}>
-          {t("games.sortBy")} <span className="text-cc-gold">{t(`games.sort.${sort}`)}</span>
-        </Button>
-        <Button
-          size="sm"
-          aria-pressed={showFavourites}
-          className={cn(showFavourites && "border-[rgba(255,93,125,.5)] bg-[rgba(255,93,125,.16)] text-[#ff8da3]")}
-          onClick={() => (signedIn ? set({ fav: !search.fav || undefined }) : authDialog.open("signin", window.location.pathname + window.location.search))}
+        <button
+          type="button"
+          aria-label={t("games.sortLabel", { sort: t(`games.sort.${sort}`) })}
+          onClick={() => set({ sort: nextSort === "popular" ? undefined : nextSort })}
+          disabled={showFavourites}
+          className="flex h-[46px] items-center gap-[9px] rounded-cc-md border border-cc-line bg-white/[.035] px-[18px] text-[13.5px] font-semibold whitespace-nowrap text-cc-control hover:border-[rgba(167,139,250,.38)] hover:bg-white/[.06] hover:text-white disabled:opacity-60"
         >
-          ♥ {t("games.favouritesOnly")}
-        </Button>
+          {t("games.sortBy")} <span className="font-extrabold text-white">{t(`games.sort.${sort}`)}</span>
+          <span aria-hidden className="text-[10px] text-[#9c88bb]">▾</span>
+        </button>
       </div>
 
       {games.isError && !showFavourites ? <Notice tone="error">{t("common.loadFailed")}</Notice> : null}
       {!pending && items.length === 0 && !(games.isError && !showFavourites) ? (
-        <Notice tone="info">{showFavourites ? t("games.noFavourites") : search.q || search.category || search.provider || search.badge ? t("games.noMatch") : t("games.empty")}</Notice>
+        <div role="status" className="flex flex-wrap items-center gap-3 rounded-[16px] border border-cc-line-strong bg-[rgba(167,139,250,.09)] px-[18px] py-[15px]">
+          <span className="min-w-0 flex-[1_1_260px] text-[13px] leading-[1.5] font-semibold text-pretty text-cc-label">{showFavourites ? t("games.noFavourites") : filtered ? t("games.noMatch") : t("games.empty")}</span>
+          {filtered ? (
+            <button type="button" onClick={() => set({ q: undefined, category: undefined, provider: undefined, badge: undefined, fav: undefined })} className="min-h-11 rounded-[11px] border border-[rgba(167,139,250,.3)] bg-white/[.03] px-4 text-[13px] font-bold text-white hover:bg-white/[.08]">
+              {t("games.clearFilters")}
+            </button>
+          ) : null}
+        </div>
       ) : null}
 
-      <div className="grid grid-cols-[repeat(auto-fill,minmax(132px,1fr))] gap-3 md:grid-cols-[repeat(auto-fill,minmax(142px,1fr))] md:gap-[14px]">
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,132px),1fr))] gap-3 min-[600px]:grid-cols-[repeat(auto-fill,minmax(min(100%,142px),1fr))] min-[600px]:gap-[14px]">
         {pending ? Array.from({ length: 12 }, (_, i) => <GameCardSkeleton key={i} />) : items.map((g) => <GameCardTile key={g.id} game={g} />)}
       </div>
 
       {!showFavourites && games.hasNextPage ? (
-        <Button className="self-center" onClick={() => void games.fetchNextPage()} loading={games.isFetchingNextPage}>
-          {t("games.loadMore", { shown: items.length, total })}
+        <Button
+          className="h-[50px] self-center rounded-cc-lg border-[rgba(167,139,250,.32)] bg-[linear-gradient(180deg,#23103f_0%,#190a2c_100%)] px-[30px] text-[14.5px] text-white hover:border-[rgba(167,139,250,.6)] hover:bg-white/[.06] hover:shadow-[0_0_26px_rgba(139,92,246,.22)]"
+          aria-label={t("games.loadMoreLabel", { shown: items.length, total })}
+          onClick={() => void games.fetchNextPage()}
+          loading={games.isFetchingNextPage}
+        >
+          {t("games.loadMore")} <span aria-hidden className="text-[13px] text-[#c4b5fd]">↓</span>
         </Button>
       ) : null}
     </section>

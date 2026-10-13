@@ -38,6 +38,7 @@
   --cc-scrim: rgba(6, 2, 12, 0.76);
   --cc-canvas: radial-gradient(1100px 640px at 50% -8%, var(--cc-canvas-top) 0%, var(--cc-canvas-mid) 42%, var(--cc-canvas-base) 100%);
   --cc-gold-cta: linear-gradient(180deg, var(--cc-gold-light), var(--cc-gold-deep));
+  --cc-gold-bar: linear-gradient(180deg, var(--cc-gold-light), #e07f05);
   --cc-dialog: linear-gradient(170deg, #2a1049 0%, #1a0930 55%, #160726 100%);
   color-scheme: dark;
 }
@@ -80,8 +81,10 @@
   --animate-cc-fade: cc-fade 0.18s ease-out;
   --animate-cc-rise: cc-rise 0.22s ease-out;
   --animate-cc-ring: cc-ring 2.4s ease-out infinite;
+  --animate-cc-blink: cc-blink 1.6s ease-in-out infinite;
   @keyframes cc-fade { from { opacity: 0; } to { opacity: 1; } }
   @keyframes cc-rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  @keyframes cc-blink { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
   @keyframes cc-ring { 0% { transform: scale(1); opacity: .8; } 100% { transform: scale(1.35); opacity: 0; } }
 }
 

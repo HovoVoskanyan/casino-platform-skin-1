@@ -20,7 +20,7 @@ describe("Games (P3-27)", () => {
     await waitFor(() => expect(within(grid).getAllByRole("link", { name: /Pragmatic Play/ })).toHaveLength(12));
     expect(within(grid).getByText("30 games")).toBeInTheDocument();
 
-    await user.click(within(grid).getByRole("button", { name: "Load More (12 of 30)" }));
+    await user.click(within(grid).getByRole("button", { name: "Load More Games (12 of 30)" }));
     await waitFor(() => expect(within(grid).getAllByRole("link", { name: /Pragmatic Play/ })).toHaveLength(24));
     expect(seen.some((u) => u.searchParams.get("page") === "2" && u.searchParams.get("pageSize") === "12")).toBe(true);
     expect(languages.every((l) => l === "en-PH")).toBe(true); // the UI language, not the browser's
@@ -196,11 +196,23 @@ describe("Promotions (P3-27)", () => {
 });
 
 describe("Home (P3-27)", () => {
-  it("builds every section from core, and leaves out the hero when no banner is live", async () => {
+  it("builds every section from core; with no banner live the design's welcome art stands in for the welcome offer", async () => {
     server.use(...catalogue(3));
     renderRoute("/");
     expect(await screen.findByRole("region", { name: "Hot Games" })).toBeInTheDocument();
     expect(await screen.findByRole("link", { name: "Slots, 30 games" })).toHaveAttribute("href", "/games?category=slots");
+    expect(screen.getByRole("link", { name: "All Games" })).toHaveAttribute("href", "/games");
+    const bonuses = await screen.findByRole("region", { name: "Bonuses" });
+    expect(within(bonuses).getByRole("link", { name: "Welcome Bonus: view in Promotions" })).toHaveAttribute("href", `/promotions?promo=${PROMOTIONS[0]!.id}`);
+    expect(within(bonuses).getByText("₱5,000")).toBeInTheDocument(); // the headline number on its own line
+    const hero = await screen.findByRole("region", { name: "Promotions" });
+    expect(within(hero).getByRole("link", { name: "Welcome Bonus — 100% up to ₱5,000" })).toHaveAttribute("href", `/promotions?promo=${PROMOTIONS[0]!.id}`);
+    expect(within(hero).queryByRole("button", { name: /Show banner/ })).toBeNull(); // one slide: no controls
+  });
+
+  it("leaves out the hero when no banner is live and no welcome offer runs", async () => {
+    server.use(http.get("*/api/v1/promotions", () => HttpResponse.json(PROMOTIONS.filter((p) => p.category !== "welcome"))), ...catalogue(3));
+    renderRoute("/");
     expect(await screen.findByRole("region", { name: "Bonuses" })).toBeInTheDocument();
     expect(screen.queryByRole("region", { name: "Promotions" })).toBeNull(); // the hero carousel
   });

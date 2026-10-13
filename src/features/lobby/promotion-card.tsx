@@ -55,3 +55,63 @@ export function PromotionCard({ promotion, compact = false, openedHere = false }
     </article>
   );
 }
+
+/** The design's four Home Bonuses themes (welcome violet, reload amber, cashback deep violet, boost sky). */
+const BONUS_THEMES: Record<string, { icon: string; card: string; glow: string; sub: string; ring: string }> = {
+  welcome: { icon: "/icon-gift.webp", card: "border-[rgba(167,139,250,.22)] bg-[linear-gradient(160deg,rgba(124,58,237,.26)_0%,rgba(22,9,38,.96)_58%)]", glow: "hover:shadow-[0_18px_38px_rgba(0,0,0,.5),0_0_24px_rgba(139,92,246,.22)]", sub: "text-cc-lavender", ring: "border-[rgba(167,139,250,.3)] text-[#e2d6f7]" },
+  reload: { icon: "/icon-coins.webp", card: "border-[rgba(235,156,13,.22)] bg-[linear-gradient(160deg,rgba(235,156,13,.22)_0%,rgba(26,11,26,.96)_58%)]", glow: "hover:shadow-[0_18px_38px_rgba(0,0,0,.5),0_0_24px_rgba(235,156,13,.22)]", sub: "text-[#c4ab8e]", ring: "border-[rgba(255,201,60,.3)] text-cc-gold-hover" },
+  cashback: { icon: "/icon-percent.webp", card: "border-[rgba(167,139,250,.22)] bg-[linear-gradient(160deg,rgba(76,29,149,.3)_0%,rgba(18,8,32,.96)_58%)]", glow: "hover:shadow-[0_18px_38px_rgba(0,0,0,.5),0_0_24px_rgba(139,92,246,.2)]", sub: "text-cc-lavender", ring: "border-[rgba(167,139,250,.3)] text-[#e2d6f7]" },
+  boost: { icon: "/icon-bolt.png", card: "border-[rgba(56,189,248,.22)] bg-[linear-gradient(160deg,rgba(14,116,190,.26)_0%,rgba(13,10,34,.96)_58%)]", glow: "hover:shadow-[0_18px_38px_rgba(0,0,0,.5),0_0_24px_rgba(56,189,248,.2)]", sub: "text-[#94a9c4]", ring: "border-[rgba(56,189,248,.3)] text-[#cfe6fb]" },
+};
+
+/**
+ * The design's Home Bonuses card puts the headline number on its own line ("100% up to" / "₱5,000"). A promotion's
+ * value is free text, so: a trailing peso amount is the headline ("100% up to ₱5,000"); else a leading percentage or
+ * amount is ("10% back every Monday"); else the whole value is.
+ */
+export function splitPromotionValue(value: string): { lead: string; amount: string } {
+  const v = value.trim();
+  const trailing = /^(.*?)\s*(₱\s?[\d.,]+[KkMm]?)$/.exec(v);
+  if (trailing?.[1]) return { lead: trailing[1], amount: trailing[2]! };
+  const leading = /^([+]?[\d.,]+%|₱\s?[\d.,]+[KkMm]?)\s+(.+)$/.exec(v);
+  if (leading) return { lead: leading[2]!, amount: leading[1]! };
+  return { lead: "", amount: v };
+}
+
+/**
+ * Design (Home Bonuses): the offer's 3D mark, its name in capitals with the value's lead line, the headline number
+ * in gold, and a "›" footer — the whole card opens the offer's terms over the Promotions page. Two columns on
+ * phones, a rail from 600px.
+ */
+export function BonusTile({ promotion }: { promotion: Promotion }) {
+  const { t } = useTranslation();
+  const theme = BONUS_THEMES[promotion.category ?? ""] ?? BONUS_THEMES.welcome!;
+  const { lead, amount } = promotion.value ? splitPromotionValue(promotion.value) : { lead: "", amount: "" };
+  return (
+    <Link
+      to="/promotions"
+      search={{ promo: promotion.id }}
+      aria-label={t("home.bonusLabel", { title: promotion.title })}
+      className={cn(
+        "flex min-w-0 snap-start flex-col gap-[10px] rounded-cc-xl border p-4 text-cc-ink transition-[transform,box-shadow] duration-200 hover:-translate-y-1 hover:text-cc-ink max-[363px]:px-4 max-[363px]:py-[14px] min-[600px]:min-w-[200px] min-[600px]:flex-[1_1_200px] min-[600px]:gap-[14px] min-[600px]:p-[clamp(16px,2.2vw,20px)]",
+        theme.card,
+        theme.glow,
+      )}
+    >
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-2 min-[600px]:min-h-[58px]">
+        <span className="flex h-11 w-11 flex-none items-center justify-center">
+          {promotion.imageUrl ? <img src={promotion.imageUrl} alt="" className="h-10 w-10 rounded-cc object-cover" /> : <img src={theme.icon} alt="" className="h-10 w-10 object-contain drop-shadow-[0_4px_8px_rgba(0,0,0,.85)]" />}
+        </span>
+        <span className="flex min-w-0 flex-[1_1_100px] flex-col gap-[3px]">
+          <span className="text-[12.5px] leading-[1.3] font-extrabold tracking-[1px] text-white uppercase">{promotion.title}</span>
+          {lead ? <span className={cn("text-[12.5px] leading-[1.35] font-medium", theme.sub)}>{lead}</span> : null}
+        </span>
+      </div>
+      {amount ? <span className="text-[clamp(28px,8vw,32px)] leading-[1.15] font-extrabold tracking-[-1px] break-words text-cc-gold [text-shadow:0_0_22px_rgba(255,201,60,.3)]">{amount}</span> : null}
+      <div className="mt-auto flex min-h-8 items-center gap-[10px] pt-[2px] min-[600px]:min-h-[42px]">
+        <span aria-hidden className={cn("flex h-7 w-7 flex-none items-center justify-center rounded-full border bg-white/[.06] text-[12px]", theme.ring)}>›</span>
+        <span className={cn("text-[12.5px] font-medium", theme.sub)}>{t("promotions.viewDetails")}</span>
+      </div>
+    </Link>
+  );
+}

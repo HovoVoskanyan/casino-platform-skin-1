@@ -1,20 +1,25 @@
 import { Link } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
-import { useBanners, type Banner } from "./api";
+import { useBanners, usePromotions, type Banner, type Promotion } from "./api";
+import { splitPromotionValue } from "./promotion-card";
 
-const ROTATE_MS = 6000;
+const ROTATE_MS = 7000;
 
 /**
  * Design (Home hero): the `home-hero` placement at 2.360:1 (1956×829 desktop, 1134×480 phone — the preset P3-22
- * set), rotating every 6 s, with dots, a pause toggle (WCAG 2.2.2), swipe on phones and ‹ › on desktop. A banner
- * linked to a promotion opens that promotion's terms. No banners live = no hero at all, not an empty frame.
- * Rotation stops for users who ask for reduced motion.
+ * set), rotating every 7 s. Under the frame: the dots, ‹ › from 600px and a pause toggle (WCAG 2.2.2); swipe on
+ * phones. A banner linked to a promotion opens that promotion's terms. Rotation stops for reduced motion.
+ *
+ * With no banner live, the design's own welcome artwork stands in — but only while the skin runs a `welcome`
+ * promotion, whose amount fills the artwork's pill and whose terms the slide opens. Neither = no hero at all.
  */
 export function HeroCarousel() {
   const { t } = useTranslation();
-  const { data: banners = [] } = useBanners("home-hero");
+  const { data: banners = [], isPending } = useBanners("home-hero");
+  const { data: promotions = [] } = usePromotions();
+  const welcome = !isPending && banners.length === 0 ? promotions.find((p) => p.category === "welcome") : undefined;
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const touch = useRef<{ x: number; y: number } | null>(null);
@@ -27,45 +32,49 @@ export function HeroCarousel() {
     return () => window.clearInterval(id);
   }, [count, paused, reduced]);
 
-  if (count === 0) return null;
-  const current = index % count;
+  if (count === 0 && !welcome) return null;
+  const current = count ? index % count : 0;
   const go = (delta: number) => setIndex((i) => (i + delta + count) % count);
 
   return (
-    <section
-      aria-roledescription="carousel"
-      aria-label={t("lobby.heroLabel")}
-      onTouchStart={(e) => { const p = e.touches[0]; if (p) touch.current = { x: p.clientX, y: p.clientY }; }}
-      onTouchEnd={(e) => {
-        const start = touch.current;
-        const p = e.changedTouches[0];
-        touch.current = null;
-        if (!start || !p) return;
-        const dx = p.clientX - start.x;
-        if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(p.clientY - start.y)) go(dx < 0 ? 1 : -1);
-      }}
-      className="relative -mt-3 aspect-[2360/1000] touch-pan-y overflow-hidden rounded-[clamp(14px,2.2vw,20px)] border border-[rgba(167,139,250,.22)] bg-cc-surface shadow-[0_20px_50px_rgba(6,3,11,.6)]"
-    >
-      {banners.map((b, i) => (
-        <Slide key={b.id} banner={b} active={i === current} position={t("lobby.slideOf", { n: i + 1, count })} />
-      ))}
+    <section aria-roledescription="carousel" aria-label={t("lobby.heroLabel")} className="-mt-3 flex flex-col">
+      <div
+        onTouchStart={(e) => { const p = e.touches[0]; if (p) touch.current = { x: p.clientX, y: p.clientY }; }}
+        onTouchEnd={(e) => {
+          const start = touch.current;
+          const p = e.changedTouches[0];
+          touch.current = null;
+          if (!start || !p || count < 2) return;
+          const dx = p.clientX - start.x;
+          if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(p.clientY - start.y)) go(dx < 0 ? 1 : -1);
+        }}
+        className="@container relative aspect-[321/136] touch-pan-y overflow-hidden rounded-[clamp(14px,2.2vw,20px)] border border-[rgba(167,139,250,.22)] bg-cc-surface shadow-[0_20px_50px_rgba(6,3,11,.6),inset_0_0_0_1px_rgba(255,255,255,.03)]"
+      >
+        {welcome ? <WelcomeSlide promotion={welcome} /> : banners.map((b, i) => <Slide key={b.id} banner={b} active={i === current} position={t("lobby.slideOf", { n: i + 1, count })} />)}
+      </div>
       {count > 1 ? (
-        <>
-          <button type="button" aria-label={t("lobby.heroPrev")} onClick={() => go(-1)} className="absolute top-1/2 left-3 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-[rgba(9,3,16,.5)] text-[18px] font-bold text-white backdrop-blur-sm hover:border-[rgba(255,201,60,.6)] md:flex">‹</button>
-          <button type="button" aria-label={t("lobby.heroNext")} onClick={() => go(1)} className="absolute top-1/2 right-3 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-[rgba(9,3,16,.5)] text-[18px] font-bold text-white backdrop-blur-sm hover:border-[rgba(255,201,60,.6)] md:flex">›</button>
-          <div className="absolute inset-x-0 bottom-[clamp(8px,2vw,14px)] flex items-center justify-center gap-2">
-            {banners.map((b, i) => (
-              <button key={b.id} type="button" aria-label={t("lobby.showSlide", { n: i + 1, count })} aria-current={i === current ? "true" : undefined} onClick={() => setIndex(i)} className="flex h-6 items-center px-[2px]">
-                <span className={cn("block h-2 rounded-full transition-[width,background-color]", i === current ? "w-6 bg-cc-gold shadow-[0_0_12px_rgba(255,201,60,.7)]" : "w-2 bg-white/30")} />
-              </button>
-            ))}
-            <button type="button" aria-label={paused ? t("lobby.heroResume") : t("lobby.heroPause")} aria-pressed={paused} onClick={() => setPaused((p) => !p)} className="ml-1 flex h-6 w-6 items-center justify-center rounded-full bg-[rgba(255,201,60,.18)] text-[9px] text-white">
-              {paused ? "▶" : "❚❚"}
+        <div role="group" aria-label={t("lobby.heroControls")} className="mx-4 mt-[6px] -mb-[14px] flex items-center justify-center gap-1">
+          <ControlButton label={t("lobby.heroPrev")} onClick={() => go(-1)} className="mr-[6px] hidden min-[600px]:flex">‹</ControlButton>
+          {banners.map((b, i) => (
+            <button key={b.id} type="button" aria-label={t("lobby.showSlide", { n: i + 1, count })} aria-current={i === current ? "true" : undefined} onClick={() => setIndex(i)} className="flex items-center px-[3px] py-[14px]">
+              <span className={cn("block h-2 rounded-full transition-[width,background-color] duration-[250ms]", i === current ? "w-6 bg-cc-gold shadow-[0_0_12px_rgba(255,201,60,.7)]" : "w-2 bg-white/[.28]")} />
             </button>
-          </div>
-        </>
+          ))}
+          <ControlButton label={t("lobby.heroNext")} onClick={() => go(1)} className="ml-[6px] hidden min-[600px]:flex">›</ControlButton>
+          <ControlButton label={paused ? t("lobby.heroResume") : t("lobby.heroPause")} pressed={paused} onClick={() => setPaused((p) => !p)} className="ml-[6px] flex text-[12px] tracking-[-1px]">
+            {paused ? "▶" : "❚❚"}
+          </ControlButton>
+        </div>
       ) : null}
     </section>
+  );
+}
+
+function ControlButton({ label, pressed, onClick, className, children }: { label: string; pressed?: boolean; onClick: () => void; className?: string; children: ReactNode }) {
+  return (
+    <button type="button" aria-label={label} aria-pressed={pressed} onClick={onClick} className={cn("h-9 w-9 flex-none items-center justify-center rounded-full border border-cc-line-strong bg-white/[.04] text-[16px] font-bold text-cc-gold-hover hover:bg-[rgba(255,201,60,.18)] hover:text-white", className)}>
+      {children}
+    </button>
   );
 }
 
@@ -77,7 +86,7 @@ function Slide({ banner, active, position }: { banner: Banner; active: boolean; 
     </picture>
   );
   return (
-    <div role="group" aria-roledescription="slide" aria-label={position} aria-hidden={!active} className={cn("absolute inset-0 transition-opacity duration-500", active ? "opacity-100" : "pointer-events-none opacity-0")}>
+    <div role="group" aria-roledescription="slide" aria-label={position} aria-hidden={!active} className={cn("absolute inset-0 transition-opacity duration-[550ms]", active ? "z-[2] opacity-100" : "pointer-events-none z-[1] opacity-0")}>
       {banner.promotionId ? (
         <Link to="/promotions" search={{ promo: banner.promotionId }} tabIndex={active ? 0 : -1} aria-label={banner.title ?? position} className="block h-full w-full">
           {picture}
@@ -86,5 +95,24 @@ function Slide({ banner, active, position }: { banner: Banner; active: boolean; 
         picture
       )}
     </div>
+  );
+}
+
+/** The design's slide 1: its artwork, the pill re-lettered with the live offer's amount (the art's own reads ₹). */
+function WelcomeSlide({ promotion }: { promotion: Promotion }) {
+  const { t } = useTranslation();
+  const { amount } = promotion.value ? splitPromotionValue(promotion.value) : { amount: "" };
+  const peso = amount.startsWith("₱");
+  return (
+    <Link to="/promotions" search={{ promo: promotion.id }} aria-label={[promotion.title, promotion.value].filter(Boolean).join(" — ")} className="absolute inset-0 block">
+      <picture>
+        <source media="(max-width: 599px)" srcSet="/home-hero-welcome-sm.webp" />
+        <img src="/home-hero-welcome.webp" alt="" width={1926} height={816} className="h-full w-full object-cover" />
+      </picture>
+      <span aria-hidden className="absolute top-[50.6%] left-[7.6%] flex h-[17.6%] w-[43.2%] items-center justify-center gap-[1.4cqw] rounded-[3.4cqw] border-[0.24cqw] border-[#f5b62a] bg-[linear-gradient(180deg,#331363_0%,#1d0838_100%)] shadow-[0_0_2.4cqw_rgba(255,201,60,.35),inset_0_0_0_0.2cqw_rgba(0,0,0,.35)]">
+        {peso ? <span className="text-[2.5cqw] font-extrabold tracking-[.06em] text-white [text-shadow:0_0.2cqw_0.5cqw_rgba(0,0,0,.6)]">{t("home.upTo")}</span> : null}
+        <span className={cn("font-extrabold tracking-[-.01em] whitespace-nowrap", peso ? "text-[4.4cqw]" : "text-[2.8cqw]", " text-[#ffcf3f] [text-shadow:0_0.25cqw_0_#a35c00,0_0.5cqw_1.2cqw_rgba(0,0,0,.55)]")}>{peso ? amount : promotion.value}</span>
+      </span>
+    </Link>
   );
 }

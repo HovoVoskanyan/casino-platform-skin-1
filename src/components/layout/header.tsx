@@ -73,8 +73,8 @@ export function Header() {
           </>
         )}
 
-        <button ref={menuButton} type="button" aria-label="Menu" aria-expanded={menuOpen} onClick={() => setMenuOpen((o) => !o)} className="relative flex h-10 w-10 flex-none items-center justify-center rounded-cc border border-cc-line-strong bg-white/[.02] text-cc-text md:hidden">
-          ☰
+        <button ref={menuButton} type="button" aria-label="Menu" aria-expanded={menuOpen} onClick={() => setMenuOpen((o) => !o)} className="relative flex h-10 w-10 flex-none flex-col items-center justify-center gap-1 rounded-cc border border-[rgba(167,139,250,.22)] bg-white/[.04] text-[#cbb6e6] hover:bg-white/[.08] md:hidden">
+          {[0, 1, 2].map((i) => <span key={i} aria-hidden className="block h-[2px] w-4 rounded-[2px] bg-current" />)}
           {/* the burger holds Help on phones: support's unread dot shows on it while the menu is shut */}
           {!menuOpen ? <UnreadDot count={unread} className="absolute -top-[6px] -right-[6px]" /> : null}
         </button>
