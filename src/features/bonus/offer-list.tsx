@@ -4,6 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { toApiError } from "@/api/problem";
 import { Dialog } from "@/components/ui/dialog";
+import { RichText } from "@/components/ui/rich-text";
 import { cn } from "@/lib/utils";
 import { authDialog } from "@/features/auth/auth-dialog-state";
 import { bonusQueries, isAwaiting, isRunning, useClaimBonus, type BonusDefinition, type Offer } from "./api";
@@ -80,7 +81,7 @@ function OfferDialog({ offer, confirm, onClose }: { offer: Offer; confirm: boole
         <div className="flex flex-col gap-[7px] rounded-cc border border-[rgba(167,139,250,.18)] bg-white/[.03] px-[14px] py-3">
           <span className="text-[11px] font-extrabold tracking-[1px] text-cc-muted uppercase">{t("bonus.termsHeading")}</span>
           <ul className="m-0 flex list-none flex-col gap-[7px] p-0">
-            {bonusTerms(t, bonus).map((x) => <li key={x} className="text-[12.5px] leading-[1.5] font-medium text-pretty text-[#cbb6e6]">• {x}</li>)}
+            {bonusTerms(t, bonus).map((x) => <li key={x} className="flex gap-1 text-[12.5px] leading-[1.5] font-medium text-pretty text-[#cbb6e6]"><span aria-hidden>•</span><RichText text={x} /></li>)}
           </ul>
         </div>
 

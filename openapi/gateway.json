@@ -1305,6 +1305,37 @@
         "security": []
       }
     },
+    "/api/v1/site": {
+      "get": {
+        "tags": [
+          "Lobby (guest)"
+        ],
+        "summary": "The site's languages and currencies as the back office set them, each list default first.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiteConfigResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
     "/api/v1/me/favourites": {
       "get": {
         "tags": [
@@ -1899,14 +1930,7 @@
             }
           }
         },
-        "security": [
-          {
-            "playerCookie": []
-          },
-          {
-            "bearer": []
-          }
-        ]
+        "security": []
       }
     },
     "/api/bonus/{bonusId}": {
@@ -1947,14 +1971,7 @@
             }
           }
         },
-        "security": [
-          {
-            "playerCookie": []
-          },
-          {
-            "bearer": []
-          }
-        ]
+        "security": []
       }
     },
     "/api/bonus/activate": {
@@ -2036,14 +2053,7 @@
             }
           }
         },
-        "security": [
-          {
-            "playerCookie": []
-          },
-          {
-            "bearer": []
-          }
-        ]
+        "security": []
       }
     },
     "/api/bonus/activations/{activationId}/cancel": {
@@ -2116,14 +2126,7 @@
             }
           }
         },
-        "security": [
-          {
-            "playerCookie": []
-          },
-          {
-            "bearer": []
-          }
-        ]
+        "security": []
       }
     },
     "/api/bonus/launch-eligibility": {
@@ -2164,14 +2167,7 @@
             }
           }
         },
-        "security": [
-          {
-            "playerCookie": []
-          },
-          {
-            "bearer": []
-          }
-        ]
+        "security": []
       }
     },
     "/api/bonus/instances/{playerBonusId}/cancel": {
@@ -2260,14 +2256,7 @@
             }
           }
         },
-        "security": [
-          {
-            "playerCookie": []
-          },
-          {
-            "bearer": []
-          }
-        ]
+        "security": []
       }
     },
     "/api/bonus/freebets/claimable": {
@@ -3700,6 +3689,35 @@
               "string"
             ],
             "format": "date-time"
+          }
+        }
+      },
+      "SiteConfigResponse": {
+        "required": [
+          "defaultLanguage",
+          "languages",
+          "defaultCurrency",
+          "currencies"
+        ],
+        "type": "object",
+        "properties": {
+          "defaultLanguage": {
+            "type": "string"
+          },
+          "languages": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "defaultCurrency": {
+            "type": "string"
+          },
+          "currencies": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         }
       },

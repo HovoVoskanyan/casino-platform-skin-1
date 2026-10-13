@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Shell } from "@/components/layout/shell";
+import { RichText } from "@/components/ui/rich-text";
 import { SupportButton } from "@/features/support/support-button";
 import { cn } from "@/lib/utils";
 
@@ -98,7 +99,7 @@ function DocBlock({ block }: { block: Block }) {
   const { t } = useTranslation();
   switch (block.t) {
     case "p":
-      return <p className={BODY}>{block.text}</p>;
+      return <RichText text={block.text} className="flex flex-col gap-3" paragraphClassName={BODY} />;
     case "link":
       return (
         <a href={block.href} target="_blank" rel="noopener noreferrer" className="flex min-h-11 max-w-full items-center gap-2 self-start text-[16px] leading-[1.45] font-bold [overflow-wrap:anywhere] text-cc-gold underline decoration-[rgba(255,201,60,.45)] underline-offset-4 hover:text-cc-gold-hover">
@@ -210,7 +211,7 @@ function Faq() {
                 </h3>
                 {on ? (
                   <div id={`faq-a-${it.id}`} role="region" aria-labelledby={`faq-q-${it.id}`} className="flex flex-col items-start gap-[14px] px-[18px] pb-[18px]">
-                    <p className={BODY}>{it.a}</p>
+                    <RichText text={it.a} className="flex flex-col gap-3" paragraphClassName={BODY} />
                     {it.to && it.link ? <FaqLink to={it.to}>{it.link}</FaqLink> : null}
                     {it.support ? <SupportButton dot={false} className={cn(GOLD_BUTTON, "px-5")}>{t("info.contactSupport")}</SupportButton> : null}
                   </div>

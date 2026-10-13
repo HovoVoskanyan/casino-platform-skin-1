@@ -34,6 +34,8 @@ export const queryKeys = {
     notifications: () => [...queryKeys.session.all, "notifications", "list"] as const,
     notificationsUnread: () => [...queryKeys.session.all, "notifications", "unread"] as const,
   },
+  /** The site's own settings — languages, default language, currency — from the back office (core /api/v1/site). */
+  site: () => ["site"] as const,
   /**
    * P3-27: the guest's lobby reads. Every key carries the UI language, because core answers each read in the
    * language the request asks for — switching language must not serve the other language's cached copy.

@@ -1594,6 +1594,51 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/site": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The site's languages and currencies as the back office set them, each list default first. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SiteConfigResponse"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/me/favourites": {
         parameters: {
             query?: never;
@@ -3255,6 +3300,12 @@ export interface components {
             imageUrl: null | string;
             /** Format: date-time */
             endsAt: null | string;
+        };
+        SiteConfigResponse: {
+            defaultLanguage: string;
+            languages: string[];
+            defaultCurrency: string;
+            currencies: string[];
         };
         LobbyGameResponse: {
             /** Format: uuid */

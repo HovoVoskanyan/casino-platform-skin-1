@@ -16,6 +16,7 @@ import { NotificationsDrawer } from "@/features/notifications/notifications-draw
 import { captureAttribution } from "@/features/auth/attribution";
 import { authDialog } from "@/features/auth/auth-dialog-state";
 import { queryKeys } from "@/lib/queryKeys";
+import { applySiteConfig, siteConfigOptions } from "@/features/site/site-config";
 
 export interface RouterContext {
   queryClient: QueryClient;
@@ -32,8 +33,16 @@ const Devtools = import.meta.env.DEV
   : () => null;
 
 export const Route = createRootRouteWithContext<RouterContext>()({
-  // The session is resolved ONCE before the first render, so the shell never flashes the guest state at a player.
-  loader: ({ context }) => context.queryClient.ensureQueryData(sessionQueryOptions()),
+  // The session is resolved ONCE before the first render, so the shell never flashes the guest state at a player;
+  // the site's languages and currency likewise, so the first paint is in the right language and money. A site config
+  // that cannot be read leaves the built-in defaults (English, PHP) rather than holding the page.
+  loader: async ({ context }) => {
+    const [, config] = await Promise.all([
+      context.queryClient.ensureQueryData(sessionQueryOptions()),
+      context.queryClient.ensureQueryData(siteConfigOptions()).catch(() => null),
+    ]);
+    if (config) applySiteConfig(config);
+  },
   component: RootLayout,
 });
 

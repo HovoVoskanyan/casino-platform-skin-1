@@ -6,6 +6,7 @@ import { authDialog } from "@/features/auth/auth-dialog-state";
 import { useSession } from "@/features/auth/session";
 import { Button } from "@/components/ui/button";
 import { BalanceMenu } from "@/features/wallet/balance-menu";
+import { LanguageSelect } from "./language-select";
 import { bonusDrawer } from "@/features/bonus/bonus-drawer";
 import { SupportButton, UnreadDot } from "@/features/support/support-button";
 import { useSupportUnread } from "@/features/support/support-store";
@@ -91,6 +92,7 @@ export function Header() {
           {signedIn ? (
             <button type="button" onClick={() => { setMenuOpen(false); bonusDrawer.open(menuButton.current); }} className="flex h-11 items-center rounded-cc px-3 text-left text-[15px] font-semibold text-cc-text hover:bg-white/[.05]">{t("nav.myBonuses")}</button>
           ) : null}
+          <LanguageSelect className="mt-1 justify-between px-3" />
         </nav>
       ) : null}
     </header>
