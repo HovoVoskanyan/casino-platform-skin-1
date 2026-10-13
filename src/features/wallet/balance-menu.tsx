@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { MASKED, peso } from "@/lib/money";
 import { cn } from "@/lib/utils";
 import { useBalance, useBalanceHidden } from "./balance-store";
 import { useBonusCounts } from "@/features/bonus/api";
 import { bonusDrawer } from "@/features/bonus/bonus-drawer";
+import { BalanceActions } from "./balance-actions";
 
 /**
  * Design (Header, signed in): the balance box — "Balance" + the live total (masked when the shared Hide balance
@@ -13,7 +14,9 @@ import { bonusDrawer } from "@/features/bonus/bonus-drawer";
  * Bonus balance, the Available to claim / Active bonuses counts and "View my bonuses". Closes on an outside press and
  * on Escape. "View my bonuses" opens the bonuses drawer in place (P3-29), handing focus back to the chevron on close.
  * The panel hangs from the sticky header, not the box: under its right edge (22px in) on desktop, edge to edge
- * (10px in) on phones — the design's placement.
+ * (10px in) on phones — the design's placement. On phones the panel ends with the Deposit + "View my bonuses" row
+ * (`BalanceActions`): Deposit opens the wallet's deposit dialog (#deposit — nothing is requested until the player
+ * submits it), "View my bonuses" goes to My Account → Bonuses. Desktop keeps its one button and the drawer.
  */
 export function BalanceMenu() {
   const { t } = useTranslation();
@@ -22,6 +25,7 @@ export function BalanceMenu() {
   const [open, setOpen] = useState(false);
   const box = useRef<HTMLSpanElement>(null);
   const chevron = useRef<HTMLButtonElement>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!open) return;
@@ -47,12 +51,19 @@ export function BalanceMenu() {
         className="flex h-full w-8 flex-none items-center justify-center border-l border-[rgba(167,139,250,.2)] bg-white/[.03] text-[11px] text-[#cbb6e6] hover:bg-[rgba(167,139,250,.16)] hover:text-white md:w-[34px]">
         {open ? "▲" : "▼"}
       </button>
-      {open ? <BalancePanel onClose={() => setOpen(false)} onBonuses={() => { setOpen(false); bonusDrawer.open(chevron.current); }} /> : null}
+      {open ? (
+        <BalancePanel
+          onClose={() => setOpen(false)}
+          onBonuses={() => { setOpen(false); bonusDrawer.open(chevron.current); }}
+          onDeposit={() => { setOpen(false); void navigate({ to: "/wallet", hash: "deposit" }); }}
+          onAccountBonuses={() => { setOpen(false); void navigate({ to: "/account", search: { tab: "bonuses" } }); }}
+        />
+      ) : null}
     </span>
   );
 }
 
-function BalancePanel({ onClose, onBonuses }: { onClose: () => void; onBonuses: () => void }) {
+function BalancePanel({ onClose, onBonuses, onDeposit, onAccountBonuses }: { onClose: () => void; onBonuses: () => void; onDeposit: () => void; onAccountBonuses: () => void }) {
   const { t } = useTranslation();
   const balance = useBalance();
   const [hidden] = useBalanceHidden();
@@ -84,7 +95,10 @@ function BalancePanel({ onClose, onBonuses }: { onClose: () => void; onBonuses: 
           <Count label={t("balance.activeBonuses")} value={bonuses.isPending ? "—" : String(bonuses.activeBonuses)} />
         </div>
       )}
-      <button type="button" onClick={onBonuses} className="flex min-h-[46px] items-center justify-center rounded-cc-md bg-[image:var(--cc-gold-cta)] text-[14px] font-extrabold text-[#2c1400] shadow-[0_8px_20px_rgba(235,156,13,.3)] hover:brightness-105">
+      <div className="md:hidden">
+        <BalanceActions onDeposit={onDeposit} onBonuses={onAccountBonuses} />
+      </div>
+      <button type="button" onClick={onBonuses} className="hidden min-h-[46px] items-center justify-center md:flex rounded-cc-md bg-[image:var(--cc-gold-cta)] text-[14px] font-extrabold text-[#2c1400] shadow-[0_8px_20px_rgba(235,156,13,.3)] hover:brightness-105">
         {t("balance.viewBonuses")}
       </button>
     </div>
