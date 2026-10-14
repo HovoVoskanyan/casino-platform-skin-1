@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
-import { PageHero, Shell } from "@/components/layout/shell";
+import { Shell } from "@/components/layout/shell";
 import { Rail, RailViewAll } from "@/components/ui/rail";
 import { Button } from "@/components/ui/button";
 import { Notice } from "@/components/ui/notice";
@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { authDialog } from "@/features/auth/auth-dialog-state";
 import { useSession } from "@/features/auth/session";
 import { GameCardSkeleton, GameCardTile } from "@/features/lobby/game-card";
+import { GamesBanner } from "@/features/lobby/games-banner";
 import { TrustStrip } from "@/features/lobby/home-panels";
 import { SORTS, useCategories, useFavourites, useGames, useProviders, type GameCard, type GameFilters, type Sort } from "@/features/lobby/api";
 
@@ -38,7 +39,7 @@ export const Route = createFileRoute("/games")({
 });
 
 /**
- * Games (design: hero + search, category pills, the filter row, Favourite Games, Popular, Game Providers, the grid
+ * Games (design: the illustrated banner, search under it, category pills, the filter row, Favourite Games, Popular, Game Providers, the grid
  * with sort and Load More, the trust strip). The catalogue is core's (P3-23) — only games this skin shows.
  */
 function GamesPage() {
@@ -48,18 +49,20 @@ function GamesPage() {
   const set = (patch: Partial<GamesSearch>) => void navigate({ search: (prev) => clean({ ...prev, ...patch }), replace: true });
   const { signedIn } = useSession();
   const filtered = Boolean(search.q || search.category || search.provider || search.badge || (search.fav && signedIn));
-  const toGrid = () => document.getElementById("all-games")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  const toGrid = () => scrollToSection("all-games");
 
   return (
     <Shell>
-      <PageHero title={<>{t("games.titleLead")} <span className="text-cc-gold">{t("games.titleAccent")}</span></>} subtitle={t("games.subtitle")} logoWidth={172}>
+      <div className="flex flex-col gap-3 min-[600px]:gap-4">
+        {/* Explore only moves the page: the search and filters in the URL stay as they are. */}
+        <GamesBanner onExplore={() => { document.getElementById("all-games")?.focus({ preventScroll: true }); scrollToSection("all-games"); }} />
         <SearchBox value={search.q ?? ""} onChange={(q) => set({ q: q || undefined })} />
-      </PageHero>
+      </div>
       <section aria-label={t("games.filters")} className="-mb-[6px] flex flex-col gap-[14px] min-[600px]:gap-[18px]">
         <CategoryPills category={search.category} badge={search.badge} onPick={(category, badge) => set({ category, badge })} />
         <FilterRow
           favourites={Boolean(search.fav && signedIn)}
-          onProviders={() => document.getElementById("game-providers")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+          onProviders={() => scrollToSection("game-providers")}
           onSort={(sort) => { set({ sort: sort === "popular" ? undefined : sort }); toGrid(); }}
           onFavourites={() => (signedIn ? set({ fav: !search.fav || undefined }) : authDialog.open("signin", window.location.pathname + window.location.search))}
         />
@@ -71,6 +74,12 @@ function GamesPage() {
       <TrustStrip variant="games" className="-mt-4 min-[600px]:mt-0" />
     </Shell>
   );
+}
+
+/** Jumps to a section under the sticky header (its `scroll-mt`), gliding only when the player has not asked for reduced motion. */
+function scrollToSection(id: string) {
+  const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+  document.getElementById(id)?.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
 }
 
 const clean = (s: GamesSearch): GamesSearch => Object.fromEntries(Object.entries(s).filter(([, v]) => v !== undefined && v !== "" && v !== false)) as GamesSearch;
@@ -92,9 +101,9 @@ function SearchBox({ value, onChange }: { value: string; onChange: (q: string) =
     return () => window.clearTimeout(id);
   }, [text, value, onChange]);
   return (
-    <label className="relative block max-w-[560px]">
+    <label className="relative block">
       <span className="sr-only">{t("games.search")}</span>
-      <svg aria-hidden width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="var(--cc-lavender)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="pointer-events-none absolute top-1/2 left-[14px] -translate-y-1/2 min-[600px]:left-4"><circle cx="11" cy="11" r="6.5" /><path d="M16 16l4.5 4.5" /></svg>
+      <svg aria-hidden width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="var(--cc-lavender)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="pointer-events-none absolute top-1/2 left-4 -translate-y-1/2 min-[600px]:left-5"><circle cx="11" cy="11" r="6.5" /><path d="M16 16l4.5 4.5" /></svg>
       <input
         type="search"
         value={text}
@@ -102,7 +111,7 @@ function SearchBox({ value, onChange }: { value: string; onChange: (q: string) =
         onChange={(e) => setText(e.target.value)}
         placeholder={t("games.searchPlaceholder")}
         // 16px on phones: anything smaller and iOS zooms the page on focus
-        className="h-[52px] w-full rounded-cc-lg border border-cc-line-strong bg-[rgba(8,4,16,.6)] pr-3 pl-[42px] text-[16px] font-medium text-cc-ink placeholder:text-cc-muted focus:border-[rgba(255,201,60,.6)] focus:shadow-[0_0_0_3px_rgba(255,201,60,.14)] focus:outline-none min-[600px]:pr-4 min-[600px]:pl-[46px] min-[600px]:text-[14.5px]"
+        className="h-[52px] w-full rounded-cc-xl border border-[rgba(167,139,250,.32)] bg-[linear-gradient(180deg,rgba(28,10,52,.92)_0%,rgba(18,6,34,.92)_100%)] pr-3 pl-[46px] text-[16px] font-medium text-cc-ink shadow-[inset_0_1px_0_rgba(255,255,255,.03)] transition-[border-color,box-shadow] placeholder:text-[#9c88bb] hover:border-[rgba(167,139,250,.48)] focus:border-[rgba(255,201,60,.7)] focus:shadow-[0_0_0_3px_rgba(255,201,60,.18)] focus:outline-none min-[600px]:h-14 min-[600px]:pr-5 min-[600px]:pl-[54px] min-[600px]:text-[16px]"
       />
     </label>
   );
@@ -249,7 +258,7 @@ function GameGrid({ search, set }: { search: GamesSearch; set: (patch: Partial<G
   return (
     <section className="flex flex-col gap-[clamp(16px,2.4vw,22px)]" aria-labelledby="all-games">
       <div className="flex flex-wrap items-center gap-3">
-        <span id="all-games" className="scroll-mt-24"><SectionTitle count={pending ? undefined : t("games.count", { count: total })}>{showFavourites ? t("games.favourites") : search.badge === "hot" ? t("games.hotGames") : search.badge === "new" ? t("games.newGames") : t("games.allGames")}</SectionTitle></span>
+        <span id="all-games" tabIndex={-1} className="scroll-mt-24 focus:outline-none"><SectionTitle count={pending ? undefined : t("games.count", { count: total })}>{showFavourites ? t("games.favourites") : search.badge === "hot" ? t("games.hotGames") : search.badge === "new" ? t("games.newGames") : t("games.allGames")}</SectionTitle></span>
         <span className="min-w-2 flex-1" />
         <button
           type="button"
