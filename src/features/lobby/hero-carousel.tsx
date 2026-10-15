@@ -5,11 +5,12 @@ import { cn } from "@/lib/utils";
 import { useBanners, usePromotions, type Banner, type Promotion } from "./api";
 import { splitPromotionValue } from "./promotion-value";
 
-const ROTATE_MS = 7000;
+/** Owner 2026-10-15: three seconds a slide — the hero moves quickly. */
+const ROTATE_MS = 3000;
 
 /**
  * Design (Home hero): the `home-hero` placement at 2.360:1 (1956×829 desktop, 1134×480 phone — the preset P3-22
- * set), rotating every 7 s. Under the frame: the dots, ‹ › from 600px and a pause toggle (WCAG 2.2.2); swipe on
+ * set), rotating every 3 s. Under the frame: the dots, ‹ › from 600px and a pause toggle (WCAG 2.2.2); swipe on
  * phones. A banner linked to a promotion opens Promotions, where the back office's bonuses are activated. Rotation
  * stops for reduced motion.
  *
