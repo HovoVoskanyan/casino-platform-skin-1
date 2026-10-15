@@ -2728,7 +2728,11 @@ export interface paths {
                 path?: never;
                 cookie?: never;
             };
-            requestBody?: never;
+            requestBody?: {
+                content: {
+                    "application/json": null | components["schemas"]["SpinWheelRequest"];
+                };
+            };
             responses: {
                 /** @description OK */
                 200: {
@@ -2750,6 +2754,93 @@ export interface paths {
                 };
                 /** @description Conflict */
                 409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/bonus/wheel/spins/{spinId}/choose": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Choose the ONE game a multi-game free-spins prize is credited on; its spins are then assigned on that game alone. Choosing the same game again answers the credited spin. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    spinId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ChooseWheelGameRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["WheelSpinResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Bad Gateway */
+                502: {
                     headers: {
                         [name: string]: unknown;
                     };
@@ -3844,6 +3935,11 @@ export interface components {
             nextSpinAt: unknown;
             replayed: boolean;
             proof: components["schemas"]["WheelProofResponse"];
+            freeSpinGameIds: string[];
+            chosenGameId: null | string;
+            /** Format: date-time */
+            chooseBy: unknown;
+            source: components["schemas"]["WheelSpinSource"];
         };
         WheelProofResponse: {
             seed: string;
@@ -3854,7 +3950,7 @@ export interface components {
             eligibleWeights: string;
         };
         /** @enum {unknown} */
-        WheelSpinOutcome: "pending" | "noPrize" | "granted" | "failed";
+        WheelSpinOutcome: "pending" | "noPrize" | "granted" | "failed" | "awaitingGame";
         /** @enum {unknown} */
         WheelPrizeType: "noPrize" | "bonusMoney" | "freeSpins";
         WheelResponse: {
@@ -3869,6 +3965,9 @@ export interface components {
             serverTime: unknown;
             segments: components["schemas"]["WheelSegmentResponse"][];
             todaySpin: null | components["schemas"]["WheelSpinResponse"];
+            pendingChoices: components["schemas"]["WheelSpinResponse"][];
+            /** Format: int32 */
+            extraSpins: number;
         };
         WheelSegmentResponse: {
             /** Format: uuid */
@@ -3886,6 +3985,14 @@ export interface components {
         };
         /** @enum {unknown} */
         WheelPlayerState: "unavailable" | "signInRequired" | "ready" | "spunToday" | "closedToday" | "ended" | "restricted" | "nothingToWin";
+        ChooseWheelGameRequest: {
+            gameId: string;
+        };
+        SpinWheelRequest: {
+            requestId: null | string;
+        };
+        /** @enum {unknown} */
+        WheelSpinSource: "daily" | "granted";
     };
     responses: never;
     parameters: never;

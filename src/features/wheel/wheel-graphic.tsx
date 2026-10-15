@@ -1,4 +1,4 @@
-import type { Ref } from "react";
+import type { ReactNode, Ref } from "react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import type { WheelSegment } from "./api";
@@ -8,19 +8,20 @@ import { prizeText } from "./copy";
 const R = 100;
 
 /**
- * Design (Home's Lucky Wheel): min(280px, 64vw) across with an 8px #ffc93c rim, the gold pointer at 12 o'clock and
- * the ChoCho tiger in a gold-ringed hub. The slices are the server's, in its order, clockwise from the pointer; their
+ * Design (Home's Lucky Wheel): min(280px, 64vw) across with an 8px #ffc93c rim and the gold pointer at 12 o'clock.
+ * The hub is the page's Spin control (owner 2026-10-16: no logo there — "Spin" / "Spun"), passed in as `hub` and laid
+ * over the centre without turning; the wheel is a size container so the hub's words scale with it. The slices are the server's, in its order, clockwise from the pointer; their
  * labels run along the radius and shrink (or wrap, or are cut) to fit. A slice the player cannot land on now is
  * dimmed. The picture itself is hidden from screen readers — the list under it says the same in words.
  */
-export function WheelGraphic({ segments, currency, rotorRef, className }: { segments: WheelSegment[]; currency: string | null | undefined; rotorRef?: Ref<HTMLDivElement>; className?: string }) {
+export function WheelGraphic({ segments, currency, rotorRef, hub, className }: { segments: WheelSegment[]; currency: string | null | undefined; rotorRef?: Ref<HTMLDivElement>; hub?: ReactNode; className?: string }) {
   const { t } = useTranslation();
   const n = segments.length;
   const colors = sliceColors(segments);
   const a = sliceAngle(n);
 
   return (
-    <div className={cn("relative aspect-square w-[min(280px,64vw)] flex-none short:w-[min(230px,52vh)]", className)}>
+    <div className={cn("@container relative aspect-square w-[min(280px,64vw)] flex-none short:w-[min(230px,52vh)]", className)}>
       <span aria-hidden className="pointer-events-none absolute -inset-3 rounded-full bg-[radial-gradient(circle,rgba(255,201,60,.22)_0%,rgba(167,139,250,.12)_55%,transparent_72%)] blur-[6px]" />
       <div ref={rotorRef} aria-hidden data-testid="wheel-rotor" className="absolute inset-0 overflow-hidden rounded-full border-[8px] border-cc-gold bg-[#2c1050] shadow-[0_18px_40px_rgba(0,0,0,.55),inset_0_0_0_2px_rgba(44,20,0,.35)] will-change-transform">
         <svg viewBox={`${-R} ${-R} ${2 * R} ${2 * R}`} className="block h-full w-full" focusable="false">
@@ -68,9 +69,7 @@ export function WheelGraphic({ segments, currency, rotorRef, className }: { segm
       </div>
       {/* the pointer: the design's gold triangle over the rim at 12 o'clock */}
       <span aria-hidden className="absolute -top-[6px] left-1/2 z-[2] h-0 w-0 -translate-x-1/2 border-x-[12px] border-t-[20px] border-x-transparent border-t-cc-gold drop-shadow-[0_3px_4px_rgba(0,0,0,.6)]" />
-      <span aria-hidden className="absolute top-1/2 left-1/2 z-[2] aspect-square w-[29%] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-full border-[3px] border-cc-gold bg-[#2c1050] shadow-[0_4px_14px_rgba(0,0,0,.55)]">
-        <img src="/chocho-logo-cut.png" alt="" draggable={false} className="block w-[260%] max-w-none -mt-[42%] -ml-[44%] select-none" />
-      </span>
+      {hub}
     </div>
   );
 }

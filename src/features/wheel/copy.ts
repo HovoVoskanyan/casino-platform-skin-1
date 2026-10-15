@@ -37,6 +37,15 @@ export function resultCopy(t: TFunction, spin: WheelSpin): ResultCopy {
     return { tone: "none", headline: t("wheel.result.noPrize"), body: t("wheel.result.noPrizeBody"), link: null };
   }
   const prize = prizeText(t, spin, spin.currency);
+  // free spins on several games: nothing is credited until the player picks one (the choice panel under it)
+  if (spin.outcome === "awaitingGame") {
+    return {
+      tone: "win",
+      headline: spin.freeSpinsCount != null ? t("wheel.result.wonSpins", { count: spin.freeSpinsCount }) : t("wheel.result.won", { prize }),
+      body: t("wheel.result.chooseBody"),
+      link: null,
+    };
+  }
   if (spin.outcome === "pending") return { tone: "pending", headline: t("wheel.result.won", { prize }), body: t("wheel.result.pendingBody"), link: "bonuses" };
   if (spin.outcome === "failed") return { tone: "failed", headline: t("wheel.result.won", { prize }), body: t("wheel.result.failedBody"), link: "support" };
   if (spin.prizeType === "freeSpins") {
@@ -66,4 +75,29 @@ export function indexOfSpin(segments: WheelSegment[], spin: Pick<WheelSpin, "seg
 export function zoneCity(timeZone: string | null | undefined): string | null {
   const city = timeZone?.split("/").pop()?.replace(/_/g, " ").trim();
   return city || null;
+}
+
+/** "Oct 18, 2026, 11:59 PM" in the UI language, on the wheel's clock (its zone) when it has one; null for no instant. */
+export function formatInstant(value: unknown, language: string, timeZone: string | null | undefined): string | null {
+  if (value === null || value === undefined || value === "") return null;
+  const d = new Date(String(value));
+  if (Number.isNaN(d.getTime())) return null;
+  const options: Intl.DateTimeFormatOptions = { dateStyle: "medium", timeStyle: "short" };
+  try {
+    return new Intl.DateTimeFormat(language, { ...options, timeZone: timeZone ?? undefined }).format(d);
+  } catch {
+    // an unknown zone or language tag: the phone's own
+    return new Intl.DateTimeFormat(undefined, options).format(d);
+  }
+}
+
+/** A wheel day ("2026-10-15", a calendar date) as "Oct 15, 2026" in the UI language. */
+export function formatDay(day: string | null | undefined, language: string): string | null {
+  if (!day || !/^\d{4}-\d{2}-\d{2}$/.test(day)) return null;
+  const d = new Date(`${day}T00:00:00Z`);
+  try {
+    return new Intl.DateTimeFormat(language, { dateStyle: "medium", timeZone: "UTC" }).format(d);
+  } catch {
+    return day;
+  }
 }

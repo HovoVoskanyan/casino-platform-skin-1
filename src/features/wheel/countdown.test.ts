@@ -53,7 +53,8 @@ describe("the result's words", () => {
   const spin = (over: Partial<WheelSpin>): WheelSpin => ({
     spinId: "s", segmentId: "g", segmentPosition: 0, label: "₱500 Bonus", prizeType: "bonusMoney", outcome: "granted", currency: "PHP",
     amountCents: 50_000, freeSpinsCount: null, spinDay: "2026-10-15", spunAt: "2026-10-15T01:00:00Z", nextSpinAt: "2026-10-15T16:00:00Z",
-    replayed: false, proof: { seed: "x", roll: 1, totalWeight: 2, eligibleWeights: "" }, ...over,
+    replayed: false, proof: { seed: "x", roll: 1, totalWeight: 2, eligibleWeights: "" }, freeSpinGameIds: [], chosenGameId: null, chooseBy: null,
+    source: "daily", ...over,
   });
 
   it("says what was won and where it is, and never an internal reason", () => {
@@ -63,6 +64,9 @@ describe("the result's words", () => {
     expect(resultCopy(t, spin({ prizeType: "noPrize", outcome: "noPrize", amountCents: null }))).toMatchObject({ tone: "none", headline: "No luck today", link: null });
     expect(resultCopy(t, spin({ outcome: "pending" }))).toMatchObject({ tone: "pending", headline: "You won ₱500 bonus!", body: "We’re adding it to your account — it will show up in a moment." });
     expect(resultCopy(t, spin({ outcome: "failed" }))).toMatchObject({ tone: "failed", headline: "You won ₱500 bonus!", link: "support" });
+    // free spins on several games: no link yet — the choice panel under it is the next step
+    expect(resultCopy(t, spin({ prizeType: "freeSpins", amountCents: null, freeSpinsCount: 10, outcome: "awaitingGame" })))
+      .toMatchObject({ tone: "win", headline: "You won 10 free spins!", body: "Choose the game you want to play them on, just below.", link: null });
   });
 
   it("names the wheel's time zone by its city", () => {

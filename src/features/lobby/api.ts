@@ -62,15 +62,18 @@ export function useGames(filters: GameFilters, pageSize = PAGE_SIZE) {
   return useInfiniteQuery(gamesQueryOptions(i18n.language, filters, pageSize));
 }
 
+/** One game's detail (GET /api/v1/games/{id}) in the UI language — `useGame`'s read, for lists that resolve several ids at once. */
+export const gameQueryOptions = (language: string, id: string) =>
+  queryOptions({
+    queryKey: queryKeys.lobby.game(language, id),
+    queryFn: () => unwrap<GameDetail>(api.GET("/api/v1/games/{id}", { params: { path: { id } }, headers: lang(language) })),
+    staleTime: STALE,
+  });
+
 /** `enabled` false = no read (P3-29: a bonus card names its game only when it has exactly one). */
 export function useGame(id: string, enabled = true) {
   const { i18n } = useTranslation();
-  return useQuery(queryOptions({
-    queryKey: queryKeys.lobby.game(i18n.language, id),
-    queryFn: () => unwrap<GameDetail>(api.GET("/api/v1/games/{id}", { params: { path: { id } }, headers: lang(i18n.language) })),
-    staleTime: STALE,
-    enabled: enabled && !!id,
-  }));
+  return useQuery({ ...gameQueryOptions(i18n.language, id), enabled: enabled && !!id });
 }
 
 export function useCategories() {

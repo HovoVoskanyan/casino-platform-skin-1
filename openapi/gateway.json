@@ -2385,6 +2385,22 @@
           "Lucky Wheel (player)"
         ],
         "summary": "Today's spin. Idempotent per wheel day: asking again answers the same spin (replayed = true). The prize is credited before this returns unless wallet/core is down (outcome = pending, credited by the settlement job).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/SpinWheelRequest"
+                  }
+                ]
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK",
@@ -2408,6 +2424,105 @@
           },
           "409": {
             "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "playerCookie": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/bonus/wheel/spins/{spinId}/choose": {
+      "post": {
+        "tags": [
+          "Lucky Wheel (player)"
+        ],
+        "summary": "Choose the ONE game a multi-game free-spins prize is credited on; its spins are then assigned on that game alone. Choosing the same game again answers the credited spin.",
+        "parameters": [
+          {
+            "name": "spinId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChooseWheelGameRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WheelSpinResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -5400,7 +5515,11 @@
           "spunAt",
           "nextSpinAt",
           "replayed",
-          "proof"
+          "proof",
+          "freeSpinGameIds",
+          "chosenGameId",
+          "chooseBy",
+          "source"
         ],
         "type": "object",
         "properties": {
@@ -5457,6 +5576,24 @@
           },
           "proof": {
             "$ref": "#/components/schemas/WheelProofResponse"
+          },
+          "freeSpinGameIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "chosenGameId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "chooseBy": {
+            "format": "date-time"
+          },
+          "source": {
+            "$ref": "#/components/schemas/WheelSpinSource"
           }
         }
       },
@@ -5490,7 +5627,8 @@
           "pending",
           "noPrize",
           "granted",
-          "failed"
+          "failed",
+          "awaitingGame"
         ]
       },
       "WheelPrizeType": {
@@ -5510,7 +5648,9 @@
           "nextSpinAt",
           "serverTime",
           "segments",
-          "todaySpin"
+          "todaySpin",
+          "pendingChoices",
+          "extraSpins"
         ],
         "type": "object",
         "properties": {
@@ -5559,6 +5699,16 @@
                 "$ref": "#/components/schemas/WheelSpinResponse"
               }
             ]
+          },
+          "pendingChoices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WheelSpinResponse"
+            }
+          },
+          "extraSpins": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
@@ -5624,6 +5774,37 @@
           "ended",
           "restricted",
           "nothingToWin"
+        ]
+      },
+      "ChooseWheelGameRequest": {
+        "required": [
+          "gameId"
+        ],
+        "type": "object",
+        "properties": {
+          "gameId": {
+            "type": "string"
+          }
+        }
+      },
+      "SpinWheelRequest": {
+        "required": [
+          "requestId"
+        ],
+        "type": "object",
+        "properties": {
+          "requestId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "WheelSpinSource": {
+        "enum": [
+          "daily",
+          "granted"
         ]
       }
     },
