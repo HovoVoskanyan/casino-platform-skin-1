@@ -1,8 +1,9 @@
-import { Link } from "@tanstack/react-router";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { Link, useRouter } from "@tanstack/react-router";
+import { useEffect, useRef, useState, type MouseEvent, type ReactNode, type RefObject } from "react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { useBanners, usePromotions, type Banner, type Promotion } from "./api";
+import { isSiteLink } from "./banner-link";
 import { splitPromotionValue } from "./promotion-value";
 
 const ROTATE_MS = 7000;
@@ -10,8 +11,9 @@ const ROTATE_MS = 7000;
 /**
  * Design (Home hero): the `home-hero` placement at 2.360:1 (1956×829 desktop, 1134×480 phone — the preset P3-22
  * set), rotating every 7 s. Under the frame: the dots, ‹ › from 600px and a pause toggle (WCAG 2.2.2); swipe on
- * phones. A banner linked to a promotion opens Promotions, where the back office's bonuses are activated. Rotation
- * stops for reduced motion.
+ * phones. A banner opens what the back office set (owner 2026-10-15): a page of the site by relative path
+ * (`/games?category=slots`, `/vip`, `/wallet#deposit`) or, linked to a promotion, Promotions — where the back office's
+ * bonuses are activated. A swipe that changes slide never also follows the link. Rotation stops for reduced motion.
  *
  * With no banner live, the design's own welcome artwork stands in — but only while the skin runs a `welcome`
  * promotion, whose amount fills the artwork's pill; the slide opens Promotions. Neither = no hero at all.
@@ -24,6 +26,8 @@ export function HeroCarousel() {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const touch = useRef<{ x: number; y: number } | null>(null);
+  // Set when the finger travelled: the click a browser may still send after it must not follow the slide's link.
+  const swipedRef = useRef(false);
   const count = banners.length;
   const reduced = typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
@@ -40,18 +44,20 @@ export function HeroCarousel() {
   return (
     <section aria-roledescription="carousel" aria-label={t("lobby.heroLabel")} className="-mt-3 flex flex-col">
       <div
-        onTouchStart={(e) => { const p = e.touches[0]; if (p) touch.current = { x: p.clientX, y: p.clientY }; }}
+        onTouchStart={(e) => { const p = e.touches[0]; swipedRef.current = false; if (p) touch.current = { x: p.clientX, y: p.clientY }; }}
         onTouchEnd={(e) => {
           const start = touch.current;
           const p = e.changedTouches[0];
           touch.current = null;
-          if (!start || !p || count < 2) return;
+          if (!start || !p) return;
           const dx = p.clientX - start.x;
+          if (Math.hypot(dx, p.clientY - start.y) > 10) swipedRef.current = true;
+          if (count < 2) return;
           if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(p.clientY - start.y)) go(dx < 0 ? 1 : -1);
         }}
         className="@container relative aspect-[321/136] touch-pan-y overflow-hidden rounded-[clamp(14px,2.2vw,20px)] border border-[rgba(167,139,250,.22)] bg-cc-surface shadow-[0_20px_50px_rgba(6,3,11,.6),inset_0_0_0_1px_rgba(255,255,255,.03)]"
       >
-        {welcome ? <WelcomeSlide promotion={welcome} /> : banners.map((b, i) => <Slide key={b.id} banner={b} active={i === current} position={t("lobby.slideOf", { n: i + 1, count })} />)}
+        {welcome ? <WelcomeSlide promotion={welcome} /> : banners.map((b, i) => <Slide key={b.id} banner={b} active={i === current} position={t("lobby.slideOf", { n: i + 1, count })} swipedRef={swipedRef} />)}
       </div>
       {count > 1 ? (
         <div role="group" aria-label={t("lobby.heroControls")} className="mx-4 mt-[6px] -mb-[14px] flex items-center justify-center gap-1">
@@ -79,7 +85,12 @@ function ControlButton({ label, pressed, onClick, className, children }: { label
   );
 }
 
-function Slide({ banner, active, position }: { banner: Banner; active: boolean; position: string }) {
+/** Where a slide goes: its page (a same-site path, checked again here), else Promotions for a promotion, else nowhere. */
+const destination = (banner: Banner) => (isSiteLink(banner.linkUrl) ? banner.linkUrl.trim() : banner.promotionId ? "/promotions" : null);
+
+function Slide({ banner, active, position, swipedRef }: { banner: Banner; active: boolean; position: string; swipedRef: RefObject<boolean> }) {
+  const router = useRouter();
+  const href = destination(banner);
   const picture = (
     <picture>
       {banner.mobileImageUrl ? <source media="(max-width: 599px)" srcSet={banner.mobileImageUrl} /> : null}
@@ -88,10 +99,24 @@ function Slide({ banner, active, position }: { banner: Banner; active: boolean; 
   );
   return (
     <div role="group" aria-roledescription="slide" aria-label={position} aria-hidden={!active} className={cn("absolute inset-0 transition-opacity duration-[550ms]", active ? "z-[2] opacity-100" : "pointer-events-none z-[1] opacity-0")}>
-      {banner.promotionId ? (
-        <Link to="/promotions" tabIndex={active ? 0 : -1} aria-label={banner.title ?? position} className="block h-full w-full">
+      {href ? (
+        // A real <a href>: middle-click, ⌘-click and "copy link" behave as on any link; a plain click (or Enter) is
+        // the router's own navigation — the path may carry a query and hash, so it goes in whole as `href`.
+        <a
+          href={href}
+          tabIndex={active ? 0 : -1}
+          aria-label={banner.title ?? position}
+          className="block h-full w-full"
+          draggable={false}
+          onClick={(e: MouseEvent<HTMLAnchorElement>) => {
+            if (swipedRef.current) { e.preventDefault(); swipedRef.current = false; return; }
+            if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+            e.preventDefault();
+            void router.navigate({ href });
+          }}
+        >
           {picture}
-        </Link>
+        </a>
       ) : (
         picture
       )}

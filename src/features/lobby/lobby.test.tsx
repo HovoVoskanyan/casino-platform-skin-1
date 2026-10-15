@@ -1,4 +1,4 @@
-import { screen, waitFor, within } from "@testing-library/react";
+import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { renderRoute } from "@/test/route";
@@ -253,5 +253,69 @@ describe("Home (P3-27)", () => {
     expect(within(hero).getAllByRole("button", { name: /Show banner/ })).toHaveLength(2);
     expect(within(hero).getByRole("link", { name: "Welcome" })).toHaveAttribute("href", "/promotions");
     expect(within(hero).getByRole("button", { name: "Pause banner rotation" })).toBeInTheDocument();
+  });
+
+  // Owner 2026-10-15: a banner opens a page of the site by relative path, set in the back office.
+  const linked = (id: string, title: string | null, linkUrl: string | null, promotionId: string | null = null) => ({
+    id, placement: "home-hero", title, imageUrl: `https://cdn.example/${id}.png`, imageWidth: 1956, imageHeight: 829,
+    mobileImageUrl: null, mobileImageWidth: null, mobileImageHeight: null, fit: "Cover", promotionId, linkUrl,
+  });
+
+  it("a banner with a page link is a real link the router follows — query and hash included", async () => {
+    server.use(http.get("*/api/v1/banners", () => HttpResponse.json([linked("b1", "Slots week", "/games?category=slots"), linked("b2", "Top up", "/wallet#deposit")])), ...catalogue(1));
+    const { router } = renderRoute("/");
+    const hero = await screen.findByRole("region", { name: "Promotions" });
+    const slots = within(hero).getByRole("link", { name: "Slots week" });
+    expect(slots).toHaveAttribute("href", "/games?category=slots");
+    expect(slots).toHaveAttribute("tabindex", "0"); // the showing slide is reachable by keyboard…
+    expect(within(hero).getByRole("link", { name: "Top up", hidden: true })).toHaveAttribute("tabindex", "-1"); // …the hidden one is not
+
+    await userEvent.setup().click(slots);
+    await waitFor(() => expect(router.state.location.pathname).toBe("/games"));
+    expect(router.state.location.search).toEqual({ category: "slots" });
+  });
+
+  it("Enter on the focused banner follows it; a modified click is left to the browser", async () => {
+    server.use(http.get("*/api/v1/banners", () => HttpResponse.json([linked("b1", "VIP club", "/vip")])), ...catalogue(1));
+    const { router } = renderRoute("/");
+    const vip = within(await screen.findByRole("region", { name: "Promotions" })).getByRole("link", { name: "VIP club" });
+
+    const newTab = new MouseEvent("click", { bubbles: true, cancelable: true, metaKey: true });
+    vip.dispatchEvent(newTab);
+    expect(newTab.defaultPrevented).toBe(false); // ⌘-click: the browser opens a tab, the page stays
+    expect(router.state.location.pathname).toBe("/");
+
+    vip.focus();
+    await userEvent.setup().keyboard("{Enter}");
+    await waitFor(() => expect(router.state.location.pathname).toBe("/vip"));
+  });
+
+  it("a link that is not a same-site path is never rendered — the banner is a picture", async () => {
+    server.use(http.get("*/api/v1/banners", () => HttpResponse.json([
+      linked("b1", "Evil", "//evil.example"), linked("b2", "Script", "javascript:alert(1)"), linked("b3", "Abs", "https://evil.example/games"),
+    ])), ...catalogue(1));
+    renderRoute("/");
+    const hero = await screen.findByRole("region", { name: "Promotions" });
+    expect(within(hero).queryAllByRole("link", { hidden: true })).toEqual([]);
+    expect(within(hero).getAllByRole("img", { hidden: true })).toHaveLength(3);
+  });
+
+  it("a swipe changes slide without following the link", async () => {
+    server.use(http.get("*/api/v1/banners", () => HttpResponse.json([linked("b1", "Slots week", "/games?category=slots"), linked("b2", "VIP club", "/vip")])), ...catalogue(1));
+    const { router } = renderRoute("/");
+    const hero = await screen.findByRole("region", { name: "Promotions" });
+    const slots = within(hero).getByRole("link", { name: "Slots week" });
+    const touch = (x: number) => ({ clientX: x, clientY: 100 }) as Touch;
+    fireEvent.touchStart(slots, { touches: [touch(300)] });
+    fireEvent.touchEnd(slots, { changedTouches: [touch(120)] });
+    fireEvent.click(slots); // the click some browsers still send at the end of the gesture
+    expect(router.state.location.pathname).toBe("/");
+    expect(within(hero).getByRole("button", { name: "Show banner 2 of 2" })).toHaveAttribute("aria-current", "true");
+
+    // a plain tap afterwards does follow
+    fireEvent.touchStart(within(hero).getByRole("link", { name: "VIP club" }), { touches: [touch(200)] });
+    fireEvent.touchEnd(within(hero).getByRole("link", { name: "VIP club" }), { changedTouches: [touch(202)] });
+    fireEvent.click(within(hero).getByRole("link", { name: "VIP club" }));
+    await waitFor(() => expect(router.state.location.pathname).toBe("/vip"));
   });
 });

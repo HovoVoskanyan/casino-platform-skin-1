@@ -3515,7 +3515,8 @@
           "mobileImageWidth",
           "mobileImageHeight",
           "fit",
-          "promotionId"
+          "promotionId",
+          "linkUrl"
         ],
         "type": "object",
         "properties": {
@@ -3578,6 +3579,12 @@
               "string"
             ],
             "format": "uuid"
+          },
+          "linkUrl": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },

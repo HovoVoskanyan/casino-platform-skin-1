@@ -3277,6 +3277,7 @@ export interface components {
             fit: string;
             /** Format: uuid */
             promotionId: null | string;
+            linkUrl: null | string;
         };
         LobbyPromotionResponse: {
             /** Format: uuid */
