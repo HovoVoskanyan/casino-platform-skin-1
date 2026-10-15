@@ -2675,6 +2675,96 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/bonus/wheel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The skin's wheel for the caller: slices, state (ready / spun today / closed / sign in …), the countdown target, and today's spin when used. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["WheelResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/bonus/wheel/spin": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Today's spin. Idempotent per wheel day: asking again answers the same spin (replayed = true). The prize is credited before this returns unless wallet/core is down (outcome = pending, credited by the settlement job). */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["WheelSpinResponse"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/support/conversation": {
         parameters: {
             query?: never;
@@ -3730,6 +3820,71 @@ export interface components {
             expiresAt: string;
             sessionId: string;
         };
+        WheelSpinResponse: {
+            /** Format: uuid */
+            spinId: string;
+            /** Format: uuid */
+            segmentId: string;
+            /** Format: int32 */
+            segmentPosition: number;
+            label: string;
+            prizeType: components["schemas"]["WheelPrizeType"];
+            outcome: components["schemas"]["WheelSpinOutcome"];
+            currency: string;
+            /** Format: int64 */
+            amountCents: null | number;
+            /** Format: int32 */
+            freeSpinsCount: null | number;
+            /** Format: date */
+            spinDay: string;
+            /** Format: date-time */
+            spunAt: unknown;
+            /** Format: date-time */
+            nextSpinAt: unknown;
+            replayed: boolean;
+            proof: components["schemas"]["WheelProofResponse"];
+        };
+        WheelProofResponse: {
+            seed: string;
+            /** Format: int64 */
+            roll: number;
+            /** Format: int64 */
+            totalWeight: number;
+            eligibleWeights: string;
+        };
+        /** @enum {unknown} */
+        WheelSpinOutcome: "pending" | "noPrize" | "granted" | "failed";
+        /** @enum {unknown} */
+        WheelPrizeType: "noPrize" | "bonusMoney" | "freeSpins";
+        WheelResponse: {
+            available: boolean;
+            state: components["schemas"]["WheelPlayerState"];
+            name: null | string;
+            currency: null | string;
+            timeZone: null | string;
+            /** Format: date-time */
+            nextSpinAt: unknown;
+            /** Format: date-time */
+            serverTime: unknown;
+            segments: components["schemas"]["WheelSegmentResponse"][];
+            todaySpin: null | components["schemas"]["WheelSpinResponse"];
+        };
+        WheelSegmentResponse: {
+            /** Format: uuid */
+            id: string;
+            /** Format: int32 */
+            position: number;
+            label: string;
+            color: null | string;
+            prizeType: components["schemas"]["WheelPrizeType"];
+            /** Format: int64 */
+            amountCents: null | number;
+            /** Format: int32 */
+            freeSpinsCount: null | number;
+            eligible: boolean;
+        };
+        /** @enum {unknown} */
+        WheelPlayerState: "unavailable" | "signInRequired" | "ready" | "spunToday" | "closedToday" | "ended" | "restricted" | "nothingToWin";
     };
     responses: never;
     parameters: never;

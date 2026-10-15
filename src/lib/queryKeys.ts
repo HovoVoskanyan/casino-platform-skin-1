@@ -33,6 +33,8 @@ export const queryKeys = {
     notificationsAll: () => [...queryKeys.session.all, "notifications"] as const,
     notifications: () => [...queryKeys.session.all, "notifications", "list"] as const,
     notificationsUnread: () => [...queryKeys.session.all, "notifications", "unread"] as const,
+    /** Lucky Wheel — the skin's wheel as the caller sees it (a guest reads it too; its state changes on sign-in, hence the session prefix). */
+    wheel: () => [...queryKeys.session.all, "wheel"] as const,
   },
   /** The site's own settings — languages, default language, currency — from the back office (core /api/v1/site). */
   site: () => ["site"] as const,

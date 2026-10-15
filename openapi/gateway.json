@@ -2358,6 +2358,75 @@
         ]
       }
     },
+    "/api/bonus/wheel": {
+      "get": {
+        "tags": [
+          "Lucky Wheel (player)"
+        ],
+        "summary": "The skin's wheel for the caller: slices, state (ready / spun today / closed / sign in …), the countdown target, and today's spin when used.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WheelResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/bonus/wheel/spin": {
+      "post": {
+        "tags": [
+          "Lucky Wheel (player)"
+        ],
+        "summary": "Today's spin. Idempotent per wheel day: asking again answers the same spin (replayed = true). The prize is credited before this returns unless wallet/core is down (outcome = pending, credited by the settlement job).",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WheelSpinResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "playerCookie": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/support/conversation": {
       "get": {
         "tags": [
@@ -5308,6 +5377,247 @@
             "type": "string"
           }
         }
+      },
+      "WheelSpinResponse": {
+        "required": [
+          "spinId",
+          "segmentId",
+          "segmentPosition",
+          "label",
+          "prizeType",
+          "outcome",
+          "currency",
+          "amountCents",
+          "freeSpinsCount",
+          "spinDay",
+          "spunAt",
+          "nextSpinAt",
+          "replayed",
+          "proof"
+        ],
+        "type": "object",
+        "properties": {
+          "spinId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "segmentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "segmentPosition": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "label": {
+            "type": "string"
+          },
+          "prizeType": {
+            "$ref": "#/components/schemas/WheelPrizeType"
+          },
+          "outcome": {
+            "$ref": "#/components/schemas/WheelSpinOutcome"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "amountCents": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int64"
+          },
+          "freeSpinsCount": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "spinDay": {
+            "type": "string",
+            "format": "date"
+          },
+          "spunAt": {
+            "format": "date-time"
+          },
+          "nextSpinAt": {
+            "format": "date-time"
+          },
+          "replayed": {
+            "type": "boolean"
+          },
+          "proof": {
+            "$ref": "#/components/schemas/WheelProofResponse"
+          }
+        }
+      },
+      "WheelProofResponse": {
+        "required": [
+          "seed",
+          "roll",
+          "totalWeight",
+          "eligibleWeights"
+        ],
+        "type": "object",
+        "properties": {
+          "seed": {
+            "type": "string"
+          },
+          "roll": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalWeight": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "eligibleWeights": {
+            "type": "string"
+          }
+        }
+      },
+      "WheelSpinOutcome": {
+        "enum": [
+          "pending",
+          "noPrize",
+          "granted",
+          "failed"
+        ]
+      },
+      "WheelPrizeType": {
+        "enum": [
+          "noPrize",
+          "bonusMoney",
+          "freeSpins"
+        ]
+      },
+      "WheelResponse": {
+        "required": [
+          "available",
+          "state",
+          "name",
+          "currency",
+          "timeZone",
+          "nextSpinAt",
+          "serverTime",
+          "segments",
+          "todaySpin"
+        ],
+        "type": "object",
+        "properties": {
+          "available": {
+            "type": "boolean"
+          },
+          "state": {
+            "$ref": "#/components/schemas/WheelPlayerState"
+          },
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "currency": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "timeZone": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "nextSpinAt": {
+            "format": "date-time"
+          },
+          "serverTime": {
+            "format": "date-time"
+          },
+          "segments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WheelSegmentResponse"
+            }
+          },
+          "todaySpin": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/WheelSpinResponse"
+              }
+            ]
+          }
+        }
+      },
+      "WheelSegmentResponse": {
+        "required": [
+          "id",
+          "position",
+          "label",
+          "color",
+          "prizeType",
+          "amountCents",
+          "freeSpinsCount",
+          "eligible"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "position": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "label": {
+            "type": "string"
+          },
+          "color": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "prizeType": {
+            "$ref": "#/components/schemas/WheelPrizeType"
+          },
+          "amountCents": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int64"
+          },
+          "freeSpinsCount": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "eligible": {
+            "type": "boolean"
+          }
+        }
+      },
+      "WheelPlayerState": {
+        "enum": [
+          "unavailable",
+          "signInRequired",
+          "ready",
+          "spunToday",
+          "closedToday",
+          "ended",
+          "restricted",
+          "nothingToWin"
+        ]
       }
     },
     "securitySchemes": {
