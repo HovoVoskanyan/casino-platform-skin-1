@@ -3,7 +3,7 @@ import { useEffect, useRef, useState, type MouseEvent, type ReactNode, type RefO
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { useBanners, usePromotions, type Banner, type Promotion } from "./api";
-import { isSiteLink } from "./banner-link";
+import { isExternalLink, isSiteLink } from "./banner-link";
 import { splitPromotionValue } from "./promotion-value";
 
 /** Owner 2026-10-15: three seconds a slide — the hero moves quickly. */
@@ -13,8 +13,9 @@ const ROTATE_MS = 3000;
  * Design (Home hero): the `home-hero` placement at 2.360:1 (1956×829 desktop, 1134×480 phone — the preset P3-22
  * set), rotating every 3 s. Under the frame: the dots, ‹ › from 600px and a pause toggle (WCAG 2.2.2); swipe on
  * phones. A banner opens what the back office set (owner 2026-10-15): a page of the site by relative path
- * (`/games?category=slots`, `/vip`, `/wallet#deposit`) or, linked to a promotion, Promotions — where the back office's
- * bonuses are activated. A swipe that changes slide never also follows the link. Rotation stops for reduced motion.
+ * (`/games?category=slots`, `/vip`, `/wallet#deposit`), another website by https address (2026-10-16 — in a new tab,
+ * marked ↗, `rel` sponsored), or, linked to a promotion, Promotions — where the back office's bonuses are activated.
+ * A swipe that changes slide never also follows the link. Rotation stops for reduced motion.
  *
  * With no banner live, the design's own welcome artwork stands in — but only while the skin runs a `welcome`
  * promotion, whose amount fills the artwork's pill; the slide opens Promotions. Neither = no hero at all.
@@ -86,12 +87,22 @@ function ControlButton({ label, pressed, onClick, className, children }: { label
   );
 }
 
-/** Where a slide goes: its page (a same-site path, checked again here), else Promotions for a promotion, else nowhere. */
-const destination = (banner: Banner) => (isSiteLink(banner.linkUrl) ? banner.linkUrl.trim() : banner.promotionId ? "/promotions" : null);
+/**
+ * Where a slide goes: its page (a same-site path, checked again here), another website (a public https address,
+ * likewise), else Promotions for a promotion, else nowhere — a link that passes neither check is never rendered.
+ */
+function destination(banner: Banner): { href: string; external: boolean } | null {
+  const link = (banner.linkUrl ?? "").trim();
+  if (isSiteLink(link)) return { href: link, external: false };
+  if (isExternalLink(link)) return { href: link, external: true };
+  return banner.promotionId ? { href: "/promotions", external: false } : null;
+}
 
 function Slide({ banner, active, position, swipedRef }: { banner: Banner; active: boolean; position: string; swipedRef: RefObject<boolean> }) {
+  const { t } = useTranslation();
   const router = useRouter();
-  const href = destination(banner);
+  const target = destination(banner);
+  const name = banner.title ?? position;
   const picture = (
     <picture>
       {banner.mobileImageUrl ? <source media="(max-width: 599px)" srcSet={banner.mobileImageUrl} /> : null}
@@ -100,20 +111,40 @@ function Slide({ banner, active, position, swipedRef }: { banner: Banner; active
   );
   return (
     <div role="group" aria-roledescription="slide" aria-label={position} aria-hidden={!active} className={cn("absolute inset-0 transition-opacity duration-[550ms]", active ? "z-[2] opacity-100" : "pointer-events-none z-[1] opacity-0")}>
-      {href ? (
+      {target?.external ? (
+        // Another website: the browser's own new tab. noopener/noreferrer — the partner gets neither this window nor
+        // the page it came from; sponsored/nofollow — search engines are told it is a paid placement.
+        <a
+          href={target.href}
+          target="_blank"
+          rel="noopener noreferrer sponsored nofollow"
+          tabIndex={active ? 0 : -1}
+          aria-label={`${name} ${t("info.opensNewTab")}`}
+          className="relative block h-full w-full"
+          draggable={false}
+          onClick={(e: MouseEvent<HTMLAnchorElement>) => {
+            if (swipedRef.current) { e.preventDefault(); swipedRef.current = false; }
+          }}
+        >
+          {picture}
+          <span aria-hidden className="absolute top-2 right-2 flex h-7 w-7 items-center justify-center rounded-full border border-white/25 bg-[rgba(6,3,11,.55)] text-white shadow-[0_2px_8px_rgba(0,0,0,.4)] backdrop-blur-sm min-[600px]:top-3 min-[600px]:right-3">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M7 17 17 7M9 7h8v8" /></svg>
+          </span>
+        </a>
+      ) : target ? (
         // A real <a href>: middle-click, ⌘-click and "copy link" behave as on any link; a plain click (or Enter) is
         // the router's own navigation — the path may carry a query and hash, so it goes in whole as `href`.
         <a
-          href={href}
+          href={target.href}
           tabIndex={active ? 0 : -1}
-          aria-label={banner.title ?? position}
+          aria-label={name}
           className="block h-full w-full"
           draggable={false}
           onClick={(e: MouseEvent<HTMLAnchorElement>) => {
             if (swipedRef.current) { e.preventDefault(); swipedRef.current = false; return; }
             if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
             e.preventDefault();
-            void router.navigate({ href });
+            void router.navigate({ href: target.href });
           }}
         >
           {picture}

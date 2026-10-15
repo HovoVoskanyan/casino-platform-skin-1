@@ -22,8 +22,26 @@ const sameSite = (path: string, allowSpace: boolean) =>
 /** One decode of the ASCII escapes, as a router would; a malformed escape stays as written. */
 const decode = (path: string) => path.replace(/%([0-7][0-9a-f])/gi, (_, hex: string) => String.fromCharCode(parseInt(hex, 16)));
 
-export function isSiteLink(raw: string | null | undefined): raw is string {
+export function isSiteLink(raw: string | null | undefined): boolean {
   const path = (raw ?? "").trim();
   return path.length > 0 && path.length <= LINK_MAX && sameSite(path, false) && sameSite(decode(path), true);
 }
 
+/**
+ * Or another website (owner 2026-10-16), mirroring core's `ExternalLinkRules`: `https:` only, a named public host
+ * with a dot (no IP, no `localhost`), no `user:password@`, no whitespace, control characters or backslash, at most
+ * {@link EXTERNAL_MAX} characters. Core has also refused every skin domain of the platform; the skin does not
+ * repeat that (it does not know them), it only refuses to render anything that is not a public https address.
+ */
+export const EXTERNAL_MAX = 2048;
+
+export function isExternalLink(raw: string | null | undefined): boolean {
+  const text = (raw ?? "").trim();
+  if (!text || text.length > EXTERNAL_MAX || [...text].some((c) => c === "\\" || /\s/.test(c) || CONTROL.test(c))) return false;
+  let url: URL;
+  try { url = new URL(text); } catch { return false; }
+  if (url.protocol !== "https:" || url.username || url.password) return false;
+  const host = url.hostname.toLowerCase().replace(/\.$/, "");
+  if (!host.includes(".") || host === "localhost" || host.endsWith(".localhost")) return false;
+  return !host.startsWith("[") && !/^\d+(\.\d+){3}$/.test(host); // the URL parser has already normalised IPv4 forms
+}

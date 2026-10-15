@@ -290,14 +290,41 @@ describe("Home (P3-27)", () => {
     await waitFor(() => expect(router.state.location.pathname).toBe("/vip"));
   });
 
-  it("a link that is not a same-site path is never rendered — the banner is a picture", async () => {
+  it("a link that is neither a same-site path nor a public https address is never rendered — the banner is a picture", async () => {
     server.use(http.get("*/api/v1/banners", () => HttpResponse.json([
-      linked("b1", "Evil", "//evil.example"), linked("b2", "Script", "javascript:alert(1)"), linked("b3", "Abs", "https://evil.example/games"),
+      linked("b1", "Evil", "//evil.example"), linked("b2", "Script", "javascript:alert(1)"), linked("b3", "Plain", "http://evil.example/games"),
     ])), ...catalogue(1));
     renderRoute("/");
     const hero = await screen.findByRole("region", { name: "Promotions" });
     expect(within(hero).queryAllByRole("link", { hidden: true })).toEqual([]);
     expect(within(hero).getAllByRole("img", { hidden: true })).toHaveLength(3);
+  });
+
+  it("another website opens in a new tab, marked sponsored, and the app stays where it is (owner 2026-10-16)", async () => {
+    server.use(http.get("*/api/v1/banners", () => HttpResponse.json([linked("b1", "Partner offer", "https://partner.example/offer?src=chocho")])), ...catalogue(1));
+    const { router } = renderRoute("/");
+    const hero = await screen.findByRole("region", { name: "Promotions" });
+    const partner = within(hero).getByRole("link", { name: "Partner offer (opens in a new tab)" });
+    expect(partner).toHaveAttribute("href", "https://partner.example/offer?src=chocho");
+    expect(partner).toHaveAttribute("target", "_blank");
+    expect(partner).toHaveAttribute("rel", "noopener noreferrer sponsored nofollow");
+
+    const click = new MouseEvent("click", { bubbles: true, cancelable: true });
+    partner.dispatchEvent(click);
+    expect(click.defaultPrevented).toBe(false); // the browser opens the tab; the router is not involved
+    expect(router.state.location.pathname).toBe("/");
+  });
+
+  it("a swipe on an external banner opens nothing", async () => {
+    server.use(http.get("*/api/v1/banners", () => HttpResponse.json([linked("b1", "Partner offer", "https://partner.example/"), linked("b2", "VIP club", "/vip")])), ...catalogue(1));
+    renderRoute("/");
+    const partner = within(await screen.findByRole("region", { name: "Promotions" })).getByRole("link", { name: "Partner offer (opens in a new tab)" });
+    const touch = (x: number) => ({ clientX: x, clientY: 100 }) as Touch;
+    fireEvent.touchStart(partner, { touches: [touch(300)] });
+    fireEvent.touchEnd(partner, { changedTouches: [touch(120)] });
+    const click = new MouseEvent("click", { bubbles: true, cancelable: true });
+    partner.dispatchEvent(click);
+    expect(click.defaultPrevented).toBe(true);
   });
 
   it("a swipe changes slide without following the link", async () => {
