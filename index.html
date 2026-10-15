@@ -5,13 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="color-scheme" content="dark" />
     <meta name="theme-color" content="#130124" />
-    <title>ChoCho</title>
+    <!-- Each page sets its own search tags in the browser (src/lib/seo.ts). The build swaps this block for the server-side
+         head (src/seo/server-head.ts) — the same tags for crawlers that do not run JavaScript; these are its defaults. -->
+    <!-- seo:head -->
+    <title>ChoCho – Online Casino Philippines: Slots, Live Casino &amp; More</title>
+    <meta name="description" content="Play online slots, live casino, crash and table games at ChoCho, the online casino for the Philippines. Deposit with GCash and Maya, claim your bonuses and play responsibly." />
+    <!-- /seo:head -->
+    <meta property="og:site_name" content="ChoCho" />
+    <meta property="og:locale" content="en_PH" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="apple-touch-icon" href="/chocho-logo-cut.png" />
     <link rel="icon" type="image/png" href="/chocho-logo-cut.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Caveat:wght@600;700&display=swap" rel="stylesheet" />
   </head>
   <body>
+    <!-- seo:body -->
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

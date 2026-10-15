@@ -5,6 +5,7 @@ import { Button, Spinner } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Notice } from "@/components/ui/notice";
 import { authDialog } from "@/features/auth/auth-dialog-state";
+import { gamePath } from "@/lib/slug";
 import { useSession } from "@/features/auth/session";
 import type { GameDetail } from "@/features/lobby/api";
 import { GameContainer } from "./game-container";
@@ -138,7 +139,7 @@ export function PlayPanel({ game, autoPlay, onAutoPlayed }: { game: GameDetail; 
           const mode = signInFor === "Demo" ? "demo" : "real";
           setSignInFor(null);
           setReturnMarker(game.id, mode);
-          authDialog.open("signin", `/games/${game.id}?play=${mode}`);
+          authDialog.open("signin", `${gamePath(game)}?play=${mode}`);
         }}>{t("game.continueToSignIn")}</Button>
         <Button variant="secondary" size="lg" onClick={() => { setStatus({ kind: "cancelled", mode: signInFor ?? "Real" }); setSignInFor(null); }}>{t("cancel")}</Button>
       </Dialog>

@@ -1,0 +1,209 @@
+{{- /*
+  The page's search tags for crawlers and link previews that do not run JavaScript (owner 2026-10-15) — a Go
+  template the container's Caddy runs on index.html (`templates` in the Caddyfile). The page itself sets the same
+  tags in the browser (src/lib/seo.ts); this file mirrors, line for line:
+    seoHead            src/lib/seo.ts
+    homeSeo, promotionsSeo, vipSeo, gamesSeo   src/features/lobby/page-seo.ts
+    gameSeo, gameAbout, seoCategory            src/features/lobby/game-seo.ts
+  and src/seo/parity.test.ts runs both on the same catalogue and fails on any difference. Change one, change both.
+
+  The build (src/seo/server-head.ts) cuts this file at the "@@" lines into three parts — the facts, the head, the
+  body — and fills in __SITE__ (src/lib/seo-site.ts) and __COPY__ (the i18n catalogue's keys this file reads, per
+  language). The facts are core's GET /api/v1/seo/page, through Caddy's /_seo/page, which answers {} when the
+  gateway or core cannot: then the page keeps the site-wide defaults, as before. text/template does not escape:
+  every value goes out through `html` (attributes, text) or `toJson` (JSON-LD, which escapes < > &).
+*/ -}}
+{{- $site := `__SITE__` | fromJson -}}
+{{- $copies := `__COPY__` | fromJson -}}
+{{- $path := .OriginalReq.URL.Path -}}
+{{- $query := .OriginalReq.URL.Query -}}
+{{- $private := dict "/account" "account.title" "/wallet" "wallet.title" "/auth/callback" "nav.signIn" "/verify-email" "verify.title" -}}
+
+{{- /* which page: the front's routes */ -}}
+{{- $kind := "other" -}}
+{{- $gameId := "" -}}
+{{- if eq $path "/" -}}{{- $kind = "home" -}}
+{{- else if eq $path "/games" -}}{{- $kind = "games" -}}
+{{- else if regexMatch "^/games/[^/]+(/[^/]*)?$" $path -}}{{- $kind = "game" -}}{{- $gameId = index (splitList "/" $path) 2 -}}
+{{- else if eq $path "/promotions" -}}{{- $kind = "promotions" -}}
+{{- else if eq $path "/vip" -}}{{- $kind = "vip" -}}
+{{- else if hasKey $private $path -}}{{- $kind = "private" -}}
+{{- end -}}
+
+{{- $f := dict -}}
+{{- if not (eq $kind "private" "other") -}}
+  {{- $f = httpInclude (printf "/_seo/page%s" (ternary (printf "?game=%s" (urlquery $gameId)) "" (eq $kind "game"))) | fromJson -}}
+{{- end -}}
+
+{{- /* the language a first-time visitor gets: the site's default (src/i18n toSiteLanguage) */ -}}
+{{- $lang := "en-PH" -}}
+{{- $code := lower (toString ($f.language | default "")) -}}
+{{- if or (eq $code "fil" "tl") (hasPrefix "fil-" $code) -}}{{- $lang = "fil" -}}{{- end -}}
+{{- $c := index $copies $lang -}}
+{{- $origin := toString ($f.origin | default "") -}}
+
+{{- /* the page's Seo: title (without the brand), bare, description, path, image, keywords, jsonLd, noindex, type */ -}}
+{{- $seo := false -}}
+{{- $title := "" -}}{{- $bare := false -}}{{- $desc := index $c "seo.home.description" -}}{{- $pagePath := $path -}}
+{{- $image := "" -}}{{- $keywords := list -}}{{- $ld := dict -}}{{- $noindex := false -}}{{- $type := "website" -}}
+{{- $g := dict -}}{{- $category := "" -}}{{- $about := list -}}
+
+{{- if eq $kind "private" -}}
+  {{- $seo = true -}}{{- $title = index $c (get $private $path) -}}{{- $desc = index $c "seo.private" -}}{{- $noindex = true -}}
+{{- else if not $origin -}}
+  {{- /* no facts: the site-wide defaults */ -}}
+{{- else if eq $kind "home" -}}
+  {{- $seo = true -}}{{- $title = index $c "seo.home.title" -}}{{- $bare = true -}}{{- $pagePath = "/" -}}
+  {{- $keywords = splitList ", " (index $c "seo.home.keywords") -}}
+  {{- $ld = dict "@context" "https://schema.org" "@graph" (list
+        (dict "@type" "WebSite" "name" $site.brand "url" (printf "%s/" $origin) "inLanguage" $site.inLanguage)
+        (dict "@type" "Organization" "name" $site.brand "url" (printf "%s/" $origin) "logo" (printf "%s%s" $origin $site.logo))) -}}
+{{- else if eq $kind "promotions" -}}
+  {{- $seo = true -}}{{- $title = index $c "promotions.title" -}}{{- $desc = index $c "seo.promotions.description" -}}{{- $pagePath = "/promotions" -}}
+  {{- $keywords = splitList ", " (index $c "seo.promotions.keywords") -}}
+{{- else if eq $kind "vip" -}}
+  {{- $seo = true -}}{{- $title = index $c "vip.title" -}}{{- $desc = index $c "seo.vip.description" -}}{{- $pagePath = "/vip" -}}
+{{- else if eq $kind "games" -}}
+  {{- $seo = true -}}
+  {{- /* the router's reading of the search: a code is [a-z0-9][a-z0-9_-]*, a badge hot|new, fav a boolean */ -}}
+  {{- $codeRule := "^[a-z0-9][a-z0-9_-]*$" -}}
+  {{- $qCategory := $query.Get "category" -}}{{- if not (regexMatch $codeRule $qCategory) -}}{{- $qCategory = "" -}}{{- end -}}
+  {{- $qProvider := $query.Get "provider" -}}{{- if not (regexMatch $codeRule $qProvider) -}}{{- $qProvider = "" -}}{{- end -}}
+  {{- $fav := not (has ($query.Get "fav") (list "" "false" "0" "null")) -}}
+  {{- $only := and (not ($query.Get "q")) (not (has ($query.Get "badge") (list "hot" "new"))) (not $fav) -}}
+  {{- $cat := dict -}}{{- $prov := dict -}}
+  {{- if and $only (not $qProvider) -}}{{- range $f.categories -}}{{- if eq .code $qCategory -}}{{- $cat = . -}}{{- end -}}{{- end -}}{{- end -}}
+  {{- if and $only (not $qCategory) -}}{{- range $f.providers -}}{{- if eq .code $qProvider -}}{{- $prov = . -}}{{- end -}}{{- end -}}{{- end -}}
+  {{- $crumbs := list
+        (dict "@type" "ListItem" "position" 1 "name" (index $c "nav.home") "item" (printf "%s/" $origin))
+        (dict "@type" "ListItem" "position" 2 "name" (index $c "nav.games") "item" (printf "%s/games" $origin)) -}}
+  {{- if $cat.code -}}
+    {{- $pagePath = printf "/games?category=%s" $cat.code -}}
+    {{- $title = index $c "seo.games.categoryTitle" | replace "{{category}}" $cat.name -}}
+    {{- $desc = index $c "seo.games.categoryDescription" | replace "{{category}}" $cat.name | replace "{{count}}" (printf "%v" $cat.gameCount) -}}
+    {{- $keywords = list $cat.name (printf "%s online" $cat.name) (index $c "seo.keywords.site") -}}
+    {{- range slice $f.providers 0 (min 5 (len $f.providers)) -}}{{- $keywords = append $keywords .name -}}{{- end -}}
+    {{- $crumbs = append $crumbs (dict "@type" "ListItem" "position" 3 "name" $cat.name "item" (printf "%s%s" $origin $pagePath)) -}}
+  {{- else if $prov.code -}}
+    {{- $pagePath = printf "/games?provider=%s" $prov.code -}}
+    {{- $title = index $c "seo.games.providerTitle" | replace "{{provider}}" $prov.name -}}
+    {{- $desc = index $c "seo.games.providerDescription" | replace "{{provider}}" $prov.name | replace "{{count}}" (printf "%v" $prov.gameCount) -}}
+    {{- $keywords = list $prov.name (index $c "seo.game.kwProvider" | replace "{{provider}}" $prov.name) (index $c "seo.keywords.site") -}}
+    {{- $crumbs = append $crumbs (dict "@type" "ListItem" "position" 3 "name" $prov.name "item" (printf "%s%s" $origin $pagePath)) -}}
+  {{- else -}}
+    {{- $pagePath = "/games" -}}
+    {{- $title = index $c "seo.games.title" -}}{{- $desc = index $c "seo.games.description" -}}
+    {{- $keywords = splitList ", " (index $c "seo.games.keywords") -}}
+    {{- range $f.categories -}}{{- $keywords = append $keywords .name -}}{{- end -}}
+    {{- range slice $f.providers 0 (min 8 (len $f.providers)) -}}{{- $keywords = append $keywords .name -}}{{- end -}}
+  {{- end -}}
+  {{- $ld = dict "@context" "https://schema.org" "@type" "BreadcrumbList" "itemListElement" $crumbs -}}
+{{- else if and (eq $kind "game") (not $f.game) -}}
+  {{- $seo = true -}}{{- $title = index $c "game.unavailable" -}}{{- $noindex = true -}}
+{{- else if eq $kind "game" -}}
+  {{- $seo = true -}}{{- $g = $f.game -}}{{- $type = "article" -}}{{- $pagePath = $f.gamePath -}}
+  {{- /* seoCategory: the game's first shown category that is not a curated list, else its first */ -}}
+  {{- $first := "" -}}
+  {{- range $f.categories -}}{{- if has .code $g.categories -}}
+    {{- if not $first -}}{{- $first = .name -}}{{- end -}}
+    {{- if and (not $category) (not (has .code $site.collections)) -}}{{- $category = .name -}}{{- end -}}
+  {{- end -}}{{- end -}}
+  {{- if not $category -}}{{- $category = $first -}}{{- end -}}
+  {{- $hasRtp := not (kindIs "invalid" $g.rtp) -}}
+  {{- $rtp := printf "%v" $g.rtp -}}
+  {{- $volatility := lower (toString ($g.volatility | default "")) -}}
+  {{- $title = index $c "seo.game.title" | replace "{{name}}" $g.name | replace "{{provider}}" $g.providerName -}}
+  {{- $facts := list -}}
+  {{- if $hasRtp -}}{{- $facts = append $facts (index $c "seo.game.rtp" | replace "{{rtp}}" $rtp) -}}{{- end -}}
+  {{- if $volatility -}}{{- $facts = append $facts (index $c "seo.game.volatility" | replace "{{volatility}}" $volatility) -}}{{- end -}}
+  {{- $desc = index $c "seo.game.lead" | replace "{{name}}" $g.name | replace "{{provider}}" $g.providerName -}}
+  {{- if $facts -}}{{- $joined := join ", " $facts -}}{{- $desc = printf "%s %s%s." $desc (upper (substr 0 1 $joined)) (substr 1 -1 $joined) -}}{{- end -}}
+  {{- $desc = printf "%s %s" $desc (index $c (ternary "seo.game.demo" "seo.game.real" $g.hasDemo)) -}}
+  {{- $image = toString ($g.logoUrl | default $g.thumbnailUrl | default "") -}}
+  {{- $keywords = list $g.name (index $c "seo.game.kwOnline" | replace "{{name}}" $g.name) -}}
+  {{- if $g.hasDemo -}}{{- $keywords = append $keywords (index $c "seo.game.kwDemo" | replace "{{name}}" $g.name) -}}{{- end -}}
+  {{- if $hasRtp -}}{{- $keywords = append $keywords (index $c "seo.game.kwRtp" | replace "{{name}}" $g.name) -}}{{- end -}}
+  {{- if $category -}}{{- $keywords = append $keywords (printf "%s %s" $g.name $category) -}}{{- end -}}
+  {{- $keywords = append $keywords $g.providerName -}}
+  {{- $keywords = append $keywords (index $c "seo.game.kwProvider" | replace "{{provider}}" $g.providerName) -}}
+  {{- $keywords = append $keywords $category -}}
+  {{- $keywords = append $keywords (index $c "seo.keywords.site") -}}
+  {{- /* gameAbout: the operator's own description leads the page; the generated copy stands in where there is none */ -}}
+  {{- if $g.description -}}
+    {{- $about = list $g.description -}}
+  {{- else -}}
+    {{- if $category -}}
+      {{- $about = append $about (index $c "game.seoAbout.intro" | replace "{{name}}" $g.name | replace "{{provider}}" $g.providerName | replace "{{category}}" $category) -}}
+    {{- else -}}
+      {{- $about = append $about (index $c "game.seoAbout.introNoCategory" | replace "{{name}}" $g.name | replace "{{provider}}" $g.providerName) -}}
+    {{- end -}}
+    {{- if and $hasRtp $volatility -}}{{- $about = append $about (index $c "game.seoAbout.stats" | replace "{{rtp}}" $rtp | replace "{{volatility}}" $volatility) -}}
+    {{- else if $hasRtp -}}{{- $about = append $about (index $c "game.seoAbout.statsRtp" | replace "{{rtp}}" $rtp) -}}
+    {{- else if $volatility -}}{{- $about = append $about (index $c "game.seoAbout.statsVolatility" | replace "{{volatility}}" $volatility) -}}
+    {{- end -}}
+    {{- $about = append $about (index $c (ternary "game.seoAbout.demo" "game.seoAbout.noDemo" $g.hasDemo) | replace "{{name}}" $g.name) -}}
+    {{- $about = append $about (index $c "game.seoAbout.payments") -}}
+  {{- end -}}
+{{- end -}}
+
+{{- /* seoHead: what the tags say */ -}}
+{{- $fullTitle := ternary $title (printf "%s | %s" $title $site.brand) $bare -}}
+{{- $url := printf "%s%s" $origin $pagePath -}}
+{{- $imageUrl := printf "%s%s" $origin $site.defaultImage -}}
+{{- if regexMatch "^[a-zA-Z][a-zA-Z0-9+.-]*:" $image -}}{{- $imageUrl = $image -}}
+{{- else if hasPrefix "//" $image -}}{{- $imageUrl = printf "%s:%s" (index (splitList ":" $origin) 0) $image -}}
+{{- else if hasPrefix "/" $image -}}{{- $imageUrl = printf "%s%s" $origin $image -}}
+{{- else if $image -}}{{- $imageUrl = printf "%s/%s" $origin $image -}}
+{{- end -}}
+{{- if eq $kind "game" -}}{{- if $g.name -}}
+  {{- $vg := dict "@type" "VideoGame" "name" $g.name "url" $url "description" $desc "gamePlatform" "Web browser" "applicationCategory" "Game" "operatingSystem" "Any" "publisher" (dict "@type" "Organization" "name" $g.providerName) "inLanguage" $site.inLanguage -}}
+  {{- if $image -}}{{- $_ := set $vg "image" $imageUrl -}}{{- end -}}
+  {{- if $category -}}{{- $_ := set $vg "genre" $category -}}{{- end -}}
+  {{- $crumbs := list
+        (dict "@type" "ListItem" "position" 1 "name" (index $c "nav.home") "item" (printf "%s/" $origin))
+        (dict "@type" "ListItem" "position" 2 "name" (index $c "nav.games") "item" (printf "%s/games" $origin))
+        (dict "@type" "ListItem" "position" 3 "name" $g.name "item" $url) -}}
+  {{- $ld = dict "@context" "https://schema.org" "@graph" (list $vg (dict "@type" "BreadcrumbList" "itemListElement" $crumbs)) -}}
+{{- end -}}{{- end -}}
+{{- $keywordsText := join ", " (uniq (compact $keywords)) -}}
+@@head
+{{- if $seo }}
+    <title>{{ $fullTitle | html }}</title>
+    <meta name="description" content="{{ $desc | html }}" />
+    {{- if $keywordsText }}
+    <meta name="keywords" content="{{ $keywordsText | html }}" />
+    {{- end }}
+    <meta name="robots" content="{{ ternary "noindex, follow" "index, follow, max-image-preview:large" $noindex }}" />
+    {{- if not $noindex }}
+    <link rel="canonical" href="{{ $url | html }}" />
+    {{- end }}
+    {{- if $origin }}
+    <meta property="og:type" content="{{ $type }}" />
+    <meta property="og:title" content="{{ $fullTitle | html }}" />
+    <meta property="og:description" content="{{ $desc | html }}" />
+    <meta property="og:url" content="{{ $url | html }}" />
+    <meta property="og:image" content="{{ $imageUrl | html }}" />
+    <meta name="twitter:title" content="{{ $fullTitle | html }}" />
+    <meta name="twitter:description" content="{{ $desc | html }}" />
+    <meta name="twitter:image" content="{{ $imageUrl | html }}" />
+    {{- end }}
+    {{- if $ld }}
+    <script type="application/ld+json" id="seo-jsonld">{{ $ld | toJson }}</script>
+    {{- end }}
+{{- else }}
+    <title>{{ index $c "seo.home.title" | html }}</title>
+    <meta name="description" content="{{ index $c "seo.home.description" | html }}" />
+{{- end }}
+@@body
+{{- if and $seo (not $noindex) }}
+    <noscript>
+      <h1>{{ ternary $g.name $title (eq $kind "game") | html }}</h1>
+      {{- if eq $kind "game" }}
+      {{- range $about }}
+      <p>{{ . | html }}</p>
+      {{- end }}
+      {{- else }}
+      <p>{{ $desc | html }}</p>
+      {{- end }}
+    </noscript>
+{{- end }}

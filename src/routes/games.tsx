@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Notice } from "@/components/ui/notice";
 import { SectionTitle } from "@/components/ui/section-title";
 import { cn } from "@/lib/utils";
+import { useSeo, type Seo } from "@/lib/seo";
+import { gamesSeo } from "@/features/lobby/page-seo";
 import { authDialog } from "@/features/auth/auth-dialog-state";
 import { useSession } from "@/features/auth/session";
 import { GameCardSkeleton, GameCardTile } from "@/features/lobby/game-card";
@@ -50,6 +52,7 @@ function GamesPage() {
   const { signedIn } = useSession();
   const filtered = Boolean(search.q || search.category || search.provider || search.badge || (search.fav && signedIn));
   const toGrid = () => scrollToSection("all-games");
+  useSeo(useGamesSeo(search));
 
   return (
     <Shell>
@@ -80,6 +83,13 @@ function GamesPage() {
 function scrollToSection(id: string) {
   const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
   document.getElementById(id)?.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
+}
+
+function useGamesSeo(search: GamesSearch): Seo {
+  const { t } = useTranslation();
+  const { data: categories = [] } = useCategories();
+  const { data: providers = [] } = useProviders();
+  return gamesSeo(t, search, categories, providers);
 }
 
 const clean = (s: GamesSearch): GamesSearch => Object.fromEntries(Object.entries(s).filter(([, v]) => v !== undefined && v !== "" && v !== false)) as GamesSearch;

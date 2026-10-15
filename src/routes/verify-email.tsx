@@ -9,6 +9,7 @@ import { Notice } from "@/components/ui/notice";
 import { Button } from "@/components/ui/button";
 import { useResendVerification, useVerifyEmail } from "@/features/auth/session";
 import { useConfirmEmailChange } from "@/features/account/api";
+import { useSeo } from "@/lib/seo";
 
 const search = z.object({ email: z.string().optional(), token: z.string().optional(), change: z.coerce.number().optional().catch(undefined) });
 
@@ -20,6 +21,7 @@ export const Route = createFileRoute("/verify-email")({ validateSearch: search, 
  */
 function VerifyEmailPage() {
   const { t } = useTranslation();
+  useSeo({ title: t("verify.title"), description: t("seo.private"), noindex: true });
   const { email, token, change } = Route.useSearch();
   const isChange = change === 1;
   const signup = useVerifyEmail();

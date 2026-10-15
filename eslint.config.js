@@ -24,7 +24,8 @@ export default tseslint.config(
     rules: { "react-refresh/only-export-components": "off" },
   },
   {
-    files: ["src/api/**", "src/test/**", "scripts/**"],
+    // the SEO parity test reads pages from a real Caddy (src/seo/parity.test.ts), not from the API
+    files: ["src/api/**", "src/test/**", "scripts/**", "src/seo/parity.test.ts"],
     rules: { "no-restricted-globals": "off" },
   },
 );

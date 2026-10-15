@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
+import { gameSlug } from "@/lib/slug";
 import type { GameCard as Game } from "./api";
 import { GameArt } from "./game-art";
 import { HeartButton } from "./heart-button";
@@ -37,7 +38,7 @@ export function GameCardTile({ game, variant = "grid" }: { game: Game; variant?:
         variant === "rail" ? HOME_CARD : variant === "row" ? ROW_CARD : "h-[176px] w-full",
       )}
     >
-      <Link to="/games/$id" params={{ id: game.id }} aria-label={t("lobby.cardLabel", { name: game.name, provider: game.providerName })} className="absolute inset-0 block rounded-cc-xl outline-none">
+      <Link to="/games/$id/{-$slug}" params={{ id: game.id, slug: gameSlug(game.name) }} aria-label={t("lobby.cardLabel", { name: game.name, provider: game.providerName })} className="absolute inset-0 block rounded-cc-xl outline-none">
         <div className={cn("absolute inset-0 transition-transform duration-[400ms]", home ? "group-hover:scale-[1.07]" : "group-hover:scale-[1.05]")}>
           <GameArt name={game.name} src={game.thumbnailUrl} />
         </div>

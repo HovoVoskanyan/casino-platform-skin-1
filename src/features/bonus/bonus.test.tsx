@@ -173,7 +173,7 @@ describe("My bonuses (P3-29)", () => {
     const card = await within(screen.getByRole("region", { name: "Active bonuses" })).findByRole("article", { name: "Free Spins Drop" });
     expect(within(card).getByText("25 of 25 spins left")).toBeInTheDocument();
     expect(within(card).getByRole("status")).toHaveTextContent("Your free spins are in the game");
-    expect(await within(card).findByRole("link", { name: "Play Sweet Bonanza" })).toHaveAttribute("href", "/games/g-sweet");
+    expect(await within(card).findByRole("link", { name: "Play Sweet Bonanza" })).toHaveAttribute("href", "/games/g-sweet/sweet-bonanza");
   });
 
   it("a running bonus shows its credit left (from the hub), its wagering progress and its expiry", async () => {
@@ -276,7 +276,7 @@ describe("My bonuses (P3-29)", () => {
       await user.click(screen.getByRole("button", { name: "My Bonuses" }));
       const drawer = await screen.findByRole("dialog", { name: "My bonuses" });
       await user.click(await within(drawer).findByRole("link", { name: "Play Sweet Bonanza" }));
-      await waitFor(() => expect(router.state.location.pathname).toBe("/games/g-sweet"));
+      await waitFor(() => expect(router.state.location.pathname).toBe("/games/g-sweet/sweet-bonanza"));
       await waitFor(() => expect(screen.queryByRole("dialog", { name: "My bonuses" })).toBeNull());
 
       const { bonusDrawer } = await import("./bonus-drawer");

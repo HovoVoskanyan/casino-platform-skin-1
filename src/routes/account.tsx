@@ -9,6 +9,7 @@ import { SecurityTab } from "@/features/account/security-tab";
 import { SessionsTab } from "@/features/account/sessions-tab";
 import { ProfileTab } from "@/features/account/profile-tab";
 import { Bonuses } from "@/features/bonus/bonuses";
+import { useSeo } from "@/lib/seo";
 
 const TABS = ["profile", "security", "sessions", "bonuses"] as const;
 type Tab = (typeof TABS)[number];
@@ -30,6 +31,7 @@ export const Route = createFileRoute("/account")({
  */
 function AccountPage() {
   const { t } = useTranslation();
+  useSeo({ title: t("account.title"), description: t("seo.private"), noindex: true });
   const { signedIn } = useSession();
   // The tab IS the URL (review F7): a link to ?tab=bonuses switches it even on this page, and a reload keeps it.
   const search = Route.useSearch();

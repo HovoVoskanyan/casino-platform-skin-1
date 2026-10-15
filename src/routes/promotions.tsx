@@ -5,6 +5,8 @@ import { Notice } from "@/components/ui/notice";
 import { SectionTitle } from "@/components/ui/section-title";
 import { useOffers } from "@/features/bonus/api";
 import { OfferTiles } from "@/features/bonus/offer-list";
+import { useSeo } from "@/lib/seo";
+import { promotionsSeo } from "@/features/lobby/page-seo";
 
 export const Route = createFileRoute("/promotions")({ component: PromotionsPage });
 
@@ -17,6 +19,7 @@ function PromotionsPage() {
   const { t } = useTranslation();
   const offers = useOffers();
   const list = offers.data ?? [];
+  useSeo(promotionsSeo(t));
 
   return (
     <Shell>

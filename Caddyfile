@@ -1,7 +1,8 @@
 # The skin front container: SPA on / (history fallback), /api/* → the gateway, prefix KEPT (the gateway serves
 # /api/* itself; only the BO front strips). GATEWAY_UPSTREAM defaults to the compose service name. On the server the
 # host's nginx sends /api/* and /r/* on a skin domain straight to the gateway (deploy/SERVER.md), so there this
-# container only serves the static files; its own proxying is the laptop's path.
+# container only serves the static files (index.html filled per page, below), /robots.txt and /sitemap.xml; its other
+# proxying is the laptop's path.
 {
 	admin off
 	auto_https off
@@ -30,9 +31,53 @@
 		}
 	}
 
+	# Owner 2026-10-15: what search engines read is core's, per skin domain (its games, its host) — the gateway answers
+	# both. Unlike /api/*, these reach this container on the server too (nginx sends every other path here).
+	handle /robots.txt {
+		rewrite * /api/v1/seo/robots.txt
+		reverse_proxy {$GATEWAY_UPSTREAM:gateway:8080} {
+			header_up X-Forwarded-For {client_ip}
+		}
+	}
+
+	handle /sitemap.xml {
+		rewrite * /api/v1/seo/sitemap.xml
+		reverse_proxy {$GATEWAY_UPSTREAM:gateway:8080} {
+			header_up X-Forwarded-For {client_ip}
+		}
+	}
+
+	# Owner 2026-10-15: each page's search tags for crawlers and link previews that do not run JavaScript. The built
+	# index.html is a Go template (src/seo/server-head.ts): Caddy fills it per request from core's page facts, which it
+	# fetches as a sub-request to /_seo/page. That route never fails the page — core's 4xx/5xx, a slow answer or no
+	# gateway at all is "{}", and the page keeps the site-wide defaults the template falls back to.
+	handle /_seo/page {
+		rewrite * /api/v1/seo/page?{query}
+		reverse_proxy {$GATEWAY_UPSTREAM:gateway:8080} {
+			header_up X-Forwarded-For {client_ip}
+			transport http {
+				dial_timeout 1s
+				response_header_timeout 2s
+			}
+			@failed status 4xx 5xx
+			handle_response @failed {
+				respond "{}" 200
+			}
+		}
+	}
+
 	handle {
 		root * /srv
 		try_files {path} /index.html
+		# only the page itself is a template; scripts, styles and pictures go out as built
+		templates {
+			mime text/html
+		}
 		file_server
+	}
+
+	handle_errors {
+		@seo path /_seo/*
+		respond @seo "{}" 200
 	}
 }

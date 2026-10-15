@@ -29,6 +29,14 @@ describe("game launch (P3-28)", () => {
     sessionStorage.clear();
   });
 
+  it("puts the game's name in the address — a bare or stale link is corrected in place, keeping its search", async () => {
+    server.use(...catalogue(1), detail());
+    const { router } = renderRoute(`/games/${G.id}/old-name?promo=x`);
+
+    await waitFor(() => expect(router.state.location.pathname).toBe(`/games/${G.id}/sweet-bonanza`));
+    expect(router.state.location.searchStr).toBe("?promo=x");
+  });
+
   it("a guest is asked to sign in and will come back to the game in the mode they chose", async () => {
     const user = userEvent.setup();
     server.use(...catalogue(1), detail());
@@ -40,7 +48,7 @@ describe("game launch (P3-28)", () => {
     await user.click(within(ask).getByRole("button", { name: "Continue to Sign in" }));
 
     expect(await screen.findByText("Welcome back to ChoCho")).toBeInTheDocument();
-    expect(authDialog.get().returnTo).toBe(`/games/${G.id}?play=real`);
+    expect(authDialog.get().returnTo).toBe(`/games/${G.id}/sweet-bonanza?play=real`);
     expect(sessionStorage.getItem("chocho:playAfterSignIn")).toBe(`${G.id}:real`); // what lets the return open it
   });
 

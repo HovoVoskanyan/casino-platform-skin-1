@@ -5,6 +5,7 @@ import { Shell } from "@/components/layout/shell";
 import { RichText } from "@/components/ui/rich-text";
 import { SupportButton } from "@/features/support/support-button";
 import { cn } from "@/lib/utils";
+import { useSeo } from "@/lib/seo";
 
 const PAGES = ["responsible-gaming", "faq", "terms", "privacy"] as const;
 type InfoPage = (typeof PAGES)[number];
@@ -52,6 +53,7 @@ function InfoPageView() {
   const sections = (copy.sections ?? [])
     .map((s) => ({ ...s, blocks: s.blocks.filter((b) => SHOW_REQUIRED || b.t !== "req") }))
     .filter((s) => s.blocks.length > 0);
+  useSeo({ title: copy.title, description: copy.intro.replace(/<[^>]+>/g, ""), path: `/info/${page}` });
 
   return (
     <Shell>

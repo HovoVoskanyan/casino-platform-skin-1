@@ -7,6 +7,7 @@ import { z } from "zod";
 import { Shell } from "@/components/layout/shell";
 import { Notice } from "@/components/ui/notice";
 import { queryKeys } from "@/lib/queryKeys";
+import { useSeo } from "@/lib/seo";
 
 const search = z.object({ returnTo: z.string().optional() });
 
@@ -19,6 +20,7 @@ export const Route = createFileRoute("/auth/callback")({ validateSearch: search,
  */
 function GoogleCallbackPage() {
   const { t } = useTranslation();
+  useSeo({ title: t("nav.signIn"), description: t("seo.private"), noindex: true });
   const navigate = useNavigate();
   const qc = useQueryClient();
   const { returnTo } = Route.useSearch();
