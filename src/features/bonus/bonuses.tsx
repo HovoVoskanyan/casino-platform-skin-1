@@ -6,6 +6,7 @@ import { toApiError } from "@/api/problem";
 import { MASKED, peso } from "@/lib/money";
 import { queryKeys } from "@/lib/queryKeys";
 import { cn } from "@/lib/utils";
+import { gameSlug } from "@/lib/slug";
 import { useGame } from "@/features/lobby/api";
 import { useBalance, useBalanceHidden } from "@/features/wallet/balance-store";
 import { SupportButton } from "@/features/support/support-button";
@@ -390,7 +391,7 @@ function HeldSpinsCard({ id, holding, open, onDetails, message }: { id: string; 
     <ActiveCard id={id} name={holding.name} reward={c.reward} status="active" remaining={c.remaining} expiry={c.expiry} details={c.details}
       open={open} onDetails={onDetails} message={message}
       extra={single && gameName ? (
-        <Link to="/games/$id" params={{ id: holding.gameIds[0]! }} className={cn(GOLD, "flex items-center px-[18px]")}>{t("bonus.spins.play", { game: gameName })}</Link>
+        <Link to="/games/$id/{-$slug}" params={{ id: holding.gameIds[0]!, slug: gameSlug(gameName) }} className={cn(GOLD, "flex items-center px-[18px]")}>{t("bonus.spins.play", { game: gameName })}</Link>
       ) : null} />
   );
 }

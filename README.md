@@ -38,6 +38,7 @@ outcomes handled, every form is RHF + zod, no hand-written fetch (lint refuses i
 npm run dev          # :3002, proxied to the gateway on :5000
 npm run api:sync     # openapi/gateway.json ← the gateway's /openapi/v1.json, then src/api/schema.d.ts
 npm test             # vitest + msw
+npm run test:seo     # the server-side head in the real Caddy image vs. the page's own tags (needs docker)
 npm run e2e          # playwright in the installed Chrome against the laptop stack + dev server
 npm run e2e:lobby    # the lobby pages through the compose skin front (:3003) on a throwaway skin + host
 ```
@@ -53,6 +54,33 @@ game page and Promotions as a guest, and the ♥ as a new player. It needs `CORE
 backend's `deploy/.env` and a rebuilt `skin-front` container; screenshots at 375 and 1280 land in `e2e/shots/`
 (ignored). It signs up one player, so it shares the laptop's signup throttle — restart gateway and identity after a
 burst of runs.
+
+## Search engines and link previews
+
+Every page sets its own title, description, keywords, canonical, Open Graph / Twitter card, robots and JSON-LD in
+the browser (`src/lib/seo.ts`; the copy is the catalogue's `seo.*` and `game.seoAbout.*`). Google runs JavaScript;
+Bing, Facebook / Messenger, Viber, Telegram and most others do not — so the container serves the same tags in the
+HTML itself:
+
+- **The build** (`seoServerHead` in `vite.config.ts` → `src/seo/server-head.ts`) turns `index.html` into a Go template
+  from `src/seo/head.gotmpl`, baking in the copy for both languages. The `<!-- seo:head -->` block (the site-wide
+  defaults the dev server keeps) becomes the per-page tags; `<!-- seo:body -->` becomes a `<noscript>` with the page's
+  heading and copy (a game's "About" paragraphs).
+- **Each request** for a page, Caddy's `templates` fill it in. The template reads the route (`/`, `/games`,
+  `/games?category=` / `?provider=`, `/games/{id}/{slug}`, `/promotions`, `/vip`; the player's own pages are noindex)
+  and asks core for the facts with one sub-request to `/_seo/page` → the gateway's anonymous `GET /api/v1/seo/page`
+  (`?game=`): the origin (as the sitemap names it), the site's default language, the game with its canonical slugged
+  path, the category and provider pills. Every other page is served as built.
+- **It never breaks the page.** `/_seo/page` answers `{}` when core says 4xx/5xx, takes longer than 2 s, or the
+  gateway is down — and the template then writes the site-wide defaults, exactly the old `index.html`.
+- **One description, two writers.** `head.gotmpl` mirrors `seoHead`, `gameSeo` / `gameAbout` / `seoCategory`, and
+  `homeSeo` / `gamesSeo` / `promotionsSeo` / `vipSeo` (`src/features/lobby/page-seo.ts`); the shared constants are
+  `src/lib/seo-site.ts`. Change the copy in the catalogue and both follow; change the logic on one side and
+  `npm run test:seo` fails until the other matches. The build fails on a catalogue key the template names but the
+  catalogue lacks.
+
+Check it on a deployed site: `curl -s https://<domain>/games/<id>/x | grep -E '<title|canonical|og:image|ld\+json'`.
+`/sitemap.xml` and `/robots.txt` are core's too (see the Caddyfile).
 
 ## What is here, and what waits on other cards
 

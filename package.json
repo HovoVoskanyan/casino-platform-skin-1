@@ -13,6 +13,7 @@
     "lint": "eslint .",
     "typecheck": "tsc -b",
     "test": "vitest run",
+    "test:seo": "SEO_PARITY=1 vitest run src/seo/parity.test.ts",
     "api:fetch": "node scripts/fetch-openapi.mjs",
     "api:gen": "openapi-typescript openapi/gateway.json -o src/api/schema.d.ts",
     "api:sync": "npm run api:fetch && npm run api:gen",

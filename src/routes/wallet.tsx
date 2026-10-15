@@ -9,6 +9,7 @@ import { BalanceCard } from "@/features/wallet/balance-card";
 import { DepositDialog } from "@/features/cashier/deposit-dialog";
 import { WithdrawDialog } from "@/features/cashier/withdraw-dialog";
 import { Transactions } from "@/features/cashier/transactions";
+import { useSeo } from "@/lib/seo";
 
 export const Route = createFileRoute("/wallet")({ component: WalletPage });
 
@@ -22,6 +23,7 @@ const asAction = (hash: string): Action | null => (hash === "deposit" || hash ==
  */
 function WalletPage() {
   const { t } = useTranslation();
+  useSeo({ title: t("wallet.title"), description: t("seo.private"), noindex: true });
   const { signedIn } = useSession();
   // The dialog open is the URL's hash — the router's, not window's: the header's Deposit link changes it with
   // pushState, which fires no hashchange. The buttons set it too, so Back closes a dialog like any other page.

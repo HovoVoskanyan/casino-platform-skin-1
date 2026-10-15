@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { z } from "zod";
 import { useTranslation } from "react-i18next";
 import { Shell } from "@/components/layout/shell";
@@ -9,11 +10,14 @@ import { useCategories, useGame } from "@/features/lobby/api";
 import { GameArt } from "@/features/lobby/game-art";
 import { HeartButton } from "@/features/lobby/heart-button";
 import { PlayPanel } from "@/features/game/play-panel";
+import { gameSlug } from "@/lib/slug";
+import { useSeo } from "@/lib/seo";
+import { gameAbout, gameSeo, seoCategory } from "@/features/lobby/game-seo";
 
 /** `?play=real|demo`: the mode a guest chose before signing in — it opens once they are back (P3-28). */
 const searchSchema = z.object({ play: z.enum(["demo", "real"]).optional().catch(undefined) });
 
-export const Route = createFileRoute("/games_/$id")({
+export const Route = createFileRoute("/games_/$id/{-$slug}")({
   validateSearch: (search) => searchSchema.parse(search),
   component: GamePage,
 });
@@ -23,20 +27,36 @@ export const Route = createFileRoute("/games_/$id")({
  * play". A game this skin does not show (hidden, inactive, another skin's, or a made-up id) is core's 404 and reads
  * as "This game is unavailable". The play modes are the `PlayPanel` (P3-28): launch, the bonus prompt, and the game
  * container the provider's fragment runs in.
+ *
+ * The address is `/games/{id}/{slug}` (owner 2026-10-15: the game's name in the URL, for search engines). The id is
+ * the key; a missing or stale slug — an old link, a renamed game — is put right in place, keeping the search.
  */
 function GamePage() {
   const { t } = useTranslation();
-  const { id } = Route.useParams();
+  const { id, slug } = Route.useParams();
   const { play } = Route.useSearch();
   const navigate = useNavigate();
   const game = useGame(id);
   const { data: categories = [] } = useCategories();
+  const canonicalSlug = game.data ? gameSlug(game.data.name) : undefined;
+
+  useEffect(() => {
+    if (canonicalSlug && slug !== canonicalSlug) {
+      void navigate({ to: "/games/$id/{-$slug}", params: { id, slug: canonicalSlug }, search: (prev) => prev, replace: true });
+    }
+  }, [canonicalSlug, slug, id, navigate]);
+
+  const g = game.data;
+  const categoryName = g ? categories.find((c) => g.categories.includes(c.code))?.name : undefined;
+  const unavailable = game.error instanceof ApiError && game.error.status === 404;
+  const kind = g ? seoCategory(categories, g.categories) : undefined;
+  useSeo(g ? gameSeo(t, g, kind) : unavailable ? { title: t("game.unavailable"), noindex: true } : null);
 
   const back = (
     <Link to="/games" className="inline-flex h-10 items-center gap-1 self-start rounded-cc px-2 text-[14px] font-bold text-cc-control hover:text-cc-ink">‹ {t("game.back")}</Link>
   );
 
-  if (game.error instanceof ApiError && game.error.status === 404) {
+  if (unavailable) {
     return (
       <Shell>
         {back}
@@ -49,9 +69,6 @@ function GamePage() {
       </Shell>
     );
   }
-
-  const g = game.data;
-  const categoryName = g ? categories.find((c) => g.categories.includes(c.code))?.name : undefined;
 
   return (
     <Shell>
@@ -74,7 +91,7 @@ function GamePage() {
             </div>
             <div className="flex flex-col gap-2">
               <h2 className="m-0 text-[15px] font-extrabold text-cc-label">{t("game.about")}</h2>
-              <p className="m-0 text-[14px] leading-[1.55] text-cc-text">{g.description ?? t("game.noDescription")}</p>
+              {(g.description ? [g.description] : gameAbout(t, g, kind)).map((p, i) => <p key={i} className="m-0 text-[14px] leading-[1.55] text-pretty text-cc-text">{p}</p>)}
               {g.rtp != null || g.volatility ? (
                 <dl className="m-0 flex flex-wrap gap-x-6 gap-y-1 text-[13px]">
                   {g.rtp != null ? (<div className="flex gap-2"><dt className="text-cc-lavender">{t("game.rtp")}</dt><dd className="m-0 font-bold text-cc-ink">{g.rtp}%</dd></div>) : null}

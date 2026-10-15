@@ -10,6 +10,8 @@ import { PaymentsPanel, TrustStrip } from "@/features/lobby/home-panels";
 import { useCategories, useGames } from "@/features/lobby/api";
 import { useOffers } from "@/features/bonus/api";
 import { OfferTiles } from "@/features/bonus/offer-list";
+import { useSeo } from "@/lib/seo";
+import { homeSeo } from "@/features/lobby/page-seo";
 
 export const Route = createFileRoute("/")({ component: HomePage });
 
@@ -26,6 +28,8 @@ function HomePage() {
   const categories = useCategories();
   const offers = useOffers();
   const hotGames = hot.data?.pages.flatMap((p) => p.items) ?? [];
+  useSeo(homeSeo(t));
+
 
   return (
     <Shell>
