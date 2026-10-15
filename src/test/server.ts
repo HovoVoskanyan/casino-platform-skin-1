@@ -29,6 +29,8 @@ export const handlers = [
   http.get("*/api/bonus/active", () => HttpResponse.json([])),
   http.get("*/api/bonus/freebets", () => HttpResponse.json([])),
   http.get("*/api/bonus/freebets/claimable", () => HttpResponse.json([])),
+  // Lucky Wheel: none set up for the skin (the bottom nav reads it on every page and then shows four items)
+  http.get("*/api/bonus/wheel", () => HttpResponse.json({ available: false, state: "unavailable", name: null, currency: null, timeZone: null, nextSpinAt: null, serverTime: new Date().toISOString(), segments: [], todaySpin: null })),
   // P3-31: a signed-in player's support thread before the first line, and no canned questions.
   http.get("*/api/v1/support/conversation", () => HttpResponse.json({ conversation: null, messages: [], hasMore: false })),
   http.get("*/api/v1/support/canned", () => HttpResponse.json([])),

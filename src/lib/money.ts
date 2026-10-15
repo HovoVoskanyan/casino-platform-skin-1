@@ -31,6 +31,19 @@ export const peso = (cents: number | string) =>
 export const pesoWhole = (cents: number) =>
   cents % 100 === 0 ? symbol + (cents / 100).toLocaleString("en-PH") : peso(cents);
 
+/**
+ * A round amount in a NAMED currency, the way `pesoWhole` writes the site's: "₱500", "₱1,250.50". A service that
+ * answers with its own currency (the Lucky Wheel's prizes) is written in that one; none, or the site's, is `pesoWhole`.
+ */
+export function wholeIn(cents: number, currency?: string | null): string {
+  const c = currency?.trim().toUpperCase();
+  if (!c || c === SKIN_CURRENCY) return pesoWhole(cents);
+  const sign = symbolOf(c);
+  return cents % 100 === 0
+    ? sign + (cents / 100).toLocaleString("en-PH")
+    : sign + (cents / 100).toLocaleString("en-PH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
 /** The site currency's sign on its own (an amount field's prefix). */
 export const currencySymbol = () => symbol;
 
