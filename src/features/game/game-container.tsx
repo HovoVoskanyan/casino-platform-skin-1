@@ -44,8 +44,13 @@ export const frameDocument = (html: string) => FRAME_RESET + html;
  *   its own origin (cross-origin to the skin, so `allow-same-origin` grants it nothing of ours), which the game needs
  *   for its own cookies and storage — a sandbox without same-origin would break those for every nested frame
  *   (review S1).
- * - Anything else (a script, an auto-posted form) runs in a `srcdoc` frame with an OPAQUE origin: it can never read
- *   the skin's cookies, storage or DOM. The real Fundist fragment must be checked in the P6-02 sandbox.
+ * - Anything else runs in a `srcdoc` frame that KEEPS THE SITE'S ORIGIN (owner 2026-10-17, as the old site ran it).
+ *   Fundist's live answer is such a script: it reads `window.top.origin` to tell Fundist's check which operator site
+ *   the game is on, calls the check, then frames the game. In an opaque-origin sandbox that read fails, the check
+ *   answers 403 "restricted" and the player gets a black screen — and the game frame would inherit the opaque origin
+ *   too. Accepted trade-off: Fundist's script runs as part of the site (it could read the page and its local storage);
+ *   the session tokens are httpOnly cookies it can never read. `allow-modals` lets Fundist's own "Restricted" alert
+ *   reach the player instead of a silent black frame.
  * - Never `allow-top-navigation`; and no `allow-popups-to-escape-sandbox` — an escaped popup keeps its opener and
  *   could navigate the casino tab (review S2). Popups (rules, help) still open, sandboxed like their opener.
  * The page sets `viewport-fit=cover`, so the safe-area insets keep the bar and the game clear of a phone's notch.
@@ -82,7 +87,7 @@ export function GameContainer({ launch, gameName, onClose }: { launch: Launch; g
               sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
               allow="autoplay; fullscreen"
               allowFullScreen
-              referrerPolicy="no-referrer"
+              referrerPolicy="strict-origin-when-cross-origin"
               className="min-h-0 w-full flex-1 border-0 bg-black"
               data-testid="game-frame"
             />
@@ -91,7 +96,7 @@ export function GameContainer({ launch, gameName, onClose }: { launch: Launch; g
               key={launch.launchId}
               title={gameName}
               srcDoc={frameDocument(launch.html)}
-              sandbox="allow-scripts allow-forms allow-popups"
+              sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
               allow="autoplay; fullscreen"
               allowFullScreen
               className="min-h-0 w-full flex-1 border-0 bg-black"

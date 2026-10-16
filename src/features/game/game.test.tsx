@@ -52,7 +52,7 @@ describe("game launch (P3-28)", () => {
     expect(sessionStorage.getItem("chocho:playAfterSignIn")).toBe(`${G.id}:real`); // what lets the return open it
   });
 
-  it("demo opens the provider's fragment in the sandboxed container", async () => {
+  it("demo opens the provider's fragment as the site, like the old site — Fundist's script reads window.top.origin", async () => {
     const user = userEvent.setup();
     const bodies = launches((b) => HttpResponse.json(answer(String(b.mode))));
     server.use(signedIn(), ...catalogue(1), detail(), eligibility(false));
@@ -61,7 +61,8 @@ describe("game launch (P3-28)", () => {
     await user.click(await screen.findByRole("button", { name: "Play for Fun" }));
     const frame = await screen.findByTestId("game-frame");
     expect(frame).toHaveAttribute("srcdoc", frameDocument('<div id="provider">Demo</div>')); // full-bleed reset first
-    expect(frame.getAttribute("sandbox")).not.toContain("allow-same-origin"); // the fragment never reaches the skin's origin
+    expect(frame.getAttribute("sandbox")).toContain("allow-same-origin"); // owner 2026-10-17: without it Fundist's check answers "restricted"
+    expect(frame.getAttribute("sandbox")).toContain("allow-modals"); // Fundist's own "Restricted" alert reaches the player
     expect(frame.getAttribute("sandbox")).not.toContain("allow-top-navigation");
     expect(frame.getAttribute("sandbox")).not.toContain("allow-popups-to-escape-sandbox"); // an escaped popup keeps its opener
     expect(bodies[0]).toMatchObject({ mode: "Demo", withBonus: false, currency: null, language: "en" });
@@ -163,6 +164,7 @@ describe("game launch (P3-28)", () => {
     const frame = await screen.findByTestId("game-frame");
     expect(frame).toHaveAttribute("src", "https://games.provider.example/launch?t=1");
     expect(frame).not.toHaveAttribute("srcdoc");
+    expect(frame).toHaveAttribute("referrerpolicy", "strict-origin-when-cross-origin"); // the provider sees which site embeds it
     expect(frame.getAttribute("sandbox")).not.toContain("allow-top-navigation");
     expect(frame.getAttribute("sandbox")).not.toContain("allow-popups-to-escape-sandbox");
   });
