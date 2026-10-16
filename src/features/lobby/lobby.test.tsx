@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor, within } from "@testing-library/react";
+import { act, fireEvent, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { renderRoute } from "@/test/route";
@@ -297,7 +297,60 @@ describe("Home (P3-27)", () => {
     renderRoute("/");
     const hero = await screen.findByRole("region", { name: "Promotions" });
     expect(within(hero).queryAllByRole("link", { hidden: true })).toEqual([]);
-    expect(within(hero).getAllByRole("img", { hidden: true })).toHaveLength(3);
+    expect(hero.querySelectorAll('[aria-roledescription="slide"]')).toHaveLength(3);
+    expect(within(hero).getAllByRole("img", { hidden: true })).toHaveLength(1); // the rest arrive as rotation reaches them
+  });
+
+  // Owner 2026-10-16: on a slow network the five banners all downloaded at once and the first appeared last.
+  it("fetches only the shown banner at first, at high priority, pulsing until it loads; the next joins once it has", async () => {
+    server.use(http.get("*/api/v1/banners", () => HttpResponse.json([linked("b1", "Slots week", "/games?category=slots"), linked("b2", "VIP club", "/vip"), linked("b3", "Top up", "/wallet#deposit")])), ...catalogue(1));
+    renderRoute("/");
+    const hero = await screen.findByRole("region", { name: "Promotions" });
+    const first = within(hero).getByRole("img", { name: "Slots week" });
+    expect(within(hero).getAllByRole("img", { hidden: true })).toEqual([first]);
+    expect(first).toHaveAttribute("fetchpriority", "high");
+    expect(first).toHaveClass("opacity-0"); // not yet: the frame pulses behind it
+    expect(hero.querySelector(".motion-safe\\:animate-pulse")).not.toBeNull();
+
+    fireEvent.load(first);
+    expect(first).toHaveClass("opacity-100"); // fades in…
+    expect(hero.querySelector(".motion-safe\\:animate-pulse")).toBeNull(); // …and the pulse is gone
+    const next = within(hero).getByRole("img", { name: "VIP club", hidden: true });
+    expect(next).toHaveAttribute("fetchpriority", "low"); // only now, and behind everything else
+    expect(within(hero).queryByRole("img", { name: "Top up", hidden: true })).toBeNull(); // the one after waits its turn
+    // every slide is still there, link and all — only the downloads wait
+    expect(within(hero).getByRole("link", { name: "Top up", hidden: true })).toHaveAttribute("href", "/wallet#deposit");
+  });
+
+  it("never rotates to a banner whose picture has not loaded; moves on the moment it lands, and skips one that fails", async () => {
+    server.use(http.get("*/api/v1/banners", () => HttpResponse.json([linked("b1", "Slots week", "/games?category=slots"), linked("b2", "VIP club", "/vip"), linked("b3", "Top up", "/wallet#deposit")])), ...catalogue(1));
+    renderRoute("/");
+    const hero = await screen.findByRole("region", { name: "Promotions" });
+    const dot = (n: number) => within(hero).getByRole("button", { name: `Show banner ${n} of 3` });
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    try {
+      act(() => vi.advanceTimersByTime(5000));
+      expect(dot(1)).toHaveAttribute("aria-current", "true"); // the 3 s only start once a banner is on screen
+
+      fireEvent.load(within(hero).getByRole("img", { name: "Slots week" }));
+      act(() => vi.advanceTimersByTime(3000));
+      expect(dot(1)).toHaveAttribute("aria-current", "true"); // time is up, but banner 2 is still on its way
+
+      fireEvent.load(within(hero).getByRole("img", { name: "VIP club", hidden: true }));
+      expect(dot(2)).toHaveAttribute("aria-current", "true"); // it landed: straight on
+
+      fireEvent.error(within(hero).getByRole("img", { name: "Top up", hidden: true }));
+      act(() => vi.advanceTimersByTime(3000));
+      expect(dot(1)).toHaveAttribute("aria-current", "true"); // banner 3 never loaded: round to banner 1
+
+      act(() => vi.advanceTimersByTime(3000));
+      expect(dot(2)).toHaveAttribute("aria-current", "true");
+      fireEvent.click(within(hero).getByRole("button", { name: "Pause banner rotation" }));
+      act(() => vi.advanceTimersByTime(9000));
+      expect(dot(2)).toHaveAttribute("aria-current", "true"); // paused stays put
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("another website opens in a new tab, marked sponsored, and the app stays where it is (owner 2026-10-16)", async () => {
