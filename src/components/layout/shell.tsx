@@ -34,7 +34,7 @@ export function PageHero({ title, subtitle, logoWidth = 152, children }: { title
         </div>
         <div className="relative flex min-w-0 flex-[1_1_100%] flex-col items-start gap-[2px] min-[600px]:-ml-2 min-[600px]:flex-[0_1_186px] min-[600px]:items-center">
           <span aria-hidden className="pointer-events-none absolute top-[44%] left-1/2 hidden h-[260px] w-[260px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(167,139,250,.26)_0%,rgba(240,163,10,.14)_42%,transparent_70%)] blur-[6px] min-[600px]:block" />
-          <img src="/chocho-logo-cut.png" alt="" style={{ maxWidth: logoWidth }} className="relative hidden w-full object-contain drop-shadow-[0_16px_30px_rgba(0,0,0,.5)] min-[600px]:block" />
+          <img src="/chocho-logo.webp" srcSet="/chocho-logo-sm.webp 160w, /chocho-logo.webp 360w" sizes={`${logoWidth}px`} width={360} height={340} alt="" style={{ maxWidth: logoWidth }} className="relative hidden w-full object-contain drop-shadow-[0_16px_30px_rgba(0,0,0,.5)] min-[600px]:block" />
           <span className="relative font-brand text-[19px] font-bold whitespace-nowrap text-[#e9a832]">Tuloy ang Good Vibes</span>
         </div>
       </div>

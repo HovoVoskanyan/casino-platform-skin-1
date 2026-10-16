@@ -93,7 +93,7 @@ function Resting({ data }: { data: Wheel }) {
   const key = data.state === "ended" ? "ended" : data.state === "restricted" ? "restricted" : "resting";
   return (
     <div className="flex flex-col items-center gap-4 py-2 text-center">
-      <img src="/nav-wheel.png" alt="" className="h-[84px] w-[84px] object-contain opacity-80 drop-shadow-[0_8px_16px_rgba(0,0,0,.6)] grayscale-[35%]" />
+      <img src="/nav-wheel.webp" alt="" className="h-[84px] w-[84px] object-contain opacity-80 drop-shadow-[0_8px_16px_rgba(0,0,0,.6)] grayscale-[35%]" />
       <div role="status" className="flex max-w-[420px] flex-col gap-2">
         <h2 className="m-0 text-[19px] font-extrabold text-[#ffd98a]">{t(`wheel.${key}.title`)}</h2>
         <p className="m-0 text-[14px] leading-[1.55] font-medium text-pretty text-cc-lavender">{t(`wheel.${key}.body`)}</p>

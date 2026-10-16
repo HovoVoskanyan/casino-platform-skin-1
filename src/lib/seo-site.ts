@@ -8,7 +8,7 @@ export const BRAND = "ChoCho";
 /** The picture a page without its own shows in a link preview. */
 export const DEFAULT_IMAGE = "/games-banner.webp";
 
-export const LOGO = "/chocho-logo-cut.png";
+export const LOGO = "/chocho-logo-512.webp";
 
 /** The languages the site's copy is written in (JSON-LD `inLanguage`). */
 export const IN_LANGUAGE = ["en-PH", "fil"];

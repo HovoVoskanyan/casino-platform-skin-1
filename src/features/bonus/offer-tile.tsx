@@ -9,7 +9,7 @@ const THEMES: Record<string, { icon: string; card: string; glow: string; sub: st
   welcome: { icon: "/icon-gift.webp", card: "border-[rgba(167,139,250,.22)] bg-[linear-gradient(160deg,rgba(124,58,237,.26)_0%,rgba(22,9,38,.96)_58%)]", glow: "hover:shadow-[0_18px_38px_rgba(0,0,0,.5),0_0_24px_rgba(139,92,246,.22)]", sub: "text-cc-lavender" },
   reload: { icon: "/icon-coins.webp", card: "border-[rgba(235,156,13,.22)] bg-[linear-gradient(160deg,rgba(235,156,13,.22)_0%,rgba(26,11,26,.96)_58%)]", glow: "hover:shadow-[0_18px_38px_rgba(0,0,0,.5),0_0_24px_rgba(235,156,13,.22)]", sub: "text-[#c4ab8e]" },
   cashback: { icon: "/icon-percent.webp", card: "border-[rgba(167,139,250,.22)] bg-[linear-gradient(160deg,rgba(76,29,149,.3)_0%,rgba(18,8,32,.96)_58%)]", glow: "hover:shadow-[0_18px_38px_rgba(0,0,0,.5),0_0_24px_rgba(139,92,246,.2)]", sub: "text-cc-lavender" },
-  freeSpins: { icon: "/icon-bolt.png", card: "border-[rgba(56,189,248,.22)] bg-[linear-gradient(160deg,rgba(14,116,190,.26)_0%,rgba(13,10,34,.96)_58%)]", glow: "hover:shadow-[0_18px_38px_rgba(0,0,0,.5),0_0_24px_rgba(56,189,248,.2)]", sub: "text-[#94a9c4]" },
+  freeSpins: { icon: "/icon-bolt.webp", card: "border-[rgba(56,189,248,.22)] bg-[linear-gradient(160deg,rgba(14,116,190,.26)_0%,rgba(13,10,34,.96)_58%)]", glow: "hover:shadow-[0_18px_38px_rgba(0,0,0,.5),0_0_24px_rgba(56,189,248,.2)]", sub: "text-[#94a9c4]" },
 };
 
 const GOLD = "bg-[image:var(--cc-gold-cta)] text-[#2c1400] shadow-[0_8px_20px_rgba(235,156,13,.3)] hover:brightness-105";

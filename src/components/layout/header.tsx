@@ -38,7 +38,7 @@ export function Header() {
       <div className="mx-auto flex min-h-[66px] max-w-[1024px] items-center gap-[6px] px-4 py-[10px] min-[400px]:gap-2 md:min-h-[76px] md:px-[22px] md:py-3">
         <div className="flex min-w-0 items-center gap-2">
           <Link to="/" aria-label={t("nav.home")} className="block flex-none">
-            <img src="/chocho-logo-cut.png" alt="ChoCho" className="block h-10 w-[48px] object-contain min-[400px]:w-[58px] drop-shadow-[0_4px_12px_rgba(0,0,0,.5)] md:h-[50px] md:w-[72px]" />
+            <img src="/chocho-logo-sm.webp" alt="ChoCho" width={160} height={151} className="block h-10 w-[48px] object-contain min-[400px]:w-[58px] drop-shadow-[0_4px_12px_rgba(0,0,0,.5)] md:h-[50px] md:w-[72px]" />
           </Link>
           <nav className="hidden items-center gap-[2px] md:flex" aria-label="Primary">
             {NAV.map((item) => {

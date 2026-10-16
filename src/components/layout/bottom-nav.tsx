@@ -30,7 +30,7 @@ export function BottomNav() {
         return (
           <Link key={item.key} to={item.to} aria-current={on ? "page" : undefined} className="relative flex h-full min-w-[44px] flex-col items-center justify-center gap-1 px-[2px] md:gap-[7px] short:flex-row short:gap-2">
             <span className="flex h-[34px] w-9 flex-none items-center justify-center md:h-10 md:w-[42px] short:h-8 short:w-8">
-              <img src={`/${item.img}.png`} alt="" className={cn("block object-contain drop-shadow-[0_3px_7px_rgba(0,0,0,.8)]", item.key === "luckyWheel" ? "h-[34px] w-[34px] md:h-10 md:w-10 short:h-8 short:w-8" : "h-7 w-7 md:h-[34px] md:w-[34px] short:h-7 short:w-7", on ? "opacity-100 brightness-110" : "opacity-[.88]")} />
+              <img src={`/${item.img}.webp`} alt="" className={cn("block object-contain drop-shadow-[0_3px_7px_rgba(0,0,0,.8)]", item.key === "luckyWheel" ? "h-[34px] w-[34px] md:h-10 md:w-10 short:h-8 short:w-8" : "h-7 w-7 md:h-[34px] md:w-[34px] short:h-7 short:w-7", on ? "opacity-100 brightness-110" : "opacity-[.88]")} />
             </span>
             <span className={cn("max-w-full text-center text-[11px] font-bold leading-[1.1] tracking-[.2px] md:whitespace-nowrap md:text-[12px]", on ? "text-cc-gold" : "text-cc-lavender")}>{t(`nav.${item.key}`)}</span>
           </Link>

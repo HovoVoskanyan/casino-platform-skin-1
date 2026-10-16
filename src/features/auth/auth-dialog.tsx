@@ -120,7 +120,7 @@ function AuthDialogContent({ initialMode }: { initialMode: AuthMode }) {
           className="relative flex w-full max-w-full flex-col gap-[18px] bg-[image:var(--cc-dialog)] px-5 pb-[calc(40px+env(safe-area-inset-bottom))] shadow-[0_30px_80px_rgba(4,1,9,.7)] outline-none animate-cc-rise sm:w-[476px] sm:max-h-[calc(100dvh-48px)] sm:overflow-auto sm:rounded-cc-2xl sm:border sm:border-cc-line-strong sm:px-7 sm:pb-6"
         >
           <div className="sticky top-0 z-[2] -mx-5 flex items-start justify-between gap-3 border-b border-[rgba(167,139,250,.14)] bg-[#2a1049] px-5 pb-[14px] pt-[18px] sm:-mx-7 sm:px-7 sm:pt-[22px]">
-            <img src="/chocho-logo-cut.png" alt="ChoCho" className="block h-11 w-[62px] flex-none object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,.5)]" />
+            <img src="/chocho-logo-sm.webp" alt="ChoCho" width={160} height={151} className="block h-11 w-[62px] flex-none object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,.5)]" />
             <DialogPrimitive.Close aria-label={closeLabel} className="flex h-10 w-10 flex-none items-center justify-center rounded-cc-md border border-cc-line-strong bg-white/[.06] text-[15px] font-extrabold text-[#cbb6e6] hover:bg-white/[.14] hover:text-cc-ink">✕</DialogPrimitive.Close>
           </div>
 

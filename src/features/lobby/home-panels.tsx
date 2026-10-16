@@ -54,7 +54,7 @@ export function TrustStrip({ variant = "home", className }: { variant?: "home" |
   const games = variant === "games";
   const items = games
     ? [{ key: "secure" }, { key: "fast" }, { key: "anywhere" }, { key: "support" }]
-    : [{ key: "secure", img: "/icon-shield.png" }, { key: "fast", img: "/icon-bolt.png" }, { key: "support", img: "/icon-headset.png" }];
+    : [{ key: "secure", img: "/icon-shield.webp" }, { key: "fast", img: "/icon-bolt.webp" }, { key: "support", img: "/icon-headset.webp" }];
   return (
     <section
       aria-label={t("home.trust")}
