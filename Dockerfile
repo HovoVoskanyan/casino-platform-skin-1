@@ -6,6 +6,9 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci --no-audit --no-fund
 COPY . .
+# The Telegram login widget's bot (its username, no @) — baked in at build time; compose passes
+# IDENTITY_TELEGRAM_BOT_USERNAME. Empty = the button says Telegram sign-in is unavailable.
+ARG VITE_TELEGRAM_BOT=
 RUN npm run build
 
 FROM caddy:2-alpine
