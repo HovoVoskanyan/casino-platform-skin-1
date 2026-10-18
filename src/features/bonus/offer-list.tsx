@@ -18,24 +18,27 @@ import { OfferTile } from "./offer-tile";
  * "Deposit to claim", which opens the wallet's deposit (nothing is requested until the player submits it).
  */
 export function OfferTiles({ offers, page = false }: { offers: Offer[]; page?: boolean }) {
-  const [shown, setShown] = useState<{ id: string; confirm: boolean } | null>(null);
-  const current = shown ? offers.find((o) => o.bonus.id === shown.id) ?? null : null;
-  const here = () => window.location.pathname + window.location.search;
-
+  const dialog = useOfferDialog(offers);
   return (
     <>
-      {offers.map((o) => (
-        <OfferTile
-          key={o.bonus.id}
-          offer={o}
-          page={page}
-          onActivate={(b) => (o.state === "guest" ? authDialog.open("signin", here()) : setShown({ id: b.id, confirm: true }))}
-          onTerms={(b) => setShown({ id: b.id, confirm: false })}
-        />
-      ))}
-      {current ? <OfferDialog key={current.bonus.id} offer={current} confirm={shown!.confirm} onClose={() => setShown(null)} /> : null}
+      {offers.map((o) => <OfferTile key={o.bonus.id} offer={o} page={page} onActivate={() => dialog.activate(o)} onTerms={() => dialog.terms(o)} />)}
+      {dialog.element}
     </>
   );
+}
+
+/**
+ * The one dialog a set of offers shares, for anything that shows them (the tiles, the Promotions panels): `activate`
+ * is the tiles' Activate (a guest is sent to sign in), `terms` opens the terms alone. Render `element` once.
+ */
+export function useOfferDialog(offers: Offer[]) {
+  const [shown, setShown] = useState<{ id: string; confirm: boolean } | null>(null);
+  const current = shown ? offers.find((o) => o.bonus.id === shown.id) ?? null : null;
+  return {
+    activate: (o: Offer) => (o.state === "guest" ? authDialog.open("signin", window.location.pathname + window.location.search) : setShown({ id: o.bonus.id, confirm: true })),
+    terms: (o: Offer) => setShown({ id: o.bonus.id, confirm: false }),
+    element: current ? <OfferDialog key={current.bonus.id} offer={current} confirm={shown!.confirm} onClose={() => setShown(null)} /> : null,
+  };
 }
 
 function OfferDialog({ offer, confirm, onClose }: { offer: Offer; confirm: boolean; onClose: () => void }) {

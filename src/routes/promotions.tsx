@@ -1,57 +1,93 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { PageHero, Shell } from "@/components/layout/shell";
+import { Shell } from "@/components/layout/shell";
 import { Notice } from "@/components/ui/notice";
 import { SectionTitle } from "@/components/ui/section-title";
-import { useOffers } from "@/features/bonus/api";
-import { OfferTiles } from "@/features/bonus/offer-list";
+import { useOffers, type Offer } from "@/features/bonus/api";
+import { useOfferDialog } from "@/features/bonus/offer-list";
+import { OfferTile } from "@/features/bonus/offer-tile";
+import { FeaturedOffer, OfferCard, WheelPanel } from "@/features/bonus/promo-panels";
+import { useWheel, wheelShown } from "@/features/wheel/api";
 import { useSeo } from "@/lib/seo";
 import { promotionsSeo } from "@/features/lobby/page-seo";
 
 export const Route = createFileRoute("/promotions")({ component: PromotionsPage });
 
+/** Which panel shows an offer, by the type set in the back office: the first of each; any other offer goes under More offers. */
+function arrange(list: Offer[]) {
+  const welcome = list.find((o) => o.bonus.type === "welcome");
+  const reload = list.find((o) => o.bonus.type === "reload");
+  const cashback = list.find((o) => o.bonus.type === "cashback");
+  return { welcome, reload, cashback, more: list.filter((o) => o !== welcome && o !== reload && o !== cashback) };
+}
+
 /**
- * Promotions (design: hero, the offers, how it works) — the bottom nav's "Bonuses". The offers are the bonuses an
- * operator has switched on in the back office (owner 2026-10-13): Active and inside their dates, in the skin's
- * currency — the same tiles as Home's Bonuses, with Activate, Deposit to claim once activated, and the terms.
+ * Promotions & Rewards (owner design 2026-10-18) — the bottom nav's "Bonuses". The offers are the bonuses an operator
+ * has switched on in the back office (owner 2026-10-13): Active and inside their dates, in the skin's currency. The
+ * first welcome offer is the featured panel, the first reload and cashback the two cards, any other offer a tile under
+ * More offers; the Daily Lucky Wheel follows while the skin has one. Every button goes through the offers' one dialog
+ * (the same flow as Home's tiles): View offer = Activate, Terms & eligibility = the terms.
  */
 function PromotionsPage() {
   const { t } = useTranslation();
   const offers = useOffers();
   const list = offers.data ?? [];
+  const dialog = useOfferDialog(list);
+  const wheel = useWheel();
   useSeo(promotionsSeo(t));
+  const { welcome, reload, cashback, more } = arrange(list);
+  const handlers = (o: Offer) => ({ offer: o, onView: () => dialog.activate(o), onTerms: () => dialog.terms(o) });
 
   return (
     <Shell>
-      <PageHero title={t("promotions.title")} subtitle={t("promotions.subtitle")} />
-
-      <section className="flex flex-col gap-4" aria-labelledby="available-bonuses">
-        <span id="available-bonuses"><SectionTitle count={offers.data ? t("promotions.availableCount", { count: list.length }) : undefined}>{t("promotions.available")}</SectionTitle></span>
-        {offers.isError ? <Notice tone="error">{t("common.loadFailed")}</Notice> : null}
-        {offers.data && list.length === 0 ? (
-          <div className="flex flex-col items-center gap-2 rounded-cc-xl border border-cc-line bg-white/[.02] px-6 py-8 text-center">
-            <span aria-hidden className="text-[22px] text-cc-gold">★</span>
-            <span className="text-[16px] font-extrabold text-cc-ink">{t("promotions.emptyTitle")}</span>
-            <span className="text-[13px] text-cc-lavender">{t("promotions.emptyBody")}</span>
-          </div>
-        ) : null}
-        <div className="grid grid-cols-1 gap-3 min-[364px]:grid-cols-2 min-[364px]:max-[599px]:[&>:last-child:nth-child(odd)]:col-span-2 min-[600px]:grid-cols-[repeat(auto-fill,minmax(230px,1fr))] min-[600px]:gap-[14px]">
-          {offers.isPending ? Array.from({ length: 3 }, (_, i) => <div key={i} aria-hidden className="h-[220px] animate-pulse rounded-cc-xl border border-cc-line bg-cc-surface-raised" />) : <OfferTiles offers={list} page />}
+      <section className="flex flex-col gap-1">
+        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+          <h1 className="m-0 text-[clamp(28px,7.4vw,40px)] leading-[1.1] font-extrabold tracking-[-0.8px] text-cc-ink">{t("promotions.title")}</h1>
+          {offers.data ? <span className="text-[14px] font-semibold whitespace-nowrap text-cc-lavender">{t("promotions.offerCount", { count: list.length })}</span> : null}
         </div>
+        <p className="m-0 text-[15px] leading-[1.5] font-medium text-pretty text-cc-lavender">{t("promotions.intro")}</p>
       </section>
 
-      <section className="flex flex-col gap-4" aria-labelledby="how-it-works">
-        <span id="how-it-works"><SectionTitle>{t("promotions.howItWorks")}</SectionTitle></span>
-        <ol className="m-0 grid list-none grid-cols-1 gap-3 p-0 sm:grid-cols-2 lg:grid-cols-4">
-          {[1, 2, 3, 4].map((n) => (
-            <li key={n} className="flex flex-col gap-2 rounded-cc-xl border border-cc-line bg-white/[.02] p-4">
-              <span className="text-[11px] font-extrabold tracking-[1.2px] text-[#c4b5fd]">{t("promotions.step", { n })}</span>
-              <span className="text-[15px] font-extrabold text-cc-ink">{t(`promotions.step${n}.title`)}</span>
-              <span className="text-[13px] leading-[1.5] text-cc-lavender">{t(`promotions.step${n}.copy`)}</span>
-            </li>
-          ))}
-        </ol>
-      </section>
+      {offers.isError ? <Notice tone="error">{t("common.loadFailed")}</Notice> : null}
+      {offers.isPending ? (
+        <div aria-hidden className="flex flex-col gap-[14px]">
+          <div className="h-[300px] animate-pulse rounded-[20px] border border-cc-line bg-cc-surface-raised lg:h-[320px]" />
+          <div className="grid grid-cols-1 gap-[14px] lg:grid-cols-2">
+            {[0, 1].map((i) => <div key={i} className="h-[230px] animate-pulse rounded-[20px] border border-cc-line bg-cc-surface-raised lg:h-[250px]" />)}
+          </div>
+        </div>
+      ) : null}
+      {offers.data && list.length === 0 ? (
+        <div className="flex flex-col items-center gap-2 rounded-cc-xl border border-cc-line bg-white/[.02] px-6 py-8 text-center">
+          <span aria-hidden className="text-[22px] text-cc-gold">★</span>
+          <span className="text-[16px] font-extrabold text-cc-ink">{t("promotions.noOffersTitle")}</span>
+          <span className="text-[13px] text-cc-lavender">{t("promotions.emptyBody")}</span>
+        </div>
+      ) : null}
+
+      {welcome || reload || cashback ? (
+        <div className="flex flex-col gap-[14px]">
+          {welcome ? <FeaturedOffer {...handlers(welcome)} /> : null}
+          {reload || cashback ? (
+            <div className="grid grid-cols-1 gap-[14px] lg:grid-cols-2">
+              {reload ? <OfferCard {...handlers(reload)} art="reload" wide={!cashback} /> : null}
+              {cashback ? <OfferCard {...handlers(cashback)} art="cashback" wide={!reload} /> : null}
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+
+      {more.length ? (
+        <section className="flex flex-col gap-4" aria-labelledby="more-offers">
+          <span id="more-offers"><SectionTitle>{t("promotions.moreOffers")}</SectionTitle></span>
+          <div className="grid grid-cols-1 gap-3 min-[364px]:grid-cols-2 min-[364px]:max-[599px]:[&>:last-child:nth-child(odd)]:col-span-2 min-[600px]:grid-cols-[repeat(auto-fill,minmax(230px,1fr))] min-[600px]:gap-[14px]">
+            {more.map((o) => <OfferTile key={o.bonus.id} offer={o} page onActivate={() => dialog.activate(o)} onTerms={() => dialog.terms(o)} />)}
+          </div>
+        </section>
+      ) : null}
+
+      {wheelShown(wheel.data) ? <WheelPanel /> : null}
+      {dialog.element}
     </Shell>
   );
 }

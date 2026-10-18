@@ -3,8 +3,9 @@ import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { renderRoute } from "@/test/route";
 import { problem, server, signedIn } from "@/test/server";
-import { catalogue, game, PROMOTIONS, RELOAD, summary, WELCOME } from "@/test/lobby-fixtures";
+import { CASHBACK, catalogue, game, PROMOTIONS, RELOAD, summary, WELCOME } from "@/test/lobby-fixtures";
 import { authDialog } from "@/features/auth/auth-dialog-state";
+import { queryKeys } from "@/lib/queryKeys";
 
 afterEach(() => authDialog.close());
 
@@ -154,20 +155,39 @@ describe("game detail (P3-27)", () => {
   });
 });
 
-describe("Bonuses switched on in the back office (owner 2026-10-13)", () => {
-  it("a guest sees them on Promotions in the skin's currency, and Activate asks them to sign in first", async () => {
+describe("Bonuses switched on in the back office (owner 2026-10-13) — Promotions & Rewards (owner design 2026-10-18)", () => {
+  it("a guest sees them on Promotions in the skin's currency, and View offer asks them to sign in first", async () => {
     const user = userEvent.setup();
     const activate = vi.fn();
     server.use(...catalogue(0), http.post("*/api/bonus/activate", () => { activate(); return HttpResponse.json({}); }));
     renderRoute("/promotions");
-    const list = await screen.findByRole("region", { name: /Available bonuses/ });
-    expect((await within(list).findAllByRole("article")).map((a) => a.getAttribute("aria-label"))).toEqual(["Welcome Bonus", "Weekly Reload"]);
-    const welcome = within(list).getByRole("article", { name: "Welcome Bonus" });
-    expect(within(welcome).getByText("₱5,000")).toBeInTheDocument();
-    expect(within(welcome).getByText("100% up to")).toBeInTheDocument();
-    await user.click(within(welcome).getByRole("button", { name: "Activate" }));
+    expect(await screen.findByRole("heading", { level: 1, name: "Promotions & Rewards" })).toBeInTheDocument();
+    expect(await screen.findByText("2 bonus offers")).toBeInTheDocument(); // the euro one is not shown, so not counted
+    expect((await screen.findAllByRole("article")).map((a) => a.getAttribute("aria-label"))).toEqual(["Welcome Bonus", "Weekly Reload"]);
+    const welcome = screen.getByRole("article", { name: "Welcome Bonus" });
+    expect(within(welcome).getByRole("heading", { name: "Welcome Bonus" })).toBeInTheDocument();
+    expect(within(welcome).getByText("100%")).toBeInTheDocument();
+    expect(within(welcome).getByText("Deposit bonus")).toBeInTheDocument();
+    expect(within(welcome).getByText("₱5,000")).toBeInTheDocument(); // the configured cap, never a made-up one
+    const reload = screen.getByRole("article", { name: "Weekly Reload" });
+    expect(within(reload).getByText("50%")).toBeInTheDocument();
+    expect(within(reload).getByText("₱2,000")).toBeInTheDocument();
+    expect(within(reload).getByRole("button", { name: "View offer" })).toBeInTheDocument();
+    await user.click(within(welcome).getByRole("button", { name: "View welcome offer" }));
     expect(authDialog.get().mode).toBe("signin");
     expect(activate).not.toHaveBeenCalled();
+  });
+
+  it("Terms & eligibility opens the bonus's terms alone — a guest is offered sign-in, never the acceptance tick", async () => {
+    const user = userEvent.setup();
+    server.use(...catalogue(0));
+    renderRoute("/promotions");
+    const reload = await screen.findByRole("article", { name: "Weekly Reload" });
+    await user.click(within(reload).getByRole("button", { name: "Terms & eligibility" }));
+    const dialog = await screen.findByRole("dialog", { name: "Weekly Reload" });
+    expect(within(dialog).getByText(/20× the bonus amount/)).toBeInTheDocument();
+    expect(within(dialog).queryByRole("checkbox")).toBeNull();
+    expect(within(dialog).getByRole("button", { name: "Sign in to activate" })).toBeInTheDocument();
   });
 
   it("a player activates only after ticking the terms, then is offered Deposit to claim", async () => {
@@ -182,7 +202,7 @@ describe("Bonuses switched on in the back office (owner 2026-10-13)", () => {
       ...catalogue(0));
     const { router } = renderRoute("/promotions");
     const welcome = await screen.findByRole("article", { name: "Welcome Bonus" });
-    await user.click(await within(welcome).findByRole("button", { name: "Activate" }));
+    await user.click(await within(welcome).findByRole("button", { name: "View welcome offer" }));
 
     const dialog = await screen.findByRole("dialog", { name: "Welcome Bonus" });
     expect(within(dialog).getByText(/20× the bonus amount/)).toBeInTheDocument(); // the terms, built from the definition
@@ -192,30 +212,69 @@ describe("Bonuses switched on in the back office (owner 2026-10-13)", () => {
     await user.click(confirm);
     expect(activated).toEqual([{ bonusId: WELCOME.id, code: null }]);
     expect(await within(dialog).findByRole("status")).toHaveTextContent("Activated!");
+    // the panel behind follows the player's new standing
+    expect(await within(welcome).findByText("Activated — make a qualifying deposit to get it.")).toBeInTheDocument();
 
     await user.click(within(dialog).getByRole("button", { name: "Deposit to claim" }));
     await waitFor(() => expect(router.state.location.href).toBe("/wallet#deposit"));
   });
 
-  it("an activated bonus's tile says Deposit to claim; a running one points to My bonuses", async () => {
+  it("an activated bonus's panel says Deposit to claim; a running one points to My bonuses; a spent one says Claimed", async () => {
     server.use(signedIn(),
-      http.get("*/api/bonus", () => HttpResponse.json([summary(WELCOME, false, true), summary(RELOAD, false)])),
+      http.get("*/api/bonus", () => HttpResponse.json([summary(WELCOME, false, true), summary(RELOAD, false), summary(CASHBACK, false)])),
       http.get("*/api/bonus/active", () => HttpResponse.json([{ bonusId: RELOAD.id, bonusName: "Weekly Reload", playerBonusId: "pb-1", status: "active", isInUse: true, hasPendingActivation: false, currentStepNumber: 1, totalSteps: 1, currency: "PHP", grantedCents: 1, wageringRequiredCents: 1, wageringCompletedCents: 0, wageringRemainingCents: 1, progressPercent: 0, grantedAt: null, expiresAt: null, closedAt: null, closeReason: null }])),
       ...catalogue(0));
-    renderRoute("/promotions");
+    const { router } = renderRoute("/promotions");
     expect(await within(await screen.findByRole("article", { name: "Welcome Bonus" })).findByRole("button", { name: "Deposit to claim" })).toBeInTheDocument();
-    expect(within(screen.getByRole("article", { name: "Weekly Reload" })).getByRole("button", { name: "In progress — view" })).toBeInTheDocument();
+    expect(within(screen.getByRole("article", { name: "Weekly Cashback" })).getByText("Claimed")).toBeInTheDocument();
+    await userEvent.click(within(screen.getByRole("article", { name: "Weekly Reload" })).getByRole("button", { name: "In progress — view" }));
+    await waitFor(() => expect(router.state.location.pathname).toBe("/account"));
+  });
+
+  it("every offer is shown: the first of each type gets its panel, anything else a tile under More offers", async () => {
+    const SPINS_DROP = { ...RELOAD, id: "0192b0a0-0000-7000-8000-0000000000b1", name: "Spins Drop", type: "freeSpins", steps: [{ ...RELOAD.steps[0]!, freeSpins: 25, intervals: [] }] } as typeof RELOAD;
+    const RELOAD_TWO = { ...RELOAD, id: "0192b0a0-0000-7000-8000-0000000000b2", name: "Midweek Reload" };
+    server.use(http.get("*/api/bonus", () => HttpResponse.json([summary(SPINS_DROP), summary(RELOAD), summary(CASHBACK), summary(RELOAD_TWO)])), ...catalogue(0));
+    renderRoute("/promotions");
+    expect(await screen.findByText("4 bonus offers")).toBeInTheDocument();
+    expect(screen.getByRole("article", { name: "Weekly Reload" })).toHaveTextContent("50% reload bonus");
+    expect(screen.getByRole("article", { name: "Weekly Cashback" })).toHaveTextContent("10% cashback");
+    const more = screen.getByRole("region", { name: "More offers" });
+    expect(within(more).getAllByRole("article").map((a) => a.getAttribute("aria-label"))).toEqual(["Spins Drop", "Midweek Reload"]);
+    expect(within(more).getAllByRole("button", { name: "Activate" })).toHaveLength(2);
+  });
+
+  it("shows the Daily Lucky Wheel only while the skin has one, linking to its page", async () => {
+    server.use(...catalogue(0));
+    const { unmount, queryClient } = renderRoute("/promotions"); // the default answer: no wheel
+    await screen.findByRole("article", { name: "Welcome Bonus" });
+    await waitFor(() => expect(queryClient.getQueryData(queryKeys.session.wheel())).toBeDefined());
+    expect(screen.queryByRole("article", { name: "Daily Lucky Wheel" })).toBeNull();
+    unmount();
+    server.use(http.get("*/api/bonus/wheel", () => HttpResponse.json({ available: true, state: "signInRequired", name: "Lucky Wheel", currency: "PHP", timeZone: "Asia/Manila", nextSpinAt: null, serverTime: new Date().toISOString(), segments: [], todaySpin: null, pendingChoices: [], extraSpins: 0 })));
+    renderRoute("/promotions");
+    const panel = await screen.findByRole("article", { name: "Daily Lucky Wheel" });
+    expect(within(panel).getByRole("link", { name: "View Lucky Wheel" })).toHaveAttribute("href", "/lucky-wheel");
   });
 
   it("none switched on: Promotions says so, and Home leaves its Bonuses section out", async () => {
     server.use(http.get("*/api/bonus", () => HttpResponse.json([])), ...catalogue(0));
     const { unmount } = renderRoute("/promotions");
-    expect(await screen.findByText("0 active offers")).toBeInTheDocument();
+    expect(await screen.findByText("0 bonus offers")).toBeInTheDocument();
+    expect(screen.getByText("No bonus offers right now")).toBeInTheDocument();
     unmount();
     server.use(http.get("*/api/bonus", () => HttpResponse.json([])), ...catalogue(3));
     renderRoute("/");
     expect(await screen.findByRole("region", { name: "Hot Games" })).toBeInTheDocument();
     expect(screen.queryByRole("region", { name: "Bonuses" })).toBeNull();
+  });
+
+  it("a failed read says so, and the page stays usable", async () => {
+    server.use(http.get("*/api/bonus", () => problem(502, "UPSTREAM_UNAVAILABLE")), ...catalogue(0));
+    renderRoute("/promotions");
+    expect(await screen.findByText("We couldn’t load this right now. Please try again in a moment.")).toBeInTheDocument();
+    expect(screen.queryByRole("article")).toBeNull();
+    expect(screen.getByRole("heading", { level: 1, name: "Promotions & Rewards" })).toBeInTheDocument();
   });
 });
 

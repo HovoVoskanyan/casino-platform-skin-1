@@ -36,6 +36,7 @@ const definition = (id: string, name: string, type: BonusDefinition["type"], per
 } as BonusDefinition);
 export const WELCOME = definition("0192b0a0-0000-7000-8000-0000000000a1", "Welcome Bonus", "welcome", 100, 500_000);
 export const RELOAD = definition("0192b0a0-0000-7000-8000-0000000000a2", "Weekly Reload", "reload", 50, 200_000);
+export const CASHBACK = definition("0192b0a0-0000-7000-8000-0000000000a4", "Weekly Cashback", "cashback", 10, 100_000);
 export const EURO = definition("0192b0a0-0000-7000-8000-0000000000a3", "Euro Welcome", "welcome", 100, 500_000, "EUR");
 export const summary = (bonus: BonusDefinition, claimable = true, hasPendingActivation = false): BonusSummary =>
   ({ bonus, hasPendingActivation, currentStepNumber: null, claimable }) as BonusSummary;

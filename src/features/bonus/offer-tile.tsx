@@ -16,6 +16,27 @@ const GOLD = "bg-[image:var(--cc-gold-cta)] text-[#2c1400] shadow-[0_8px_20px_rg
 const QUIET = "border border-[rgba(167,139,250,.3)] bg-white/[.05] text-cc-text hover:bg-white/[.1]";
 
 /**
+ * What a player can do with an offer now — Activate (or `activateLabel`), Deposit to claim once activated, In progress
+ * while it runs, Claimed when its uses are spent. Shared by the tiles and the Promotions panels; `className` sizes it.
+ */
+export function OfferAction({ offer, onActivate, activateLabel, className }: { offer: Offer; onActivate: () => void; activateLabel: string; className?: string }) {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const base = "flex min-h-11 items-center justify-center rounded-cc-md px-3";
+  switch (offer.state) {
+    case "guest":
+    case "claimable":
+      return <button type="button" onClick={onActivate} className={cn(base, "text-[14px] font-extrabold", GOLD, className)}>{activateLabel}</button>;
+    case "awaiting":
+      return <button type="button" onClick={() => void navigate({ to: "/wallet", hash: "deposit" })} className={cn(base, "text-[14px] font-extrabold", GOLD, className)}>{t("bonus.tile.depositToClaim")}</button>;
+    case "running":
+      return <button type="button" onClick={() => void navigate({ to: "/account", search: { tab: "bonuses" } })} className={cn(base, "text-[13.5px] font-bold", QUIET, className)}>{t("bonus.tile.inProgress")}</button>;
+    default:
+      return <span className={cn(base, "border border-dashed border-[rgba(167,139,250,.26)] text-[13px] font-bold text-cc-muted", className)}>{t("bonus.tile.claimed")}</span>;
+  }
+}
+
+/**
  * Design (Home Bonuses / Promotions): one bonus switched on in the back office — its 3D mark, name in capitals, the
  * headline in gold — ending in what the player can do now: Activate (a guest is asked to sign in first), Deposit to
  * claim once activated, In progress while it runs, Claimed when its uses are spent. "Terms" opens the full terms.
@@ -23,7 +44,6 @@ const QUIET = "border border-[rgba(167,139,250,.3)] bg-white/[.05] text-cc-text 
  */
 export function OfferTile({ offer, onActivate, onTerms, page = false }: { offer: Offer; onActivate: (bonus: BonusDefinition) => void; onTerms: (bonus: BonusDefinition) => void; page?: boolean }) {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const { bonus, state } = offer;
   const theme = THEMES[bonus.type] ?? THEMES.welcome!;
   const { lead, amount } = offerHeadline(t, bonus);
@@ -51,21 +71,7 @@ export function OfferTile({ offer, onActivate, onTerms, page = false }: { offer:
       {state === "awaiting" ? <span className={cn("text-[12px] leading-[1.4] font-semibold", theme.sub)}>{t("bonus.tile.activated")}</span> : null}
 
       <div className="mt-auto flex flex-col gap-2 pt-[2px]">
-        {state === "guest" || state === "claimable" ? (
-          <button type="button" onClick={() => onActivate(bonus)} className={cn("flex min-h-11 items-center justify-center rounded-cc-md px-3 text-[14px] font-extrabold", GOLD)}>
-            {t("bonus.tile.activate")}
-          </button>
-        ) : state === "awaiting" ? (
-          <button type="button" onClick={() => void navigate({ to: "/wallet", hash: "deposit" })} className={cn("flex min-h-11 items-center justify-center rounded-cc-md px-3 text-[14px] font-extrabold", GOLD)}>
-            {t("bonus.tile.depositToClaim")}
-          </button>
-        ) : state === "running" ? (
-          <button type="button" onClick={() => void navigate({ to: "/account", search: { tab: "bonuses" } })} className={cn("flex min-h-11 items-center justify-center rounded-cc-md px-3 text-[13.5px] font-bold", QUIET)}>
-            {t("bonus.tile.inProgress")}
-          </button>
-        ) : (
-          <span className="flex min-h-11 items-center justify-center rounded-cc-md border border-dashed border-[rgba(167,139,250,.26)] px-3 text-[13px] font-bold text-cc-muted">{t("bonus.tile.claimed")}</span>
-        )}
+        <OfferAction offer={offer} onActivate={() => onActivate(bonus)} activateLabel={t("bonus.tile.activate")} />
         <button type="button" onClick={() => onTerms(bonus)} className="flex min-h-9 items-center justify-center gap-1 self-center px-2 text-[12.5px] font-semibold text-[#cbb6e6] underline decoration-[rgba(203,182,230,.4)] underline-offset-4 hover:text-white">
           {t("bonus.viewTerms")}
         </button>

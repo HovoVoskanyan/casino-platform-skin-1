@@ -63,6 +63,14 @@ export function useWheel() {
 }
 
 /**
+ * Whether the skin shows the Lucky Wheel (the bottom nav's item, the Promotions panel): only while it has one (owner
+ * 2026-10-15) — not while bonus answers "unavailable" (none set up, or switched off), nor while the answer is loading or
+ * failed, so it is never flashed — and anyway while the player has something there (owner 2026-10-16): free spins
+ * waiting for a game, or extra spins.
+ */
+export const wheelShown = (w: Wheel | undefined) => !!w && (w.state !== "unavailable" || w.pendingChoices.length > 0 || w.extraSpins > 0);
+
+/**
  * POST /api/bonus/wheel/spin — the day's free spin, or (once that is used) one of the player's extra spins. Every
  * call carries the tap's `requestId`: the same id answers the same spin (`replayed`), so retrying a tap whose answer
  * was lost never spends a second extra spin. The wheel itself is re-read by the page once the animation has landed,

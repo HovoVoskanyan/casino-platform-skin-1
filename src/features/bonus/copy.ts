@@ -185,3 +185,15 @@ export function offerHeadline(t: TFunction, b: BonusDefinition): { lead: string;
   if (step?.freeSpins) return { lead: t("bonus.tile.freeSpins", { count: step.freeSpins }), amount: String(step.freeSpins) };
   return { lead: "", amount: "" };
 }
+
+/**
+ * The same first band as `offerHeadline`, as separate figures — the Promotions panels lay them out themselves ("50%
+ * reload bonus" / "Up to ₱2,000"). Every number is the definition's own; a missing one stays null.
+ */
+export function offerFigures(b: BonusDefinition): { percent: number | null; cap: string | null; spins: number | null } {
+  const step = firstStep(b);
+  const band = bands(step)[0];
+  const percent = band && band.bonusPercent > 0 ? band.bonusPercent : null;
+  const cap = percent ? band!.maxBonusCents ?? step?.maxBonusAmountCents ?? null : null;
+  return { percent, cap: cap ? pesoWhole(cap) : null, spins: step?.freeSpins || null };
+}
