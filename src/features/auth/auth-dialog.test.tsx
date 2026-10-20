@@ -1,4 +1,4 @@
-import { screen, waitFor } from "@testing-library/react";
+import { act, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { renderWithProviders } from "@/test/render";
@@ -120,7 +120,16 @@ describe("the shared auth dialog", () => {
     expect(await screen.findByText("Welcome back to ChoCho")).toBeInTheDocument();
   });
 
-  it("registers by phone — the default tab — then confirms the number with the SMS code", async () => {
+  it("registration opens on Email, sign-in on Phone (owner 2026-10-20)", async () => {
+    renderWithProviders(<AuthDialog />);
+    authDialog.open("register");
+    await screen.findByRole("dialog");
+    expect(screen.getByRole("tab", { name: "Email" })).toHaveAttribute("aria-selected", "true");
+    act(() => authDialog.open("signin"));
+    expect(await screen.findByRole("tab", { name: "Phone" })).toHaveAttribute("aria-selected", "true");
+  });
+
+  it("registers by phone, then confirms the number with the SMS code", async () => {
     const user = userEvent.setup();
     let signup: Record<string, unknown> | null = null;
     const verified = vi.fn();
@@ -132,7 +141,7 @@ describe("the shared auth dialog", () => {
     authDialog.open("register");
     await screen.findByRole("dialog");
 
-    expect(screen.getByRole("tab", { name: "Phone" })).toHaveAttribute("aria-selected", "true");
+    await user.click(screen.getByRole("tab", { name: "Phone" }));
     await user.type(screen.getByLabelText("Mobile number"), "0917");
     await user.type(screen.getByLabelText("Password"), "Passw0rd!2345");
     await user.click(screen.getByRole("checkbox"));
@@ -159,6 +168,7 @@ describe("the shared auth dialog", () => {
     renderWithProviders(<AuthDialog />);
     authDialog.open("register");
     await screen.findByRole("dialog");
+    await user.click(screen.getByRole("tab", { name: "Phone" }));
     await user.type(screen.getByLabelText("Mobile number"), "9171234567");
     await user.type(screen.getByLabelText("Password"), "Passw0rd!2345");
     await user.click(screen.getByRole("checkbox"));

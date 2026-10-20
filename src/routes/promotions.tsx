@@ -25,7 +25,7 @@ function arrange(list: Offer[]) {
  * Promotions & Rewards (owner design 2026-10-18) — the bottom nav's "Bonuses". The offers are the bonuses an operator
  * has switched on in the back office (owner 2026-10-13): Active and inside their dates, in the skin's currency. The
  * first welcome offer is the featured panel, the first reload and cashback the two cards, any other offer a tile under
- * More offers; the Daily Lucky Wheel follows while the skin has one. Every button goes through the offers' one dialog
+ * More offers. The Daily Lucky Wheel, while the skin has one, leads the page right under the intro (owner 2026-10-20). Every button goes through the offers' one dialog
  * (the same flow as Home's tiles): View offer = Activate, Terms & eligibility = the terms.
  */
 function PromotionsPage() {
@@ -47,6 +47,8 @@ function PromotionsPage() {
         </div>
         <p className="m-0 text-[15px] leading-[1.5] font-medium text-pretty text-cc-lavender">{t("promotions.intro")}</p>
       </section>
+
+      {wheelShown(wheel.data) ? <WheelPanel /> : null}
 
       {offers.isError ? <Notice tone="error">{t("common.loadFailed")}</Notice> : null}
       {offers.isPending ? (
@@ -86,7 +88,6 @@ function PromotionsPage() {
         </section>
       ) : null}
 
-      {wheelShown(wheel.data) ? <WheelPanel /> : null}
       {dialog.element}
     </Shell>
   );

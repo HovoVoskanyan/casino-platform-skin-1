@@ -58,7 +58,8 @@ function AuthDialogContent({ initialMode }: { initialMode: AuthMode }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [view, setView] = useState<View>(initialMode);
-  const [contact, setContact] = useState<Contact>("phone");
+  // Registration starts on Email, sign-in and reset on Phone (owner 2026-10-20); each mode remounts this, so it applies on every switch.
+  const [contact, setContact] = useState<Contact>(initialMode === "register" ? "email" : "phone");
   const [formError, setFormError] = useState<string | null>(null);
   const [shown, setShown] = useState(false);
   const [pending, setPending] = useState<{ email: string; password: string } | null>(null);
