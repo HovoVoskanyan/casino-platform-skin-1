@@ -591,6 +591,7 @@
   "bonus.spins.howToPlay": "Buksan ang laro para magamit ang iyong spins.",
   "bonus.spins.settingUp": "Inihahanda pa ng game provider ang iyong spins. Magiging handa na ang mga ito sa laro maya-maya.",
   "bonus.spins.refused": "Hindi naidagdag ng game provider ang mga spin na ito. Makipag-ugnayan sa 24/7 Support at aayusin namin ito.",
+  "bonus.spins.awaitingLaunch": "Naidadagdag ang iyong spins pagkatapos ng una mong laro gamit ang totoong pera. Magbukas ng kahit anong laro gamit ang totoong pera, saka bumalik para gamitin ang mga ito — naghihintay ang mga ito hanggang sa mag-expire.",
   "bonus.spins.play": "Laruin ang {{game}}",
   "bonus.remaining": "Natitirang bonus credit: {{left}} sa {{total}}",
   "bonus.progress": "Natapos na wagering: {{done}} sa {{target}}",

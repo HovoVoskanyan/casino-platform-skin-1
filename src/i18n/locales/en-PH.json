@@ -591,6 +591,7 @@
   "bonus.spins.howToPlay": "Open the game to play your spins.",
   "bonus.spins.settingUp": "Your spins are still being set up with the game provider. They’ll be ready in the game shortly.",
   "bonus.spins.refused": "The game provider hasn’t added these spins. Contact 24/7 Support and we’ll sort it out.",
+  "bonus.spins.awaitingLaunch": "Your spins are added after your first real-money game. Open any game for real money, then come back to play them — they wait for you until they expire.",
   "bonus.spins.play": "Play {{game}}",
   "bonus.remaining": "{{left}} of {{total}} bonus credit remaining",
   "bonus.progress": "Wagering completed: {{done}} of {{target}}",

@@ -5027,7 +5027,8 @@
         "enum": [
           "assigned",
           "refused",
-          "unknown"
+          "unknown",
+          "awaitingLaunch"
         ]
       },
       "BonusType": {

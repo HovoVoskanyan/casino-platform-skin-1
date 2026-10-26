@@ -163,7 +163,11 @@ export function heldSpinsCopy(t: TFunction, f: PlayerFreeBet, gameName: string |
     remaining: t("bonus.spins.left", { left: f.remainingCount, total: f.totalCount }),
     expiry: when(f.expiresAt) ? t("bonus.expires", { date: when(f.expiresAt) }) : null,
     details: [
-      f.assignmentOutcome === "unknown" ? t("bonus.spins.settingUp") : f.assignmentOutcome === "refused" ? t("bonus.spins.refused") : t("bonus.spins.howToPlay"),
+      // awaitingLaunch is not a failure: bonus sends the spins on the player's first real-money game (owner 2026-10-26).
+      f.assignmentOutcome === "unknown" ? t("bonus.spins.settingUp")
+        : f.assignmentOutcome === "refused" ? t("bonus.spins.refused")
+        : f.assignmentOutcome === "awaitingLaunch" ? t("bonus.spins.awaitingLaunch")
+        : t("bonus.spins.howToPlay"),
       when(f.expiresAt) ? t("bonus.spins.expire", { date: when(f.expiresAt) }) : null,
     ].filter((x): x is string => !!x),
   };

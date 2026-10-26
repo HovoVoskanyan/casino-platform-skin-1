@@ -3791,7 +3791,7 @@ export interface components {
         /** @enum {unknown} */
         PlayerFreeBetStatus: "active" | "fullyUsed" | "expired" | "cancelled";
         /** @enum {unknown} */
-        FreeRoundsAssignmentOutcome: "assigned" | "refused" | "unknown";
+        FreeRoundsAssignmentOutcome: "assigned" | "refused" | "unknown" | "awaitingLaunch";
         /** @enum {unknown} */
         BonusType: "welcome" | "reload" | "cashback" | "freeSpins";
         /** @enum {unknown} */

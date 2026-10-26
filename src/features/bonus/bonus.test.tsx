@@ -176,6 +176,22 @@ describe("My bonuses (P3-29)", () => {
     expect(await within(card).findByRole("link", { name: "Play Sweet Bonanza" })).toHaveAttribute("href", "/games/g-sweet/sweet-bonanza");
   });
 
+  it("a deposit's spins awarded before the first real-money game show as waiting for it, not as refused", async () => {
+    // Owner 2026-10-26: bonus keeps them (awaitingLaunch) and sends them on the player's first real-money launch.
+    const user = userEvent.setup();
+    const waiting = {
+      playerFreeBetId: "pf-2", freeBetId: "fb-step", name: "Deposit bonus free spins", source: "bonus", status: "active", playerBonusId: "pb-1",
+      totalCount: 20, remainingCount: 20, betLevel: 1, assigned: false, assignmentOutcome: "awaitingLaunch", grantedAt: "2026-10-26T00:00:00Z", expiresAt: SPINS.expireAt, gameIds: ["g-sweet"],
+    };
+    server.use(signedIn(), ...bonusApi({ catalog: [], claimable: [], freebets: [waiting] }));
+    await openBonusesTab();
+
+    const card = await within(await screen.findByRole("region", { name: "Active bonuses" })).findByRole("article", { name: "Deposit bonus free spins" });
+    await user.click(within(card).getByRole("button", { name: "View details" }));
+    expect(within(card).getByText(/Your spins are added after your first real-money game\./)).toBeInTheDocument();
+    expect(within(card).queryByText(/hasn’t added these spins/)).toBeNull();
+  });
+
   it("a running bonus shows its credit left (from the hub), its wagering progress and its expiry", async () => {
     server.use(signedIn(), ...bonusApi({ catalog: [offered(RELOAD, false)], claimable: [], active: [running] }));
     await openBonusesTab();
