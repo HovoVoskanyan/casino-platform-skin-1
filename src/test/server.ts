@@ -19,7 +19,7 @@ export const ACCOUNT = {
 export const handlers = [
   http.get("*/api/id/auth/account", () => HttpResponse.json(ACCOUNT)),
   // the site's settings from the back office: one language and PHP unless a test says otherwise (no switcher shown)
-  http.get("*/api/v1/site", () => HttpResponse.json({ defaultLanguage: "en-ph", languages: ["en-ph"], defaultCurrency: "PHP", currencies: ["PHP"] })),
+  http.get("*/api/v1/site", () => HttpResponse.json({ defaultLanguage: "en-ph", languages: ["en-ph"], defaultCurrency: "PHP", currencies: ["PHP"], realPlayMinimumCents: 500 })),
   http.get("*/api/v1/me/profile", () => HttpResponse.json({ displayName: null, city: null, playerNumber: 4820117 })),
   http.get("*/api/v1/me/favourites", () => HttpResponse.json([])),
   http.get("*/api/payments/history", () => HttpResponse.json([])),

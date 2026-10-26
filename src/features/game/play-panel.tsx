@@ -5,6 +5,7 @@ import { Button, Spinner } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Notice } from "@/components/ui/notice";
 import { authDialog } from "@/features/auth/auth-dialog-state";
+import { realPlayMinimum } from "@/lib/money";
 import { gamePath } from "@/lib/slug";
 import { useSession } from "@/features/auth/session";
 import type { GameDetail } from "@/features/lobby/api";
@@ -97,6 +98,14 @@ export function PlayPanel({ game, autoPlay, onAutoPlayed }: { game: GameDetail; 
   const launching = status.kind === "launching";
   const modeLabel = (mode: Mode) => t(mode === "Demo" ? "game.modeNameDemo" : "game.modeNameReal");
   const errorKey = (code: string) => (LAUNCH_ERRORS as readonly string[]).includes(code) ? `game.launchError.${code}` : "game.launchError.UNKNOWN";
+  // Owner 2026-10-26: real money needs more than the site's floor in the balance that pays — cash, or the bonus balance
+  // for a bonus-funded session. The amount is core's (/api/v1/site); without one the line leaves it out.
+  const errorText = (s: Extract<Status, { kind: "error" }>) => {
+    if (s.code !== "BALANCE_TOO_LOW") return t(errorKey(s.code), { mode: modeLabel(s.mode) });
+    const amount = realPlayMinimum();
+    if (s.withBonus) return amount ? t("game.bonusBalanceTooLow", { amount }) : t("game.bonusBalanceTooLowAny");
+    return amount ? t("game.balanceTooLow", { amount }) : t("game.launchError.BALANCE_TOO_LOW");
+  };
 
   return (
     <div className="flex flex-col gap-3">
@@ -122,10 +131,10 @@ export function PlayPanel({ game, autoPlay, onAutoPlayed }: { game: GameDetail; 
       {status.kind === "cancelled" ? <Notice tone="info">{t(status.mode === "Demo" ? "game.signInCancelledDemo" : "game.signInCancelled", { name: game.name })}</Notice> : null}
       {status.kind === "error" ? (
         <div role="alert" className="flex flex-wrap items-center gap-3 rounded-cc-md border border-[rgba(255,93,125,.4)] bg-[rgba(255,93,125,.1)] px-[14px] py-3 text-[13px] font-semibold text-[#ffb3c2]">
-          <span className="min-w-0 flex-1">{t(errorKey(status.code), { mode: modeLabel(status.mode) })}</span>
-          {status.code === "CURRENCY_NOT_HELD" ? (
+          <span className="min-w-0 flex-1">{errorText(status)}</span>
+          {status.code === "CURRENCY_NOT_HELD" || (status.code === "BALANCE_TOO_LOW" && !status.withBonus) ? (
             <Link to="/wallet" hash="deposit" className="flex h-8 items-center rounded-[9px] border border-[rgba(255,201,60,.45)] bg-[rgba(255,201,60,.12)] px-3 text-[12.5px] font-bold text-[#ffd98a]">{t("wallet.deposit")}</Link>
-          ) : status.code === "BONUS_NOT_ELIGIBLE" ? (
+          ) : status.code === "BONUS_NOT_ELIGIBLE" || status.code === "BALANCE_TOO_LOW" ? (
             <button type="button" onClick={() => start(status.mode, false)} className="h-8 rounded-[9px] border border-[rgba(255,201,60,.45)] bg-[rgba(255,201,60,.12)] px-3 text-[12.5px] font-bold text-[#ffd98a]">{t("game.playWithCash")}</button>
           ) : (
             <button type="button" onClick={() => start(status.mode, status.withBonus)} className="h-8 rounded-[9px] border border-[rgba(255,201,60,.45)] bg-[rgba(255,201,60,.12)] px-3 text-[12.5px] font-bold text-[#ffd98a]">{t("common.retry")}</button>

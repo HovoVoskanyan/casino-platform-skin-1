@@ -109,6 +109,28 @@ describe("game launch (P3-28)", () => {
     expect(within(notice).getByRole("link", { name: "Deposit" })).toHaveAttribute("href", "/wallet#deposit");
   });
 
+  it("real money with no more than the site's ₱5 floor says how much is needed: cash offers the deposit, bonus offers cash", async () => {
+    // Owner 2026-10-26: more than ₱5 in the balance that pays (core's BALANCE_TOO_LOW; the amount is /api/v1/site's).
+    const user = userEvent.setup();
+    const bodies = launches(() => problem(400, "BALANCE_TOO_LOW"));
+    server.use(signedIn(), ...catalogue(1), detail(), eligibility(true));
+    renderRoute(`/games/${G.id}`);
+
+    await user.click(await screen.findByRole("button", { name: "Play for Real" }));
+    await user.click(within(await screen.findByRole("dialog")).getByRole("button", { name: /cash/i }));
+    let notice = await screen.findByRole("alert");
+    expect(notice).toHaveTextContent("To play for real money you need more than ₱5 in your balance. Top up to play.");
+    expect(within(notice).getByRole("link", { name: "Deposit" })).toHaveAttribute("href", "/wallet#deposit");
+
+    await user.click(screen.getByRole("button", { name: "Play for Real" }));
+    await user.click(within(await screen.findByRole("dialog")).getByRole("button", { name: /bonus/i }));
+    await waitFor(() => expect(bodies).toHaveLength(2));
+    notice = await screen.findByRole("alert");
+    expect(notice).toHaveTextContent("Your bonus balance needs to be more than ₱5 to play with it.");
+    expect(within(notice).getByRole("button", { name: "Play with cash" })).toBeInTheDocument();
+    expect(bodies.map((b) => b.withBonus)).toEqual([false, true]);
+  });
+
   it("back from OUR sign-in (?play=real + the marker) the chosen mode opens by itself, exactly once", async () => {
     const bodies = launches(() => HttpResponse.json(answer("Real")));
     server.use(signedIn(), ...catalogue(1), detail(), eligibility(false));

@@ -352,6 +352,44 @@ describe("free spins on several games: the player picks one", () => {
   });
 });
 
+describe("free spins before the player's first real-money game (owner 2026-10-26)", () => {
+  it("the card says real-money play comes first; a pick before it is refused with that, and the prize stays choosable", async () => {
+    const user = userEvent.setup();
+    let picks = 0;
+    server.use(signedIn(), gameReads(),
+      http.get("*/api/bonus/wheel", () => HttpResponse.json(wheel("spunToday", { todaySpin: awaiting({ replayed: true }), pendingChoices: [awaiting()] }))),
+      http.post("*/api/bonus/wheel/spins/:spinId/choose", () => { picks += 1; return problem(409, "GAME_LAUNCH_REQUIRED"); }),
+    );
+    renderRoute("/lucky-wheel");
+    const card = await screen.findByTestId("wheel-choice");
+    expect(within(card).getByTestId("wheel-launch-rule")).toHaveTextContent(
+      "Free spins are added only after you’ve played a game for real money — you need more than ₱5 in your balance to open one.");
+
+    await user.click(await within(card).findByRole("button", { name: /Gates of Olympus/ }));
+    await user.click(within(await screen.findByRole("dialog")).getByRole("button", { name: "Yes, choose this game" }));
+
+    expect(await within(card).findByText(/Free spins are added after your first real-money game/)).toBeInTheDocument();
+    expect(within(card).getByRole("link", { name: "Browse games" })).toHaveAttribute("href", "/games");
+    // not a conflict: the prize is still the player's, the list stays up for after they have played
+    expect(screen.queryByRole("heading", { name: "This prize is already on a game" })).toBeNull();
+    expect(within(card).getByRole("button", { name: /Sweet Bonanza/ })).toBeEnabled();
+    expect(picks).toBe(1);
+  });
+
+  it("a single-game prize won before it waits to be claimed on its game", async () => {
+    server.use(signedIn(), gameReads(), http.get("*/api/bonus/wheel", () => HttpResponse.json(wheel("spunToday", {
+      todaySpin: awaiting({ freeSpinGameIds: [GAME_ID(2)], replayed: true }), pendingChoices: [awaiting({ freeSpinGameIds: [GAME_ID(2)] })],
+    }))));
+    renderRoute("/lucky-wheel");
+    const result = await screen.findByTestId("wheel-result");
+    expect(within(result).getByText("They’re added after your first real-money game — play one, then claim them just below.")).toBeInTheDocument();
+    const card = await screen.findByTestId("wheel-choice");
+    expect(card).toHaveTextContent("Claim your free spins");
+    expect(card).toHaveTextContent("Your free spins are on this game. Claim them once you’ve played a game for real money.");
+    expect(await within(card).findByRole("button", { name: /Gates of Olympus/ })).toHaveTextContent("Claim");
+  });
+});
+
 describe("extra spins an operator gave the player", () => {
   it("after the daily spin the hub is ready again, shows how many are left, and each tap sends its own requestId", async () => {
     const user = userEvent.setup();

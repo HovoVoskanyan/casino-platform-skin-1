@@ -37,12 +37,13 @@ export function resultCopy(t: TFunction, spin: WheelSpin): ResultCopy {
     return { tone: "none", headline: t("wheel.result.noPrize"), body: t("wheel.result.noPrizeBody"), link: null };
   }
   const prize = prizeText(t, spin, spin.currency);
-  // free spins on several games: nothing is credited until the player picks one (the choice panel under it)
+  // free spins on several games: nothing is credited until the player picks one (the choice panel under it); on one
+  // game they wait only for the player's first real-money game (owner 2026-10-26), then are claimed the same way
   if (spin.outcome === "awaitingGame") {
     return {
       tone: "win",
       headline: spin.freeSpinsCount != null ? t("wheel.result.wonSpins", { count: spin.freeSpinsCount }) : t("wheel.result.won", { prize }),
-      body: t("wheel.result.chooseBody"),
+      body: t((spin.freeSpinGameIds ?? []).length === 1 ? "wheel.result.claimBody" : "wheel.result.chooseBody"),
       link: null,
     };
   }

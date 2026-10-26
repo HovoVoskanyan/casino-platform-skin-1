@@ -54,5 +54,5 @@ export function useLaunchEligibility(gameId: string) {
 /** Launch refusals → the notice copy (keys under `game.launchError.*`); anything unnamed is the generic line. */
 export const LAUNCH_ERRORS = [
   "PLAYER_RESTRICTED", "CURRENCY_NOT_HELD", "BONUS_NOT_ELIGIBLE", "BONUS_UNAVAILABLE", "WALLET_UNAVAILABLE",
-  "LAUNCH_PROVIDER_FAILED", "LAUNCH_NOT_CONFIGURED", "CONFLICT", "NOT_FOUND", "RATE_LIMITED", "SESSION_NOT_LIVE",
+  "LAUNCH_PROVIDER_FAILED", "LAUNCH_NOT_CONFIGURED", "CONFLICT", "NOT_FOUND", "RATE_LIMITED", "SESSION_NOT_LIVE", "BALANCE_TOO_LOW",
 ] as const;

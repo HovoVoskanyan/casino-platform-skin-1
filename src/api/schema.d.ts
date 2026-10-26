@@ -3488,6 +3488,8 @@ export interface components {
             languages: string[];
             defaultCurrency: string;
             currencies: string[];
+            /** Format: int64 */
+            realPlayMinimumCents: null | number;
         };
         LobbyGameResponse: {
             /** Format: uuid */

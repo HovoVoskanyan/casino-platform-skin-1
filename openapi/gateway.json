@@ -3888,7 +3888,8 @@
           "defaultLanguage",
           "languages",
           "defaultCurrency",
-          "currencies"
+          "currencies",
+          "realPlayMinimumCents"
         ],
         "type": "object",
         "properties": {
@@ -3909,6 +3910,13 @@
             "items": {
               "type": "string"
             }
+          },
+          "realPlayMinimumCents": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int64"
           }
         }
       },

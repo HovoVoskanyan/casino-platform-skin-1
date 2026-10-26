@@ -9,6 +9,7 @@ import { Notice } from "@/components/ui/notice";
 import { gameQueryOptions, useGame, type GameDetail } from "@/features/lobby/api";
 import { GameArt } from "@/features/lobby/game-art";
 import { supportPanel } from "@/features/support/support-store";
+import { realPlayMinimum } from "@/lib/money";
 import { gameSlug } from "@/lib/slug";
 import { cn } from "@/lib/utils";
 import { spinGameId, useChooseWheelGame, type Wheel, type WheelSpin } from "./api";
@@ -20,14 +21,18 @@ import { GOLD_LINK, QUIET_LINK } from "./styles";
  * them; only then are its spins credited, all on that game. This is the picker: the prize, the deadline, the games
  * (each read from the lobby, shown as it arrives), a confirmation (the pick is final), then "N free spins on {game}"
  * with Play now. Bonus has the last word on everything: the window closing, a pick made elsewhere, a frozen account.
+ * Owner 2026-10-26: free spins are credited only after the player's first real-money game — the card says so up front,
+ * a pick before that is refused (GAME_LAUNCH_REQUIRED) and the prize keeps waiting, and a single-game prize won before
+ * it waits here too, claimed with its one game.
  */
 
 /** What went wrong with a pick. `expired`, `conflict` and `gone` end the choice; the others leave the list up. */
-type Problem = "expired" | "conflict" | "gone" | "restricted" | "invalid" | "generic";
+type Problem = "expired" | "conflict" | "gone" | "restricted" | "launchRequired" | "invalid" | "generic";
 
 function problemOf(e: unknown): Problem {
   const { errorCode, status } = toApiError(e);
   if (errorCode === "WHEEL_NOT_AVAILABLE") return "expired";
+  if (errorCode === "GAME_LAUNCH_REQUIRED") return "launchRequired"; // a 409 that keeps the prize: before the CONFLICT rule
   if (errorCode === "PLAYER_RESTRICTED") return "restricted";
   if (errorCode === "VALIDATION_FAILED" || status === 400) return "invalid";
   if (errorCode === "NOT_FOUND" || status === 404) return "gone";
@@ -59,6 +64,9 @@ export function ChoiceCard({ spin, timeZone, onAct, wonOn = false, className }: 
 
   const count = spin.freeSpinsCount ?? 0;
   const prize = t("wheel.prize.freeSpins", { count });
+  // one game: nothing to choose — the prize waits only for the player's first real-money game, and is claimed on it
+  const single = (spin.freeSpinGameIds ?? []).length === 1;
+  const minimum = realPlayMinimum();
 
   async function choose(game: GameDetail) {
     onAct?.(spin.spinId);
@@ -100,6 +108,15 @@ export function ChoiceCard({ spin, timeZone, onAct, wonOn = false, className }: 
         {final === "conflict" ? <Link to="/account" search={{ tab: "bonuses" }} className={QUIET_LINK}>{t("wheel.viewBonuses")}</Link> : null}
       </Outcome>
     );
+  } else if (problem === "launchRequired") {
+    status = (
+      <Notice tone="info" role="none" className="w-full">
+        <span className="flex flex-col items-start gap-2">
+          <span>{t("wheel.choice.launchRequired")}</span>
+          <Link to="/games" className={cn(QUIET_LINK, "min-h-10 px-3 text-[13px]")}>{t("wheel.choice.browseGames")}</Link>
+        </span>
+      </Notice>
+    );
   } else if (problem) {
     status = (
       <Notice tone={problem === "restricted" ? "info" : "error"} role="none" className="w-full">
@@ -120,13 +137,16 @@ export function ChoiceCard({ spin, timeZone, onAct, wonOn = false, className }: 
     <section aria-labelledby={titleId} data-testid="wheel-choice" data-spin={spin.spinId} className={cn(CARD, className)}>
       {choosing ? (
         <div className="flex flex-col gap-1">
-          <span className="text-[11px] font-extrabold tracking-[1.1px] text-cc-gold uppercase">{t("wheel.choice.eyebrow")}</span>
+          <span className="text-[11px] font-extrabold tracking-[1.1px] text-cc-gold uppercase">{t(single ? "wheel.choice.eyebrowSingle" : "wheel.choice.eyebrow")}</span>
           <h3 id={titleId} className="m-0 text-[19px] leading-[1.25] font-extrabold tracking-[-0.3px] text-cc-ink">{prize}</h3>
           <p className="m-0 flex flex-wrap gap-x-3 gap-y-[2px] text-[12.5px] leading-[1.5] font-semibold text-cc-lavender">
             {day ? <span>{t("wheel.choice.wonOn", { date: day })}</span> : null}
             {deadline ? <span className="text-[#ffd98a]">{t("wheel.choice.chooseBy", { date: deadline })}</span> : null}
           </p>
-          <p className="m-0 text-[13px] leading-[1.5] font-medium text-pretty text-cc-text">{t("wheel.choice.intro")}</p>
+          <p className="m-0 text-[13px] leading-[1.5] font-medium text-pretty text-cc-text">{t(single ? "wheel.choice.introSingle" : "wheel.choice.intro")}</p>
+          <p data-testid="wheel-launch-rule" className="m-0 text-[12.5px] leading-[1.5] font-semibold text-pretty text-cc-lavender">
+            {minimum ? t("wheel.choice.launchRule", { amount: minimum }) : t("wheel.choice.launchRuleAny")}
+          </p>
         </div>
       ) : (
         <h3 id={titleId} className="sr-only">{prize}</h3>
@@ -136,7 +156,7 @@ export function ChoiceCard({ spin, timeZone, onAct, wonOn = false, className }: 
         {status}
       </div>
 
-      {choosing ? <GameList ids={spin.freeSpinGameIds ?? []} disabled={chooser.isPending} onPick={setConfirming} /> : null}
+      {choosing ? <GameList ids={spin.freeSpinGameIds ?? []} disabled={chooser.isPending} onPick={setConfirming} pickLabel={t(single ? "wheel.choice.claim" : "wheel.choice.pick")} /> : null}
 
       <Dialog
         open={!!confirming}
@@ -165,7 +185,7 @@ export function ChoiceCard({ spin, timeZone, onAct, wonOn = false, className }: 
 }
 
 /** The prize's games, each read from the lobby and shown as it arrives; one that cannot be read is left out. */
-function GameList({ ids, disabled, onPick }: { ids: string[]; disabled: boolean; onPick: (game: GameDetail) => void }) {
+function GameList({ ids, disabled, onPick, pickLabel }: { ids: string[]; disabled: boolean; onPick: (game: GameDetail) => void; pickLabel: string }) {
   const { t, i18n } = useTranslation();
   const games = useQueries({ queries: ids.map((id) => gameQueryOptions(i18n.language, id)) });
   const loading = games.some((g) => g.isPending);
@@ -213,7 +233,7 @@ function GameList({ ids, disabled, onPick }: { ids: string[]; disabled: boolean;
                 <span className="line-clamp-2 text-[14px] leading-[1.25] font-extrabold break-words text-cc-ink min-[400px]:text-[14.5px]">{game.name}</span>
                 <span className="truncate text-[12px] font-semibold text-cc-lavender">{game.providerName}</span>
               </span>
-              <span aria-hidden className="hidden flex-none rounded-full border border-[rgba(255,201,60,.5)] px-3 py-[6px] text-[12px] font-extrabold text-cc-gold group-hover:bg-[rgba(255,201,60,.12)] min-[400px]:inline-flex">{t("wheel.choice.pick")}</span>
+              <span aria-hidden className="hidden flex-none rounded-full border border-[rgba(255,201,60,.5)] px-3 py-[6px] text-[12px] font-extrabold text-cc-gold group-hover:bg-[rgba(255,201,60,.12)] min-[400px]:inline-flex">{pickLabel}</span>
               {/* a narrow phone keeps the room for the game's name: a chevron instead of the word */}
               <span aria-hidden className="flex h-7 w-7 flex-none items-center justify-center rounded-full border border-[rgba(255,201,60,.5)] text-[17px] leading-none font-extrabold text-cc-gold min-[400px]:hidden">›</span>
             </button>
