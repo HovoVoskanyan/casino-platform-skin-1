@@ -20,9 +20,10 @@ import { GOLD_LINK, QUIET_LINK } from "./styles";
  * them; only then are its spins credited, all on that game. This is the picker: the prize, the deadline, the games
  * (each read from the lobby, shown as it arrives), a confirmation (the pick is final), then "N free spins on {game}"
  * with Play now. Bonus has the last word on everything: the window closing, a pick made elsewhere, a frozen account.
- * Owner 2026-10-28: free spins land before any real-money game (core registers the player with the provider itself), so
- * the card no longer announces a play-first rule; bonus's GAME_LAUNCH_REQUIRED stays handled as a refusal that keeps the
- * prize, in case an older holding still answers it.
+ * Owner 2026-10-28: a prize won before the player's first real-money game is granted all the same — bonus holds its spins
+ * (the freebets list says "awaitingLaunch") and sends them on the first launch, so the card no longer announces a
+ * play-first rule and the player just presses Play now. GAME_LAUNCH_REQUIRED stays handled as a refusal that keeps the
+ * prize, for an older holding that still answers it.
  */
 
 /** What went wrong with a pick. `expired`, `conflict` and `gone` end the choice; the others leave the list up. */
