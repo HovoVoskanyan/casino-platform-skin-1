@@ -2,7 +2,7 @@ import { queryOptions } from "@tanstack/react-query";
 import { api } from "@/api/client";
 import type { components } from "@/api/schema";
 import { applySiteLanguages } from "@/i18n";
-import { setRealPlayMinimum, setSkinCurrency } from "@/lib/money";
+import { setSkinCurrency } from "@/lib/money";
 import { queryKeys } from "@/lib/queryKeys";
 
 export type SiteConfig = components["schemas"]["SiteConfigResponse"];
@@ -22,9 +22,8 @@ export const siteConfigOptions = () =>
     staleTime: 5 * 60_000,
   });
 
-/** Language set + default, the currency and its real-money floor, applied to the running site. */
+/** Language set + default and the currency, applied to the running site. */
 export function applySiteConfig(config: SiteConfig) {
   setSkinCurrency(config.defaultCurrency);
-  setRealPlayMinimum(config.realPlayMinimumCents);
   applySiteLanguages(config.languages, config.defaultLanguage);
 }

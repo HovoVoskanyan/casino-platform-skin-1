@@ -352,8 +352,8 @@ describe("free spins on several games: the player picks one", () => {
   });
 });
 
-describe("free spins before the player's first real-money game (owner 2026-10-26)", () => {
-  it("the card says real-money play comes first; a pick before it is refused with that, and the prize stays choosable", async () => {
+describe("a pick bonus still answers GAME_LAUNCH_REQUIRED (an older holding)", () => {
+  it("the card no longer announces a play-first rule; the refusal keeps the prize choosable", async () => {
     const user = userEvent.setup();
     let picks = 0;
     server.use(signedIn(), gameReads(),
@@ -362,8 +362,7 @@ describe("free spins before the player's first real-money game (owner 2026-10-26
     );
     renderRoute("/lucky-wheel");
     const card = await screen.findByTestId("wheel-choice");
-    expect(within(card).getByTestId("wheel-launch-rule")).toHaveTextContent(
-      "Free spins are added only after you’ve played a game for real money — you need more than ₱5 in your balance to open one.");
+    expect(within(card).queryByTestId("wheel-launch-rule")).toBeNull(); // owner 2026-10-28: free spins land before any real-money game
 
     await user.click(await within(card).findByRole("button", { name: /Gates of Olympus/ }));
     await user.click(within(await screen.findByRole("dialog")).getByRole("button", { name: "Yes, choose this game" }));

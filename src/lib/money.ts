@@ -16,19 +16,6 @@ function symbolOf(currency: string): string {
   }
 }
 
-let realPlayMinimumCents: number | null = null;
-
-/** Core's floor for a real-money game in the site's currency (/api/v1/site); none (null) when the site has no floor. */
-export function setRealPlayMinimum(cents: number | null | undefined) {
-  realPlayMinimumCents = typeof cents === "number" && cents > 0 ? cents : null;
-}
-
-/**
- * "₱5" — playing for real money needs MORE than this in the balance (owner 2026-10-26), and free spins are credited
- * only after the first real-money game. Null when the site has no floor: the copy then leaves the amount out.
- */
-export const realPlayMinimum = (): string | null => (realPlayMinimumCents === null ? null : pesoWhole(realPlayMinimumCents));
-
 export function setSkinCurrency(code: string) {
   const c = code.trim().toUpperCase();
   if (!/^[A-Z]{3,5}$/.test(c)) return;

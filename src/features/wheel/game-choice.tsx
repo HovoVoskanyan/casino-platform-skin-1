@@ -9,7 +9,6 @@ import { Notice } from "@/components/ui/notice";
 import { gameQueryOptions, useGame, type GameDetail } from "@/features/lobby/api";
 import { GameArt } from "@/features/lobby/game-art";
 import { supportPanel } from "@/features/support/support-store";
-import { realPlayMinimum } from "@/lib/money";
 import { gameSlug } from "@/lib/slug";
 import { cn } from "@/lib/utils";
 import { spinGameId, useChooseWheelGame, type Wheel, type WheelSpin } from "./api";
@@ -21,9 +20,9 @@ import { GOLD_LINK, QUIET_LINK } from "./styles";
  * them; only then are its spins credited, all on that game. This is the picker: the prize, the deadline, the games
  * (each read from the lobby, shown as it arrives), a confirmation (the pick is final), then "N free spins on {game}"
  * with Play now. Bonus has the last word on everything: the window closing, a pick made elsewhere, a frozen account.
- * Owner 2026-10-26: free spins are credited only after the player's first real-money game — the card says so up front,
- * a pick before that is refused (GAME_LAUNCH_REQUIRED) and the prize keeps waiting, and a single-game prize won before
- * it waits here too, claimed with its one game.
+ * Owner 2026-10-28: free spins land before any real-money game (core registers the player with the provider itself), so
+ * the card no longer announces a play-first rule; bonus's GAME_LAUNCH_REQUIRED stays handled as a refusal that keeps the
+ * prize, in case an older holding still answers it.
  */
 
 /** What went wrong with a pick. `expired`, `conflict` and `gone` end the choice; the others leave the list up. */
@@ -64,9 +63,8 @@ export function ChoiceCard({ spin, timeZone, onAct, wonOn = false, className }: 
 
   const count = spin.freeSpinsCount ?? 0;
   const prize = t("wheel.prize.freeSpins", { count });
-  // one game: nothing to choose — the prize waits only for the player's first real-money game, and is claimed on it
+  // one game: nothing to choose — the prize is claimed with its one game
   const single = (spin.freeSpinGameIds ?? []).length === 1;
-  const minimum = realPlayMinimum();
 
   async function choose(game: GameDetail) {
     onAct?.(spin.spinId);
@@ -144,9 +142,6 @@ export function ChoiceCard({ spin, timeZone, onAct, wonOn = false, className }: 
             {deadline ? <span className="text-[#ffd98a]">{t("wheel.choice.chooseBy", { date: deadline })}</span> : null}
           </p>
           <p className="m-0 text-[13px] leading-[1.5] font-medium text-pretty text-cc-text">{t(single ? "wheel.choice.introSingle" : "wheel.choice.intro")}</p>
-          <p data-testid="wheel-launch-rule" className="m-0 text-[12.5px] leading-[1.5] font-semibold text-pretty text-cc-lavender">
-            {minimum ? t("wheel.choice.launchRule", { amount: minimum }) : t("wheel.choice.launchRuleAny")}
-          </p>
         </div>
       ) : (
         <h3 id={titleId} className="sr-only">{prize}</h3>

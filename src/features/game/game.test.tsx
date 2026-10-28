@@ -87,10 +87,10 @@ describe("game launch (P3-28)", () => {
     expect(screen.getByRole("dialog", { name: "Playing Sweet Bonanza" })).toHaveTextContent("Bonus");
   });
 
-  it("a refusal lands in the notice slot; Retry keeps the chosen mode; no pesos account offers the deposit", async () => {
+  it("a refusal lands in the notice slot; Retry keeps the chosen mode", async () => {
     const user = userEvent.setup();
     let fail = "LAUNCH_PROVIDER_FAILED";
-    const bodies = launches((b) => (fail ? problem(fail === "CURRENCY_NOT_HELD" ? 400 : 502, fail) : HttpResponse.json(answer(String(b.mode)))));
+    const bodies = launches((b) => (fail ? problem(502, fail) : HttpResponse.json(answer(String(b.mode)))));
     server.use(signedIn(), ...catalogue(1), detail(), eligibility(false));
     renderRoute(`/games/${G.id}`);
 
@@ -100,35 +100,20 @@ describe("game launch (P3-28)", () => {
     await user.click(screen.getByRole("button", { name: "Retry" }));
     await screen.findByTestId("game-frame");
     expect(bodies.map((b) => b.mode)).toEqual(["Real", "Real"]);
-
-    await user.click(screen.getByRole("button", { name: "Close game" }));
-    fail = "CURRENCY_NOT_HELD";
-    await user.click(screen.getByRole("button", { name: "Play for Real" }));
-    const notice = await screen.findByRole("alert");
-    expect(notice).toHaveTextContent("Make a deposit to play for real money.");
-    expect(within(notice).getByRole("link", { name: "Deposit" })).toHaveAttribute("href", "/wallet#deposit");
   });
 
-  it("real money with no more than the site's ₱5 floor says how much is needed: cash offers the deposit, bonus offers cash", async () => {
-    // Owner 2026-10-26: more than ₱5 in the balance that pays (core's BALANCE_TOO_LOW; the amount is /api/v1/site's).
+  it("real money opens at any balance: no deposit link, no floor copy (owner 2026-10-28)", async () => {
+    // Core creates the wallet account when there is none and opens the game at zero, so the panel never sends the
+    // player to the cashier: an empty-balance player plays the free spins the wheel gave.
     const user = userEvent.setup();
-    const bodies = launches(() => problem(400, "BALANCE_TOO_LOW"));
-    server.use(signedIn(), ...catalogue(1), detail(), eligibility(true));
+    const bodies = launches(() => HttpResponse.json(answer("Real")));
+    server.use(signedIn(), ...catalogue(1), detail(), eligibility(false));
     renderRoute(`/games/${G.id}`);
 
     await user.click(await screen.findByRole("button", { name: "Play for Real" }));
-    await user.click(within(await screen.findByRole("dialog")).getByRole("button", { name: /cash/i }));
-    let notice = await screen.findByRole("alert");
-    expect(notice).toHaveTextContent("To play for real money you need more than ₱5 in your balance. Top up to play.");
-    expect(within(notice).getByRole("link", { name: "Deposit" })).toHaveAttribute("href", "/wallet#deposit");
-
-    await user.click(screen.getByRole("button", { name: "Play for Real" }));
-    await user.click(within(await screen.findByRole("dialog")).getByRole("button", { name: /bonus/i }));
-    await waitFor(() => expect(bodies).toHaveLength(2));
-    notice = await screen.findByRole("alert");
-    expect(notice).toHaveTextContent("Your bonus balance needs to be more than ₱5 to play with it.");
-    expect(within(notice).getByRole("button", { name: "Play with cash" })).toBeInTheDocument();
-    expect(bodies.map((b) => b.withBonus)).toEqual([false, true]);
+    await screen.findByTestId("game-frame");
+    expect(bodies).toHaveLength(1);
+    expect(screen.queryByRole("link", { name: "Deposit" })).toBeNull();
   });
 
   it("back from OUR sign-in (?play=real + the marker) the chosen mode opens by itself, exactly once", async () => {
