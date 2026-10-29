@@ -225,7 +225,6 @@ function ProvidersRail({ selected, onPick }: { selected?: string; onPick: (code:
     <Rail id="game-providers" title={t("games.providers")} label={t("games.providers")} arrows="games">
       {providers.map((p) => {
         const on = selected === p.code;
-        const mark = p.name.replace(/[^A-Za-z ]/g, "").split(" ").filter(Boolean).slice(0, 2).map((w) => w[0]!.toUpperCase()).join("");
         return (
           <button
             key={p.code}
@@ -235,16 +234,33 @@ function ProvidersRail({ selected, onPick }: { selected?: string; onPick: (code:
             onClick={() => onPick(p.code)}
             className={cn("flex h-[108px] min-w-[176px] flex-[1_1_176px] snap-start flex-col items-center justify-center gap-[7px] rounded-cc-xl border px-[18px] py-[14px] transition-[transform,border-color,box-shadow] duration-200 hover:-translate-y-[2px] hover:border-[rgba(167,139,250,.42)] hover:shadow-[0_12px_26px_rgba(0,0,0,.4)]", on ? "border-[rgba(255,201,60,.42)] bg-[linear-gradient(180deg,#2b1350_0%,#1c0b33_100%)]" : "border-cc-line bg-[linear-gradient(180deg,#23103f_0%,#180a2c_100%)]")}
           >
-            {p.thumbnailUrl ? (
-              <img src={p.thumbnailUrl} alt="" className="h-[30px] max-w-[120px] flex-none object-contain" />
-            ) : (
-              <span aria-hidden className="flex h-[30px] w-[30px] flex-none items-center justify-center rounded-[9px] border border-[rgba(167,139,250,.22)] bg-white/[.05] text-[11px] font-extrabold tracking-[.4px] text-[#b7a5d3]">{mark}</span>
-            )}
-            <span className={cn("text-[14.5px] leading-[1.15] font-extrabold tracking-[-0.2px] whitespace-nowrap", on ? "text-cc-gold-hover" : "text-cc-text")}>{p.name}</span>
+            <ProviderFace name={p.name} src={p.thumbnailUrl} showName={p.showName} on={on} />
           </button>
         );
       })}
     </Rail>
+  );
+}
+
+/**
+ * What a provider card shows. A logo is sized by the card: it fills the room the card has and keeps its own shape —
+ * core stores it at the size it was uploaded (owner 2026-10-29), so nothing here may assume a box. The name goes under
+ * it only while the provider's `showName` switch is on; off, the logo stands alone (the button's label still names
+ * it). No logo, or one that fails to load, is the design's lettered mark over the name, whatever the switch says.
+ */
+function ProviderFace({ name, src, showName, on }: { name: string; src?: string | null; showName: boolean; on: boolean }) {
+  const [failed, setFailed] = useState<string | null>(null);
+  const logo = src && failed !== src;
+  const mark = name.replace(/[^A-Za-z ]/g, "").split(" ").filter(Boolean).slice(0, 2).map((w) => w[0]!.toUpperCase()).join("") || name.trim().slice(0, 1).toUpperCase();
+  return (
+    <>
+      {logo ? (
+        <img src={src} alt="" loading="lazy" decoding="async" onError={() => setFailed(src)} className="min-h-0 w-full flex-1 object-contain" />
+      ) : (
+        <span aria-hidden className="flex h-[30px] w-[30px] flex-none items-center justify-center rounded-[9px] border border-[rgba(167,139,250,.22)] bg-white/[.05] text-[11px] font-extrabold tracking-[.4px] text-[#b7a5d3]">{mark}</span>
+      )}
+      {logo && !showName ? null : <span className={cn("text-[14.5px] leading-[1.15] font-extrabold tracking-[-0.2px] whitespace-nowrap", on ? "text-cc-gold-hover" : "text-cc-text")}>{name}</span>}
+    </>
   );
 }
 

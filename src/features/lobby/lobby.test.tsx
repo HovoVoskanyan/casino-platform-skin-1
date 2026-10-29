@@ -59,6 +59,32 @@ describe("Games (P3-27)", () => {
     expect(within(within(grid).getByRole("link", { name: "Game 2, Pragmatic Play" })).queryByText(/HOT|NEW/)).toBeNull();
   });
 
+  it("a provider's logo is sized by its card, the name under it only while its switch is on; a failed logo falls back to mark and name (owner 2026-10-29)", async () => {
+    server.use(...catalogue(1));
+    server.use(http.get("*/api/v1/providers", () => HttpResponse.json([
+      { code: "pgsoft", name: "PG Soft", thumbnailUrl: "https://assets.example/providers/pg.webp", showName: false, tag: null, gameCount: 3 },
+      { code: "evolution", name: "Evolution", thumbnailUrl: "https://assets.example/providers/evo.webp", showName: true, tag: null, gameCount: 2 },
+      { code: "one", name: "1", thumbnailUrl: null, showName: false, tag: null, gameCount: 1 },
+    ])));
+    renderRoute("/games");
+
+    const card = await screen.findByRole("button", { name: /PG Soft/ });
+    const logo = card.querySelector("img")!;
+    expect(logo).toHaveAttribute("src", "https://assets.example/providers/pg.webp");
+    expect(logo).toHaveClass("w-full", "flex-1", "object-contain"); // sized by the card, never a fixed thumbnail box
+    expect(within(card).queryByText("PG Soft")).toBeNull(); // switch off: the logo alone, the button's label still names it
+
+    const named = screen.getByRole("button", { name: /Evolution/ });
+    expect(named.querySelector("img")).toHaveAttribute("src", "https://assets.example/providers/evo.webp");
+    expect(within(named).getByText("Evolution")).toBeInTheDocument();
+
+    fireEvent.error(logo);
+    expect(card.querySelector("img")).toBeNull();
+    expect(within(card).getByText("PS")).toBeInTheDocument();
+    expect(within(card).getByText("PG Soft")).toBeInTheDocument();
+    expect(within(screen.getByRole("button", { name: /^1\b/ })).getAllByText("1")).toHaveLength(2); // no logo: mark and name whatever the switch, and a name with no letters still gets a mark
+  });
+
   it("a hand-typed numeric search stays a search", async () => {
     const seen: URL[] = [];
     server.use(...catalogue(1, seen));

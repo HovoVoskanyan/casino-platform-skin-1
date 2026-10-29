@@ -33,7 +33,7 @@ const categories = [
   { code: "slots", name: "Slots & <Reels>", thumbnailUrl: null, gameCount: 42 },
   { code: "live", name: "Live Casino", thumbnailUrl: null, gameCount: 7 },
 ];
-const providers = Array.from({ length: 10 }, (_, i) => ({ code: `prov-${i}`, name: `Provider "${i}"`, thumbnailUrl: null, tag: null, gameCount: 30 - i }));
+const providers = Array.from({ length: 10 }, (_, i) => ({ code: `prov-${i}`, name: `Provider "${i}"`, thumbnailUrl: null, showName: true, tag: null, gameCount: 30 - i }));
 const games: Record<string, GameDetail> = {
   [GAME]: {
     id: GAME, name: "Sweet <Bonanza> \"1000\" & Co", providerCode: "prov-0", providerName: "Provider \"0\"", thumbnailUrl: "https://cdn.example/t.png",

@@ -3436,6 +3436,7 @@ export interface components {
             code: string;
             name: string;
             thumbnailUrl: null | string;
+            showName: boolean;
             tag: null | string;
             /** Format: int32 */
             gameCount: number;
@@ -3488,6 +3489,8 @@ export interface components {
             languages: string[];
             defaultCurrency: string;
             currencies: string[];
+            /** Format: int64 */
+            realPlayMinimumCents: null | number;
         };
         LobbyGameResponse: {
             /** Format: uuid */

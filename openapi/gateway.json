@@ -3658,6 +3658,7 @@
           "code",
           "name",
           "thumbnailUrl",
+          "showName",
           "tag",
           "gameCount"
         ],
@@ -3674,6 +3675,9 @@
               "null",
               "string"
             ]
+          },
+          "showName": {
+            "type": "boolean"
           },
           "tag": {
             "type": [

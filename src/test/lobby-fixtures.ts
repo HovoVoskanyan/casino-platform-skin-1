@@ -18,7 +18,7 @@ export const CATEGORIES: Category[] = [
   { code: "slots", name: "Slots", thumbnailUrl: null, gameCount: 30 },
   { code: "live", name: "Live Casino", thumbnailUrl: null, gameCount: 4 },
 ];
-export const PROVIDERS: Provider[] = [{ code: "pragmatic", name: "Pragmatic Play", thumbnailUrl: null, tag: "Hot", gameCount: 30 }];
+export const PROVIDERS: Provider[] = [{ code: "pragmatic", name: "Pragmatic Play", thumbnailUrl: null, showName: true, tag: "Hot", gameCount: 30 }];
 
 export const PROMOTIONS: Promotion[] = [
   { id: "11111111-1111-7111-8111-111111111111", category: "welcome", title: "Welcome Bonus", value: "100% up to ₱5,000", body: "Make your first deposit and enjoy extra rewards.", imageUrl: null, endsAt: null },
