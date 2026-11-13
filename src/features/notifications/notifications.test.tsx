@@ -93,7 +93,7 @@ describe("in-site notifications (P3-30)", () => {
     const { drawer, user, router } = await openDrawer();
     expect(await within(drawer).findByText("Deposit received")).toBeInTheDocument();
     expect(within(drawer).getByText("₱500.00 has been added to your balance. Good luck!")).toBeInTheDocument();
-    expect(within(drawer).getByText("You’ve got 20 free spins! Find them in My bonuses.")).toBeInTheDocument();
+    expect(within(drawer).getByText(/^You’ve got 20 free spins! Find them in My bonuses\. They can take up to 10 minutes to show up in the game/)).toBeInTheDocument();
     expect(within(drawer).getByText("News from ChoCho")).toBeInTheDocument();
 
     // A deposit notice takes the player to the wallet.

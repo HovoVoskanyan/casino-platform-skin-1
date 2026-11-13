@@ -116,6 +116,21 @@ describe("game launch (P3-28)", () => {
     expect(screen.queryByRole("link", { name: "Deposit" })).toBeNull();
   });
 
+  it("a player holding free spins on this game is told they can take up to 10 minutes and to refresh (owner 2026-11-13)", async () => {
+    const spins = (gameId: string) => http.get("*/api/bonus/freebets", () => HttpResponse.json([{ playerFreeBetId: "fb-1", status: "active", totalCount: 10, remainingCount: 10, assigned: true, assignmentOutcome: "assigned", gameIds: [gameId] }]));
+    server.use(signedIn(), ...catalogue(1), detail(), eligibility(false), spins(G.id));
+    const view = renderRoute(`/games/${G.id}`);
+    expect(await screen.findByText("You have free spins on this game.")).toBeInTheDocument();
+    expect(screen.getByText("Free spins can take up to 10 minutes to reach the game after you receive them.")).toBeInTheDocument();
+    expect(screen.getByText(/^Don’t see them yet\? Refresh the game/)).toBeInTheDocument();
+    view.unmount();
+
+    server.use(spins("another-game"));
+    renderRoute(`/games/${G.id}`);
+    await screen.findByRole("button", { name: "Play for Real" });
+    expect(screen.queryByText(/free spins on this game/)).toBeNull();
+  });
+
   it("back from OUR sign-in (?play=real + the marker) the chosen mode opens by itself, exactly once", async () => {
     const bodies = launches(() => HttpResponse.json(answer("Real")));
     server.use(signedIn(), ...catalogue(1), detail(), eligibility(false));

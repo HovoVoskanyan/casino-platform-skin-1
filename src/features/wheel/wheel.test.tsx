@@ -346,7 +346,7 @@ describe("free spins on several games: the player picks one", () => {
     renderRoute("/lucky-wheel");
     const result = await screen.findByTestId("wheel-result");
     expect(within(result).getByRole("heading", { name: "You won 10 free spins!" })).toBeInTheDocument();
-    expect(await within(result).findByText("Your free spins are ready on Gates of Olympus.")).toBeInTheDocument();
+    expect(await within(result).findByText(/^Your free spins are on Gates of Olympus\. They can take up to 10 minutes to show up/)).toBeInTheDocument();
     expect(within(result).getByRole("link", { name: "Play now: Gates of Olympus" })).toHaveAttribute("href", `/games/${GAME_ID(2)}/gates-of-olympus`);
     expect(screen.queryByTestId("wheel-choice")).toBeNull();
   });

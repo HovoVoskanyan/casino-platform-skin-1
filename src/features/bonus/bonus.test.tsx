@@ -172,7 +172,7 @@ describe("My bonuses (P3-29)", () => {
     await waitFor(() => expect(body).toEqual({ freeBetId: SPINS.freeBetId, currency: "PHP" }));
     const card = await within(screen.getByRole("region", { name: "Active bonuses" })).findByRole("article", { name: "Free Spins Drop" });
     expect(within(card).getByText("25 of 25 spins left")).toBeInTheDocument();
-    expect(within(card).getByRole("status")).toHaveTextContent("Your free spins are in the game");
+    expect(within(card).getByRole("status")).toHaveTextContent("Your free spins will be in the game within 10 minutes");
     expect(await within(card).findByRole("link", { name: "Play Sweet Bonanza" })).toHaveAttribute("href", "/games/g-sweet/sweet-bonanza");
   });
 

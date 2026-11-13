@@ -16,7 +16,7 @@ describe("Info pages (design copy, 24 Sep 2026 content pack)", () => {
   it("the FAQ opens an answer with its link into the site, and search narrows questions and topics", async () => {
     const user = userEvent.setup();
     renderRoute("/info/faq");
-    expect(await screen.findByText("9 questions")).toBeInTheDocument();
+    expect(await screen.findByText("10 questions")).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Where can I find my available and active bonuses?" }));
     expect(screen.getByRole("link", { name: /Open My Account → Bonuses/ })).toHaveAttribute("href", "/account?tab=bonuses");
 
@@ -29,6 +29,6 @@ describe("Info pages (design copy, 24 Sep 2026 content pack)", () => {
     expect(screen.getByText("No matching questions")).toBeInTheDocument();
     // two ways out, as the design draws them: the ✕ in the field and the button in the no-results box
     await user.click(screen.getAllByRole("button", { name: "Clear search" }).at(-1)!);
-    expect(screen.getByText("9 questions")).toBeInTheDocument();
+    expect(screen.getByText("10 questions")).toBeInTheDocument();
   });
 });

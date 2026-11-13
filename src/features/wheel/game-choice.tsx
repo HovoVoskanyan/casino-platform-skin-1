@@ -6,6 +6,7 @@ import { toApiError } from "@/api/problem";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Notice } from "@/components/ui/notice";
+import { SpinsHowTo } from "@/features/bonus/spins-how-to";
 import { gameQueryOptions, useGame, type GameDetail } from "@/features/lobby/api";
 import { GameArt } from "@/features/lobby/game-art";
 import { supportPanel } from "@/features/support/support-store";
@@ -264,6 +265,7 @@ function Credited({ spin }: { spin: WheelSpin }) {
     >
       {gameId && name ? <PlayNow gameId={gameId} name={name} /> : null}
       <Link to="/account" search={{ tab: "bonuses" }} className={QUIET_LINK}>{t("wheel.viewBonuses")}</Link>
+      <SpinsHowTo className="w-full" />
     </Outcome>
   );
 }

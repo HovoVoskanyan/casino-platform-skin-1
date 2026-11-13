@@ -1,9 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useQuery } from "@tanstack/react-query";
 import { Button, Spinner } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Notice } from "@/components/ui/notice";
 import { authDialog } from "@/features/auth/auth-dialog-state";
+import { bonusQueries, spinsHeld } from "@/features/bonus/api";
+import { SpinsHowTo } from "@/features/bonus/spins-how-to";
 import { gamePath } from "@/lib/slug";
 import { useSession } from "@/features/auth/session";
 import type { GameDetail } from "@/features/lobby/api";
@@ -50,6 +53,10 @@ export function PlayPanel({ game, autoPlay, onAutoPlayed }: { game: GameDetail; 
   const { signedIn } = useSession();
   const launch = useLaunch(game.id);
   const eligibility = useLaunchEligibility(game.id);
+  // Owner 2026-11-13: spins reach the game up to 10 minutes after they are given — a player holding some here is told
+  // so, and to refresh the game, before they open it and find none.
+  const freeBets = useQuery({ ...bonusQueries.freeBets(), enabled: signedIn });
+  const spinsHere = signedIn && (freeBets.data ?? []).some((f) => spinsHeld(f) && f.assigned && f.gameIds.includes(game.id));
   const [status, setStatus] = useState<Status>({ kind: "idle" });
   const [playing, setPlaying] = useState<Launch | null>(null);
   const [signInFor, setSignInFor] = useState<Mode | null>(null);
@@ -119,6 +126,7 @@ export function PlayPanel({ game, autoPlay, onAutoPlayed }: { game: GameDetail; 
         </div>
       </div>
 
+      {spinsHere ? <SpinsHowTo lead={t("game.spinsDelay")} /> : null}
       {!game.hasDemo ? <Notice tone="info">{t("game.noDemo")}</Notice> : null}
       {!signedIn ? <Notice tone="info">{t("game.signInRequired")}</Notice> : null}
       {status.kind === "cancelled" ? <Notice tone="info">{t(status.mode === "Demo" ? "game.signInCancelledDemo" : "game.signInCancelled", { name: game.name })}</Notice> : null}

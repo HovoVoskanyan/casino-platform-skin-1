@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { toApiError } from "@/api/problem";
 import { Button, Spinner } from "@/components/ui/button";
 import { Notice } from "@/components/ui/notice";
+import { SpinsHowTo } from "@/features/bonus/spins-how-to";
 import { SectionTitle } from "@/components/ui/section-title";
 import { cn } from "@/lib/utils";
 import { authDialog } from "@/features/auth/auth-dialog-state";
@@ -356,7 +357,9 @@ function Result({ copy, spin, brief = false, more = false }: { copy: ResultCopy;
           <PlayNow gameId={gameId} name={name} />
           <Link to="/account" search={{ tab: "bonuses" }} className={QUIET_LINK}>{t("wheel.viewBonuses")}</Link>
         </div>
-      ) : copy.link === "bonuses" ? (
+      ) : null}
+      {brief ? null : name && gameId ? <SpinsHowTo className="mt-1 w-full" /> : null}
+      {brief || (name && gameId) ? null : copy.link === "bonuses" ? (
         <Link to="/account" search={{ tab: "bonuses" }} className={cn(QUIET_LINK, "mt-1")}>{t("wheel.viewBonuses")}</Link>
       ) : copy.link === "support" ? (
         <button type="button" className={cn(QUIET_LINK, "mt-1")} onClick={(e) => supportPanel.open(e.currentTarget)}>{t("wheel.contactSupport")}</button>
@@ -385,7 +388,7 @@ function PrizeList({ data }: { data: Wheel }) {
 function Rules({ timeZone }: { timeZone: string | null | undefined }) {
   const { t } = useTranslation();
   const city = zoneCity(timeZone);
-  const rules = [t("wheel.rules.daily"), city ? t("wheel.rules.reset", { zone: city }) : t("wheel.rules.resetNoZone"), t("wheel.rules.prizes"), t("wheel.rules.fair")];
+  const rules = [t("wheel.rules.daily"), city ? t("wheel.rules.reset", { zone: city }) : t("wheel.rules.resetNoZone"), t("wheel.rules.prizes"), t("wheel.rules.spinsDelay"), t("wheel.rules.fair")];
   return (
     <section aria-labelledby="wheel-rules" className="flex flex-col gap-4">
       <span id="wheel-rules"><SectionTitle>{t("wheel.rules.title")}</SectionTitle></span>

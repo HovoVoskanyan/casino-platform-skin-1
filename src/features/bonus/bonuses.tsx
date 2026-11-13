@@ -10,6 +10,7 @@ import { gameSlug } from "@/lib/slug";
 import { useGame } from "@/features/lobby/api";
 import { useBalance, useBalanceHidden } from "@/features/wallet/balance-store";
 import { SupportButton } from "@/features/support/support-button";
+import { SpinsHowTo } from "./spins-how-to";
 import {
   bonusQueries, isAwaiting, sections, useBonusData, useClaimBonus, useClaimSpins, type ClaimableFreeBet, type PlayerFreeBet,
 } from "./api";
@@ -350,9 +351,9 @@ function SpinsOfferCard({ id, offer, state, onTerms, onAccept, onClaim }: {
   );
 }
 
-function ActiveCard({ id, name, reward, status, remaining, progress, expiry, details, open, onDetails, message, extra }: {
+function ActiveCard({ id, name, reward, status, remaining, progress, expiry, details, open, onDetails, message, extra, note }: {
   id: string; name: string; reward: string; status: "active" | "awaiting"; remaining: string | null; progress?: Progress | null;
-  expiry: string | null; details: string[]; open: boolean; onDetails: () => void; message: Message | undefined; extra?: ReactNode;
+  expiry: string | null; details: string[]; open: boolean; onDetails: () => void; message: Message | undefined; extra?: ReactNode; note?: ReactNode;
 }) {
   const { t } = useTranslation();
   const pct = progress && progress.target ? Math.max(0, Math.min(100, Math.round((progress.done / progress.target) * 100))) : 0;
@@ -372,6 +373,7 @@ function ActiveCard({ id, name, reward, status, remaining, progress, expiry, det
       ) : null}
       {expiry ? <span className="text-[12.5px] font-semibold text-[#a795c5]">{expiry}</span> : null}
       {open ? <List id={detailsId} heading={t("bonus.detailsHeading")} items={details} /> : null}
+      {note}
       <Status message={message} />
       <div className="flex flex-wrap gap-2 pt-[2px]">
         <button type="button" aria-expanded={open} aria-controls={detailsId} onClick={onDetails} className={OUTLINE}>{t(open ? "bonus.hideDetails" : "bonus.viewDetails")}</button>
@@ -389,7 +391,7 @@ function HeldSpinsCard({ id, holding, open, onDetails, message }: { id: string; 
   const c = heldSpinsCopy(t, holding, gameName);
   return (
     <ActiveCard id={id} name={holding.name} reward={c.reward} status="active" remaining={c.remaining} expiry={c.expiry} details={c.details}
-      open={open} onDetails={onDetails} message={message}
+      open={open} onDetails={onDetails} message={message} note={holding.assigned ? <SpinsHowTo /> : null}
       extra={single && gameName ? (
         <Link to="/games/$id/{-$slug}" params={{ id: holding.gameIds[0]!, slug: gameSlug(gameName) }} className={cn(GOLD, "flex items-center px-[18px]")}>{t("bonus.spins.play", { game: gameName })}</Link>
       ) : null} />
