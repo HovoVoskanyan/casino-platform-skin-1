@@ -96,40 +96,38 @@ describe("My Account (P3-24)", () => {
     await waitFor(() => expect(unlinked).toHaveBeenCalled());
   });
 
-  it("a number the sign-up never confirmed can be verified later (Later was not forever)", async () => {
+  it("an unconfirmed number is just shown: no badge, no Verify, no code entry", async () => {
     const user = userEvent.setup();
-    let phoneVerified = false;
-    const resent = vi.fn();
-    const verified = vi.fn();
     server.use(signedIn(),
-      http.get("*/api/id/auth/account", () => HttpResponse.json({ ...ACCOUNT, email: null, phone: "+639171234567", phoneVerified })),
-      http.post("*/api/id/auth/resend-phone-verification", async ({ request }) => { resent(await request.json()); return new HttpResponse(null, { status: 202 }); }),
-      http.post("*/api/id/auth/verify-phone", async ({ request }) => { verified(await request.json()); phoneVerified = true; return new HttpResponse(null, { status: 204 }); }));
+      http.get("*/api/id/auth/account", () => HttpResponse.json({ ...ACCOUNT, email: null, phone: "+639171234567", phoneVerified: false })));
     renderRoute("/account");
     await user.click(await screen.findByRole("tab", { name: "Security" }));
     const contacts = (await screen.findByRole("heading", { name: "Contact details" })).closest("section")!;
 
-    expect(within(contacts).getByText("Not verified")).toBeInTheDocument();
-    await user.click(within(contacts).getByRole("button", { name: "Verify" }));
-    await waitFor(() => expect(resent).toHaveBeenCalledWith({ phone: "+639171234567" }));
-    await user.type(await within(contacts).findByLabelText("Verification code"), "246810");
-    await user.click(within(contacts).getByRole("button", { name: "Confirm number" }));
-    await waitFor(() => expect(verified).toHaveBeenCalledWith({ phone: "+639171234567", code: "246810" }));
-    expect(await within(contacts).findByText("Verified")).toBeInTheDocument();
+    expect(within(contacts).getByText("+639171234567")).toBeInTheDocument();
+    expect(within(contacts).queryByText("Not verified")).toBeNull();
+    expect(within(contacts).queryByText("Verified")).toBeNull();
+    expect(within(contacts).queryByRole("button", { name: "Verify" })).toBeNull();
+    expect(within(contacts).queryByLabelText("Verification code")).toBeNull();
+    // Changing a number needs a texted code too, so the number offers no Change; the missing email can be added.
+    expect(within(contacts).queryByRole("button", { name: "Change" })).toBeNull();
+    expect(within(contacts).getByRole("button", { name: "Add" })).toBeInTheDocument();
   });
 
   it("a detail another account holds reads as My Account's own error, not the sign-up's", async () => {
     const user = userEvent.setup();
     server.use(signedIn(), account(),
-      http.post("*/api/id/auth/account/phone", () => problem(409, "CONTACT_IN_USE")));
+      http.post("*/api/id/auth/account/email", () => problem(409, "CONTACT_IN_USE")));
     renderRoute("/account");
     await user.click(await screen.findByRole("tab", { name: "Security" }));
     const contacts = (await screen.findByRole("heading", { name: "Contact details" })).closest("section")!;
 
-    await user.click(within(contacts).getByRole("button", { name: "Add" }));
-    await user.type(within(contacts).getByLabelText("New mobile number"), "9171234567");
+    // The account has no number, and one cannot be added without SMS: the only contact row is the email.
+    expect(within(contacts).queryByRole("button", { name: "Add" })).toBeNull();
+    await user.click(within(contacts).getByRole("button", { name: "Change" }));
+    await user.type(within(contacts).getByLabelText("New email address"), "taken@example.test");
     await user.type(within(contacts).getByLabelText("Current password"), "Passw0rd!2345");
-    await user.click(within(contacts).getByRole("button", { name: "Send code" }));
+    await user.click(within(contacts).getByRole("button", { name: "Send confirmation link" }));
     expect(await within(contacts).findByText("Another account already uses this. Use a different one.")).toBeInTheDocument();
     expect(within(contacts).queryByText(/Sign in/)).toBeNull();
   });

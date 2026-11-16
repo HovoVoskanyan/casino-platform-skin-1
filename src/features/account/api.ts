@@ -4,7 +4,7 @@ import type { components } from "@/api/schema";
 import type { ApiError } from "@/api/problem";
 import { queryKeys } from "@/lib/queryKeys";
 import type { TFunction } from "i18next";
-import { useSession, verifyUrl, useResendPhoneVerification, useResendVerification, useVerifyPhone } from "@/features/auth/session";
+import { useSession, verifyUrl } from "@/features/auth/session";
 
 /**
  * P3-24 — My Account over identity (the account: contacts, pending changes, sign-in methods, the age consent) and core
@@ -98,21 +98,6 @@ export function useUnlinkTelegram() {
 
 export function useConfirmAge() {
   return useAccountMutation<void>(() => api.POST("/api/id/auth/account/confirm-age", { parseAs: "text" }));
-}
-
-/**
- * P3-24 review S1: confirming the CURRENT contact later — a sign-up whose code step was skipped ("Later"), or an email
- * never confirmed. The sign-up endpoints, then the account re-read.
- */
-export function useVerifyCurrentContact() {
-  const qc = useQueryClient();
-  const refresh = () => void qc.invalidateQueries({ queryKey: queryKeys.session.account() });
-  return {
-    resendEmail: useResendVerification(),
-    resendPhone: useResendPhoneVerification(),
-    verifyPhone: useVerifyPhone(),
-    refresh,
-  };
 }
 
 /** Two-factor changed on this tab: the account view (which shows it) is re-read. */

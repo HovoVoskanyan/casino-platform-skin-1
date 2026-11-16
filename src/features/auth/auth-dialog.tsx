@@ -14,7 +14,7 @@ import { authDialog, useAuthDialog, type AuthMode } from "./auth-dialog-state";
 import { readAttribution } from "./attribution";
 import { TelegramButton } from "./telegram-button";
 import { toLogin, type Contact } from "./phone";
-import { useForgotPassword, useGoogleSignIn, useResendPhoneVerification, useResetPassword, useSignIn, useSignUp, useVerifyPhone } from "./session";
+import { useForgotPassword, useGoogleSignIn, useResetPassword, useSignIn, useSignUp } from "./session";
 
 /** Design (Registration): 8+ characters with a letter and a number. */
 const password = (required: string) =>
@@ -29,21 +29,20 @@ const registerSchema = (c: Contact) => z.object({ login: login(c), password: pas
 const resetSchema = (c: Contact) => z.object({ login: login(c) });
 const resetConfirmSchema = (c: Contact) => z.object({ login: login(c), otp: z.string().trim().regex(/^\d{6}$/, "auth.validation.otp"), newPassword: password("auth.validation.passwordCreate") });
 const totpSchema = z.object({ totpCode: z.string().trim().regex(/^\d{6}$/, "auth.validation.totp") });
-const codeSchema = z.object({ code: z.string().trim().regex(/^\d{6}$/, "auth.validation.otp") });
 
 type SignInValues = z.infer<ReturnType<typeof signInSchema>>;
 type RegisterValues = z.infer<ReturnType<typeof registerSchema>>;
 type ResetValues = z.infer<ReturnType<typeof resetSchema>>;
 type ResetConfirmValues = z.infer<ReturnType<typeof resetConfirmSchema>>;
 
-type View = AuthMode | "reset-confirm" | "totp" | "verify-phone";
+type View = AuthMode | "reset-confirm" | "totp";
 
 /**
  * The ONE auth dialog (design: Registration). Opens over whichever page asked, in the mode the hash names, and
  * returns the player to the destination the opener remembered. Views: signin → (totp) · register · reset →
- * reset-confirm, and after a sign-up by phone, verify-phone (the SMS code — skippable: confirming is not a gate). Phone
- * is the design's default tab (P3-24): +63 and the ten digits, sent to identity in E.164. Cookies are set by the
- * gateway; the page never sees a token.
+ * reset-confirm. A sign-up by phone finishes signed in — the number is never confirmed by an SMS code (owner
+ * 2026-11-16: no SMS provider). Phone is the design's default tab (P3-24): +63 and the ten digits, sent to identity
+ * in E.164. Cookies are set by the gateway; the page never sees a token.
  */
 export function AuthDialog() {
   const { mode } = useAuthDialog();
@@ -58,21 +57,19 @@ function AuthDialogContent({ initialMode }: { initialMode: AuthMode }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [view, setView] = useState<View>(initialMode);
-  // Registration starts on Email, sign-in and reset on Phone (owner 2026-10-20); each mode remounts this, so it applies on every switch.
-  const [contact, setContact] = useState<Contact>(initialMode === "register" ? "email" : "phone");
+  // Sign-in starts on Phone, registration on Email (owner 2026-10-20). A password reset is by email only — the phone
+  // route texts its code and there is no SMS provider (owner 2026-11-16). Each mode remounts this, so it applies on every switch.
+  const [contact, setContact] = useState<Contact>(initialMode === "signin" ? "phone" : "email");
   const [formError, setFormError] = useState<string | null>(null);
   const [shown, setShown] = useState(false);
   const [pending, setPending] = useState<{ email: string; password: string } | null>(null);
   const [resetLogin, setResetLogin] = useState("");
-  const [verifyingPhone, setVerifyingPhone] = useState("");
 
   const signIn = useSignIn();
   const signUp = useSignUp();
   const forgot = useForgotPassword();
   const reset = useResetPassword();
   const google = useGoogleSignIn();
-  const verifyPhone = useVerifyPhone();
-  const resendPhone = useResendPhoneVerification();
   const byContact = (value: string) => (contact === "phone" ? { phone: toLogin("phone", value) } : { email: value.trim() });
 
   const errorText = (code: string) => t(`auth.error.${code}`, { defaultValue: t("auth.error.UNKNOWN") });
@@ -99,9 +96,8 @@ function AuthDialogContent({ initialMode }: { initialMode: AuthMode }) {
       case "reset": return [t("auth.resetTitle"), t("auth.resetSubhead")];
       case "reset-confirm": return [t("auth.resetCodeTitle"), t("auth.resetCodeSubhead")];
       case "totp": return [t("auth.totpTitle"), t("auth.totpSubhead")];
-      case "verify-phone": return [t("auth.verifyPhoneTitle"), t("auth.verifyPhoneSubhead", { phone: verifyingPhone })];
     }
-  }, [view, t, verifyingPhone]);
+  }, [view, t]);
 
   const closeLabel = view === "register" ? t("auth.closeRegister") : view === "reset" || view === "reset-confirm" ? t("auth.closeReset") : t("auth.closeSignIn");
 
@@ -130,7 +126,7 @@ function AuthDialogContent({ initialMode }: { initialMode: AuthMode }) {
             <p className="m-0 text-[13.5px] font-medium leading-[1.5] text-cc-lavender text-pretty">{heading[1]}</p>
           </div>
 
-          {(view === "signin" || view === "register" || view === "reset") ? (
+          {(view === "signin" || view === "register") ? (
             <div role="tablist" aria-label="Contact method" className="grid grid-cols-2 gap-[6px] rounded-cc-lg border border-cc-line bg-white/[.03] p-[5px]">
               {(["phone", "email"] as const).map((tab) => (
                 <button
@@ -202,13 +198,8 @@ function AuthDialogContent({ initialMode }: { initialMode: AuthMode }) {
                 const attribution = readAttribution();
                 try {
                   await signUp.mutateAsync({ ...byContact(values.login), password: values.password, ageConfirmed: values.consent, affiliate: attribution.affiliate, source: attribution.source });
-                  if (contact === "phone") {
-                    // Signed in already; the code confirms the number (not a gate — "Later" finishes).
-                    setVerifyingPhone(toLogin("phone", values.login));
-                    switchView("verify-phone");
-                  } else {
-                    await finish(t("auth.registered"));
-                  }
+                  // The email welcome points at the inbox; a phone sign-up has nothing to confirm.
+                  await finish(t(contact === "phone" ? "auth.registeredPhone" : "auth.registered"));
                 } catch (e) {
                   setFormError(errorText((e as { errorCode?: string }).errorCode ?? "UNKNOWN"));
                 }
@@ -257,28 +248,6 @@ function AuthDialogContent({ initialMode }: { initialMode: AuthMode }) {
             />
           ) : null}
 
-          {view === "verify-phone" ? (
-            <VerifyPhoneForm
-              pending={verifyPhone.isPending}
-              resending={resendPhone.isPending}
-              fieldError={fieldError}
-              onResend={() => resendPhone.mutate({ phone: verifyingPhone }, {
-                onSuccess: () => toast.success(t("auth.verifyPhoneResent")),
-                onError: (e) => setFormError(errorText(e.errorCode)),
-              })}
-              onLater={() => void finish(t("auth.registered"))}
-              onSubmit={async ({ code }) => {
-                setFormError(null);
-                try {
-                  await verifyPhone.mutateAsync({ phone: verifyingPhone, code });
-                  await finish(t("auth.phoneVerified"));
-                } catch (e) {
-                  setFormError(errorText((e as { errorCode?: string }).errorCode ?? "UNKNOWN"));
-                }
-              }}
-            />
-          ) : null}
-
           {view === "signin" || view === "register" ? (
             <div className="flex flex-col gap-[18px]">
               <div className="flex items-center gap-3">
@@ -299,12 +268,12 @@ function AuthDialogContent({ initialMode }: { initialMode: AuthMode }) {
             </div>
           ) : null}
 
-          {view === "verify-phone" ? null : <p className="m-0 text-center text-[13px] font-medium text-cc-lavender">
+          <p className="m-0 text-center text-[13px] font-medium text-cc-lavender">
             {view === "signin" || view === "totp" ? t("auth.newHere") : view === "register" ? t("auth.haveAccount") : t("auth.remembered")}{" "}
             <button type="button" onClick={() => switchView(view === "signin" || view === "totp" ? "register" : "signin")} className="border-0 bg-transparent p-0 font-bold text-cc-gold hover:text-cc-gold-hover">
               {view === "signin" || view === "totp" ? t("auth.createAccount") : view === "register" ? t("nav.signIn") : t("auth.backToSignIn")}
             </button>
-          </p>}
+          </p>
         </DialogPrimitive.Content>
       </DialogPrimitive.Overlay>
     </DialogPrimitive.Portal>
@@ -432,26 +401,6 @@ function ResetConfirmForm({ contact, login: initial, onSubmit, pending, shown, o
       </Field>
       <PasswordField id="rc-password" label={t("auth.newPasswordLabel")} placeholder={t("auth.createPasswordPlaceholder")} autoComplete="new-password" shown={shown} onToggle={onToggle} error={fieldError(form.formState.errors.newPassword?.message)} hint={t("auth.passwordHint")} register={form.register("newPassword")} />
       <Button type="submit" variant="primary" size="lg" loading={pending}>{t("auth.submitResetConfirm")}</Button>
-    </form>
-  );
-}
-
-/** P3-24: the SMS code sign-up by phone sent. Confirming is not a gate — "Later" closes the dialog, signed in. */
-function VerifyPhoneForm({ onSubmit, onResend, onLater, pending, resending, fieldError }: {
-  onSubmit: (v: z.infer<typeof codeSchema>) => Promise<void>; onResend: () => void; onLater: () => void; pending: boolean; resending: boolean; fieldError: FieldError;
-}) {
-  const { t } = useTranslation();
-  const form = useForm<z.infer<typeof codeSchema>>({ resolver: zodResolver(codeSchema), defaultValues: { code: "" } });
-  return (
-    <form onSubmit={form.handleSubmit(onSubmit)} noValidate className="flex flex-col gap-[18px]">
-      <Field label={t("auth.verifyPhoneCodeLabel")} htmlFor="vp-code" error={fieldError(form.formState.errors.code?.message)}>
-        <Input id="vp-code" inputMode="numeric" autoComplete="one-time-code" placeholder="000000" maxLength={6} autoFocus aria-invalid={!!form.formState.errors.code} className="tracking-[6px]" {...form.register("code")} />
-      </Field>
-      <Button type="submit" variant="primary" size="lg" loading={pending}>{t("auth.verifyPhoneSubmit")}</Button>
-      <div className="flex items-center justify-between">
-        <button type="button" onClick={onResend} disabled={resending} className="min-h-[44px] border-0 bg-transparent px-[2px] text-[13px] font-bold text-cc-gold hover:text-cc-gold-hover disabled:opacity-60">{t("auth.verifyPhoneResend")}</button>
-        <button type="button" onClick={onLater} className="min-h-[44px] border-0 bg-transparent px-[2px] text-[13px] font-bold text-cc-lavender hover:text-cc-ink">{t("auth.verifyPhoneLater")}</button>
-      </div>
     </form>
   );
 }

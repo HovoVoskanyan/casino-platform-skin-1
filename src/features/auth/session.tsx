@@ -137,23 +137,6 @@ export function useResetPassword() {
   });
 }
 
-/** P3-24: the SMS code that confirms the number sign-up sent to. */
-export function useVerifyPhone() {
-  return useMutation<void, ApiError, { phone: string; code: string }>({
-    mutationFn: async (body) => {
-      await api.POST("/api/id/auth/verify-phone", { body, parseAs: "text" });
-    },
-  });
-}
-
-export function useResendPhoneVerification() {
-  return useMutation<void, ApiError, { phone: string }>({
-    mutationFn: async (body) => {
-      await api.POST("/api/id/auth/resend-phone-verification", { body, parseAs: "text" });
-    },
-  });
-}
-
 export function useVerifyEmail() {
   return useMutation<void, ApiError, { email: string; token: string }>({
     mutationFn: async (body) => {

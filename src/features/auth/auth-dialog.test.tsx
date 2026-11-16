@@ -107,7 +107,8 @@ describe("the shared auth dialog", () => {
     authDialog.open("reset");
     await screen.findByRole("dialog");
 
-    await user.click(screen.getByRole("tab", { name: "Email" }));
+    // Email only: the phone route texts its code and there is no SMS provider, so the reset offers no Phone tab.
+    expect(screen.queryByRole("tab")).toBeNull();
     await user.type(screen.getByLabelText("Email address"), "p@example.test");
     await user.click(screen.getByRole("button", { name: "Send reset code" }));
 
@@ -129,13 +130,14 @@ describe("the shared auth dialog", () => {
     expect(await screen.findByRole("tab", { name: "Phone" })).toHaveAttribute("aria-selected", "true");
   });
 
-  it("registers by phone, then confirms the number with the SMS code", async () => {
+  it("registers by phone and finishes signed in — no SMS code step", async () => {
     const user = userEvent.setup();
     let signup: Record<string, unknown> | null = null;
-    const verified = vi.fn();
+    const verify = vi.fn();
     server.use(
       http.post("*/api/id/auth/signup", async ({ request }) => { signup = (await request.json()) as Record<string, unknown>; return cookieSession(); }),
-      http.post("*/api/id/auth/verify-phone", async ({ request }) => { verified(await request.json()); return new HttpResponse(null, { status: 204 }); }),
+      http.post("*/api/id/auth/verify-phone", () => { verify(); return new HttpResponse(null, { status: 204 }); }),
+      http.post("*/api/id/auth/resend-phone-verification", () => { verify(); return new HttpResponse(null, { status: 202 }); }),
     );
     renderWithProviders(<AuthDialog />);
     authDialog.open("register");
@@ -155,29 +157,14 @@ describe("the shared auth dialog", () => {
     await waitFor(() => expect(signup).not.toBeNull());
     expect(signup).toMatchObject({ phone: "+639171234567", email: null, verifyUrl: null, ageConfirmed: true });
 
-    expect(await screen.findByText("We texted a 6-digit code to +639171234567.")).toBeInTheDocument();
-    await user.type(screen.getByLabelText("Verification code"), "246810");
-    await user.click(screen.getByRole("button", { name: "Confirm number" }));
-    await waitFor(() => expect(verified).toHaveBeenCalledWith({ phone: "+639171234567", code: "246810" }));
+    // Straight out of the dialog: no "Confirm your number", no code field, nothing sent to the verify endpoints.
     await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+    expect(screen.queryByText("Confirm your number")).toBeNull();
+    expect(screen.queryByLabelText("Verification code")).toBeNull();
+    expect(verify).not.toHaveBeenCalled();
   });
 
-  it("confirming the number is not a gate: Later closes the dialog, signed in", async () => {
-    const user = userEvent.setup();
-    server.use(http.post("*/api/id/auth/signup", () => cookieSession()));
-    renderWithProviders(<AuthDialog />);
-    authDialog.open("register");
-    await screen.findByRole("dialog");
-    await user.click(screen.getByRole("tab", { name: "Phone" }));
-    await user.type(screen.getByLabelText("Mobile number"), "9171234567");
-    await user.type(screen.getByLabelText("Password"), "Passw0rd!2345");
-    await user.click(screen.getByRole("checkbox"));
-    await user.click(screen.getByRole("button", { name: "Create account" }));
-    await user.click(await screen.findByRole("button", { name: "Later" }));
-    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
-  });
-
-  it("signs in and resets by phone, sending the number in E.164", async () => {
+  it("signs in by phone in E.164; a forgotten password is reset by email", async () => {
     const user = userEvent.setup();
     const signins: unknown[] = [];
     const forgot = vi.fn();
@@ -195,9 +182,11 @@ describe("the shared auth dialog", () => {
     await waitFor(() => expect(signins).toHaveLength(1));
     expect(signins[0]).toMatchObject({ emailOrUsername: "+639171234567" });
 
+    // Forgot from the Phone tab still lands on the email reset.
     await user.click(screen.getByRole("button", { name: /Forgot/ }));
-    await user.type(await screen.findByLabelText("Mobile number"), "9171234567");
+    await user.type(await screen.findByLabelText("Email address"), "p@example.test");
+    expect(screen.queryByLabelText("Mobile number")).toBeNull();
     await user.click(screen.getByRole("button", { name: "Send reset code" }));
-    await waitFor(() => expect(forgot).toHaveBeenCalledWith({ email: null, phone: "+639171234567" }));
+    await waitFor(() => expect(forgot).toHaveBeenCalledWith({ email: "p@example.test", phone: null }));
   });
 });

@@ -8,8 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/input";
 import { Notice } from "@/components/ui/notice";
 import { toLogin } from "@/features/auth/phone";
+import { useResendVerification } from "@/features/auth/session";
 import { AccountCard } from "./account-card";
-import { useCancelContactChange, useConfirmPhoneChange, useResendContactChange, useStartContactChange, useVerifyCurrentContact, type Account, type Contact } from "./api";
+import { useCancelContactChange, useConfirmPhoneChange, useResendContactChange, useStartContactChange, type Account, type Contact } from "./api";
 
 const emailSchema = z.object({ value: z.string().trim().min(1, "auth.validation.emailRequired").email("auth.validation.email"), password: z.string() });
 const phoneSchema = z.object({ value: z.string().transform((v) => v.replace(/[\s-]/g, "")).pipe(z.string().regex(/^9\d{9}$/, "auth.validation.phone")), password: z.string() });
@@ -18,15 +19,18 @@ const codeSchema = z.object({ code: z.string().trim().regex(/^\d{6}$/, "auth.val
 /**
  * Design (My Account → Security, contact details): the email and the mobile number — "Not added" when absent, a
  * pending change shown as CHANGE PENDING until the NEW contact confirms it (a link to the new email, a code to the
- * new number); the current one stays the sign-in detail until then. "Resend confirmation", "Cancel change". A current
- * detail that was never confirmed (the sign-up's code step skipped) gets "Verify" (P3-24 review S1).
+ * new number); the current one stays the sign-in detail until then. "Resend confirmation", "Cancel change". An email
+ * that was never confirmed gets "Verify" (P3-24 review S1). The mobile number carries no verified state and no
+ * "Verify" — ChoCho has no SMS code step for the current number (owner 2026-11-16).
  */
 export function ContactsCard({ account, errorText }: { account: Account; errorText: (code: string) => string }) {
   const { t } = useTranslation();
   return (
     <AccountCard title={t("account.contacts.title")} intro={t("account.contacts.intro")}>
       <ContactRow contact="email" account={account} errorText={errorText} />
-      <ContactRow contact="phone" account={account} errorText={errorText} />
+      {/* No SMS provider (owner 2026-11-16): a number cannot be added or changed — both need a texted code. The row
+          shows the number the account has; a change already pending can still be cancelled. */}
+      {account.phone || account.pendingPhone ? <ContactRow contact="phone" account={account} errorText={errorText} /> : null}
     </AccountCard>
   );
 }
@@ -34,19 +38,19 @@ export function ContactsCard({ account, errorText }: { account: Account; errorTe
 function ContactRow({ contact, account, errorText }: { contact: Contact; account: Account; errorText: (code: string) => string }) {
   const { t } = useTranslation();
   const current = contact === "email" ? account.email : account.phone;
-  const verified = contact === "email" ? account.emailVerified : account.phoneVerified;
+  // Only the email has a verified state on screen; the number is shown as it is.
+  const verifiable = contact === "email";
+  const verified = account.emailVerified;
   const pending = contact === "email" ? account.pendingEmail : account.pendingPhone;
   const [editing, setEditing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const resend = useResendContactChange();
   const cancel = useCancelContactChange();
-  const verify = useVerifyCurrentContact();
+  const resendEmail = useResendVerification();
   const [verifying, setVerifying] = useState(false);
   const startVerify = () => {
     setError(null);
-    const onError = (e: { errorCode?: string }) => setError(errorText(e.errorCode ?? "UNKNOWN"));
-    if (contact === "email") verify.resendEmail.mutate({ email: current! }, { onSuccess: () => setVerifying(true), onError });
-    else verify.resendPhone.mutate({ phone: current! }, { onSuccess: () => setVerifying(true), onError });
+    resendEmail.mutate({ email: current! }, { onSuccess: () => setVerifying(true), onError: (e) => setError(errorText(e.errorCode ?? "UNKNOWN")) });
   };
   const label = t(contact === "email" ? "account.contacts.email" : "account.contacts.phone");
 
@@ -58,20 +62,19 @@ function ContactRow({ contact, account, errorText }: { contact: Contact; account
           <span className="truncate text-[15px] font-bold text-cc-ink">{current ?? <span className="text-cc-muted">{t("account.contacts.notAdded")}</span>}</span>
         </div>
         <span className="flex items-center gap-2">
-          {current ? <span className={verified ? "text-[12px] font-bold text-cc-ok" : "text-[12px] font-bold text-cc-gold"}>{t(verified ? "account.contacts.verified" : "account.contacts.unverified")}</span> : null}
-          {current && !verified && !pending && !editing && !verifying ? (
-            <Button size="sm" variant="primary" loading={verify.resendEmail.isPending || verify.resendPhone.isPending} onClick={startVerify}>{t("account.contacts.verify")}</Button>
+          {current && verifiable ? <span className={verified ? "text-[12px] font-bold text-cc-ok" : "text-[12px] font-bold text-cc-gold"}>{t(verified ? "account.contacts.verified" : "account.contacts.unverified")}</span> : null}
+          {current && verifiable && !verified && !pending && !editing && !verifying ? (
+            <Button size="sm" variant="primary" loading={resendEmail.isPending} onClick={startVerify}>{t("account.contacts.verify")}</Button>
           ) : null}
-          {!editing && !pending ? <Button size="sm" variant="secondary" onClick={() => { setEditing(true); setError(null); }}>{t(current ? "account.contacts.change" : "account.contacts.add")}</Button> : null}
+          {!editing && !pending && contact === "email" ? <Button size="sm" variant="secondary" onClick={() => { setEditing(true); setError(null); }}>{t(current ? "account.contacts.change" : "account.contacts.add")}</Button> : null}
         </span>
       </div>
 
       {error ? <Notice tone="error">{error}</Notice> : null}
 
-      {verifying && current && !verified ? (
+      {verifying && current && verifiable && !verified ? (
         <div className="flex flex-col gap-3 rounded-cc border border-cc-line-strong bg-white/[.03] p-3">
-          <span className="text-[13.5px] text-cc-text">{t(contact === "email" ? "account.contacts.verifyEmailSent" : "account.contacts.verifyPhoneSent", { value: current })}</span>
-          {contact === "phone" ? <CurrentPhoneCodeForm phone={current} errorText={errorText} onError={setError} onDone={() => setVerifying(false)} /> : null}
+          <span className="text-[13.5px] text-cc-text">{t("account.contacts.verifyEmailSent", { value: current })}</span>
         </div>
       ) : null}
 
@@ -161,36 +164,10 @@ function PhoneCodeForm({ errorText, onError }: { errorText: (code: string) => st
   });
   return (
     <form onSubmit={submit} noValidate className="flex flex-wrap items-end gap-2">
-      <Field label={t("auth.verifyPhoneCodeLabel")} htmlFor="cc-code" error={form.formState.errors.code?.message ? t(form.formState.errors.code.message) : undefined} className="min-w-[180px] flex-1">
+      <Field label={t("account.contacts.codeLabel")} htmlFor="cc-code" error={form.formState.errors.code?.message ? t(form.formState.errors.code.message) : undefined} className="min-w-[180px] flex-1">
         <Input id="cc-code" inputMode="numeric" autoComplete="one-time-code" placeholder="000000" maxLength={6} className="tracking-[6px]" {...form.register("code")} />
       </Field>
       <Button type="submit" variant="primary" loading={confirm.isPending}>{t("account.contacts.confirmCode")}</Button>
-    </form>
-  );
-}
-
-/** The code the sign-up endpoint texted to the CURRENT number — verify-phone, as the sign-up's own code step does. */
-function CurrentPhoneCodeForm({ phone, errorText, onError, onDone }: { phone: string; errorText: (code: string) => string; onError: (message: string | null) => void; onDone: () => void }) {
-  const { t } = useTranslation();
-  const { verifyPhone, refresh } = useVerifyCurrentContact();
-  const form = useForm<z.infer<typeof codeSchema>>({ resolver: zodResolver(codeSchema), defaultValues: { code: "" } });
-  const submit = form.handleSubmit(async ({ code }) => {
-    onError(null);
-    try {
-      await verifyPhone.mutateAsync({ phone, code });
-      toast.success(t("account.contacts.phoneVerified"));
-      refresh();
-      onDone();
-    } catch (e) {
-      onError(errorText((e as { errorCode?: string }).errorCode ?? "UNKNOWN"));
-    }
-  });
-  return (
-    <form onSubmit={submit} noValidate className="flex flex-wrap items-end gap-2">
-      <Field label={t("auth.verifyPhoneCodeLabel")} htmlFor="cc-current-code" error={form.formState.errors.code?.message ? t(form.formState.errors.code.message) : undefined} className="min-w-[180px] flex-1">
-        <Input id="cc-current-code" inputMode="numeric" autoComplete="one-time-code" placeholder="000000" maxLength={6} className="tracking-[6px]" {...form.register("code")} />
-      </Field>
-      <Button type="submit" variant="primary" loading={verifyPhone.isPending}>{t("account.contacts.confirmCode")}</Button>
     </form>
   );
 }
