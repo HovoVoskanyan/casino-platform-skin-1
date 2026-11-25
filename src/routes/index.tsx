@@ -33,6 +33,8 @@ function HomePage() {
 
   return (
     <Shell>
+      {/* The page's one heading, for search and screen readers: the hero is the operator's artwork, its words baked in. */}
+      <h1 className="sr-only">{t("home.heading")}</h1>
       <HeroCarousel />
 
       {hot.isPending || hotGames.length > 0 ? (

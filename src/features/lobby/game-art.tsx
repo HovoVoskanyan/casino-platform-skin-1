@@ -23,10 +23,14 @@ function palette(name: string) {
   return PALETTES[h % PALETTES.length]!;
 }
 
-export function GameArt({ name, src, className }: { name: string; src?: string | null; className?: string }) {
+/**
+ * `alt`: only where the picture stands for the game on its own (the game page) — a card's caption already names it.
+ * `priority`: the page's main picture, fetched first instead of lazily (it is what the page paints largest).
+ */
+export function GameArt({ name, src, className, alt = "", priority = false }: { name: string; src?: string | null; className?: string; alt?: string; priority?: boolean }) {
   const [failed, setFailed] = useState<string | null>(null);
   if (src && failed !== src) {
-    return <img src={src} alt="" loading="lazy" decoding="async" onError={() => setFailed(src)} className={cn("h-full w-full object-cover object-[50%_30%]", className)} />;
+    return <img src={src} alt={alt} loading={priority ? "eager" : "lazy"} fetchPriority={priority ? "high" : undefined} decoding="async" onError={() => setFailed(src)} className={cn("h-full w-full object-cover object-[50%_30%]", className)} />;
   }
   const [a, b, c, d] = palette(name);
   return (

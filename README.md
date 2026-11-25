@@ -67,7 +67,8 @@ HTML itself:
   defaults the dev server keeps) becomes the per-page tags; `<!-- seo:body -->` becomes a `<noscript>` with the page's
   heading and copy (a game's "About" paragraphs).
 - **Each request** for a page, Caddy's `templates` fill it in. The template reads the route (`/`, `/games`,
-  `/games?category=` / `?provider=`, `/games/{id}/{slug}`, `/promotions`, `/vip`; the player's own pages are noindex)
+  `/games?category=` / `?provider=`, Load More's `&page=N`, `/games/{id}/{slug}`, `/promotions`, `/vip`, `/lucky-wheel`,
+  `/info/{page}`; any case or trailing slash gets the page's one canonical; the player's own pages are noindex)
   and asks core for the facts with one sub-request to `/_seo/page` → the gateway's anonymous `GET /api/v1/seo/page`
   (`?game=`): the origin (as the sitemap names it), the site's default language, the game with its canonical slugged
   path, the category and provider pills. Every other page is served as built.

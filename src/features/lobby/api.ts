@@ -44,10 +44,11 @@ async function unwrap<T>(call: Promise<{ data?: T }>): Promise<T> {
   return data as T;
 }
 
-export const gamesQueryOptions = (language: string, filters: GameFilters, pageSize = PAGE_SIZE) =>
+/** `startPage`: the page the list opens on — the Games grid's `?page=` (Load More's own address, for crawlers). */
+export const gamesQueryOptions = (language: string, filters: GameFilters, pageSize = PAGE_SIZE, startPage = 1) =>
   infiniteQueryOptions({
-    queryKey: queryKeys.lobby.games(language, { ...filters, pageSize }),
-    initialPageParam: 1,
+    queryKey: queryKeys.lobby.games(language, { ...filters, pageSize, ...(startPage > 1 ? { startPage } : {}) }),
+    initialPageParam: startPage,
     queryFn: ({ pageParam }) =>
       unwrap<GamePage>(api.GET("/api/v1/games", {
         params: { query: { ...filters, q: filters.q || undefined, page: pageParam, pageSize } },
@@ -57,9 +58,9 @@ export const gamesQueryOptions = (language: string, filters: GameFilters, pageSi
     staleTime: STALE,
   });
 
-export function useGames(filters: GameFilters, pageSize = PAGE_SIZE) {
+export function useGames(filters: GameFilters, pageSize = PAGE_SIZE, startPage = 1) {
   const { i18n } = useTranslation();
-  return useInfiniteQuery(gamesQueryOptions(i18n.language, filters, pageSize));
+  return useInfiniteQuery(gamesQueryOptions(i18n.language, filters, pageSize, startPage));
 }
 
 /** One game's detail (GET /api/v1/games/{id}) in the UI language — `useGame`'s read, for lists that resolve several ids at once. */

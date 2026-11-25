@@ -1,10 +1,10 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import { Shell } from "@/components/layout/shell";
 import { Rail, RailViewAll } from "@/components/ui/rail";
-import { Button } from "@/components/ui/button";
+import { buttonVariants, Spinner } from "@/components/ui/button";
 import { Notice } from "@/components/ui/notice";
 import { SectionTitle } from "@/components/ui/section-title";
 import { cn } from "@/lib/utils";
@@ -32,6 +32,9 @@ const searchSchema = z.object({
   badge: z.enum(["hot", "new"]).optional().catch(undefined),
   sort: z.enum(SORTS).optional().catch(undefined),
   fav: z.coerce.boolean().optional().catch(undefined),
+  // Load More's own address (`?page=2`…), for crawlers: a page from 2 on starts the grid there. Digits only, as the
+  // server-side head reads it (seo/head.gotmpl).
+  page: text(z.string().regex(/^[0-9]{1,5}$/)).transform(Number).pipe(z.number().int().min(2)).optional().catch(undefined),
 });
 type GamesSearch = z.infer<typeof searchSchema>;
 
@@ -48,7 +51,8 @@ function GamesPage() {
   const { t } = useTranslation();
   const search = Route.useSearch();
   const navigate = useNavigate({ from: "/games" });
-  const set = (patch: Partial<GamesSearch>) => void navigate({ search: (prev) => clean({ ...prev, ...patch }), replace: true });
+  // Any change of filter starts the list over: the page number belongs to the view it was counted in.
+  const set = (patch: Partial<GamesSearch>) => void navigate({ search: (prev) => clean({ ...prev, page: undefined, ...patch }), replace: true });
   const { signedIn } = useSession();
   const filtered = Boolean(search.q || search.category || search.provider || search.badge || (search.fav && signedIn));
   const toGrid = () => scrollToSection("all-games");
@@ -268,8 +272,11 @@ function GameGrid({ search, set }: { search: GamesSearch; set: (patch: Partial<G
   const { t } = useTranslation();
   const { signedIn } = useSession();
   const filters: GameFilters = { q: search.q, category: search.category, provider: search.provider, badge: search.badge, sort: search.sort };
-  const games = useGames(filters);
+  const startPage = search.page ?? 1;
+  const games = useGames(filters, undefined, startPage);
   const favourites = useFavourites();
+  const { data: categories = [] } = useCategories();
+  const { data: providers = [] } = useProviders();
   const sort: Sort = search.sort ?? "popular";
   const nextSort = SORTS[(SORTS.indexOf(sort) + 1) % SORTS.length]!;
   const showFavourites = Boolean(search.fav && signedIn);
@@ -280,11 +287,22 @@ function GameGrid({ search, set }: { search: GamesSearch; set: (patch: Partial<G
   const items = showFavourites ? favouriteCards : (games.data?.pages.flatMap((p) => p.items) ?? []);
   const total = showFavourites ? favouriteCards.length : (games.data?.pages[0]?.total ?? 0);
   const pending = showFavourites ? favourites.isPending : games.isPending;
+  // The page's H1 names the view, as its search title does: one category, one provider, or all the games.
+  const category = !search.provider ? categories.find((c) => c.code === search.category) : undefined;
+  const provider = !search.category ? providers.find((p) => p.code === search.provider) : undefined;
+  const heading = showFavourites ? t("games.favourites")
+    : search.badge === "hot" ? t("games.hotGames")
+    : search.badge === "new" ? t("games.newGames")
+    : category ? category.name
+    : provider ? t("games.providerGames", { provider: provider.name })
+    : t("games.allGames");
+  // Load More is a real link to the next page's address, so crawlers reach every game; people stay put and the grid grows.
+  const nextPage = (games.data?.pages.at(-1)?.page ?? startPage) + 1;
 
   return (
     <section className="flex flex-col gap-[clamp(16px,2.4vw,22px)]" aria-labelledby="all-games">
       <div className="flex flex-wrap items-center gap-3">
-        <span id="all-games" tabIndex={-1} className="scroll-mt-24 focus:outline-none"><SectionTitle count={pending ? undefined : t("games.count", { count: total })}>{showFavourites ? t("games.favourites") : search.badge === "hot" ? t("games.hotGames") : search.badge === "new" ? t("games.newGames") : t("games.allGames")}</SectionTitle></span>
+        <span id="all-games" tabIndex={-1} className="scroll-mt-24 focus:outline-none"><SectionTitle as="h1" count={pending ? undefined : t("games.count", { count: total })}>{heading}</SectionTitle></span>
         <span className="min-w-2 flex-1" />
         <button
           type="button"
@@ -315,14 +333,24 @@ function GameGrid({ search, set }: { search: GamesSearch; set: (patch: Partial<G
       </div>
 
       {!showFavourites && games.hasNextPage ? (
-        <Button
-          className="h-[50px] self-center rounded-cc-lg border-[rgba(167,139,250,.32)] bg-[linear-gradient(180deg,#23103f_0%,#190a2c_100%)] px-[30px] text-[14.5px] text-white hover:border-[rgba(167,139,250,.6)] hover:bg-white/[.06] hover:shadow-[0_0_26px_rgba(139,92,246,.22)]"
+        <Link
+          to="/games"
+          search={{ ...search, page: nextPage }}
+          className={cn(
+            buttonVariants(),
+            "h-[50px] self-center rounded-cc-lg border-[rgba(167,139,250,.32)] bg-[linear-gradient(180deg,#23103f_0%,#190a2c_100%)] px-[30px] text-[14.5px] text-white hover:border-[rgba(167,139,250,.6)] hover:bg-white/[.06] hover:shadow-[0_0_26px_rgba(139,92,246,.22)]",
+            games.isFetchingNextPage && "pointer-events-none opacity-60",
+          )}
           aria-label={t("games.loadMoreLabel", { shown: items.length, total })}
-          onClick={() => void games.fetchNextPage()}
-          loading={games.isFetchingNextPage}
+          aria-busy={games.isFetchingNextPage || undefined}
+          onClick={(e) => {
+            e.preventDefault(); // the router leaves a prevented click alone: the grid grows in place, the address stays
+            if (!games.isFetchingNextPage) void games.fetchNextPage();
+          }}
         >
+          {games.isFetchingNextPage ? <Spinner /> : null}
           {t("games.loadMore")} <span aria-hidden className="text-[13px] text-[#c4b5fd]">↓</span>
-        </Button>
+        </Link>
       ) : null}
     </section>
   );

@@ -5,7 +5,9 @@ import { useTranslation } from "react-i18next";
 import { Shell } from "@/components/layout/shell";
 import { Notice } from "@/components/ui/notice";
 import { ApiError } from "@/api/problem";
-import { useCategories, useGame } from "@/features/lobby/api";
+import { Rail } from "@/components/ui/rail";
+import { useCategories, useGame, useGames, type GameDetail } from "@/features/lobby/api";
+import { GameCardSkeleton, GameCardTile } from "@/features/lobby/game-card";
 import { GameArt } from "@/features/lobby/game-art";
 import { HeartButton } from "@/features/lobby/heart-button";
 import { PlayPanel } from "@/features/game/play-panel";
@@ -66,7 +68,7 @@ function GamePage() {
       {g ? (
         <section className="flex flex-col gap-5 rounded-cc-2xl border border-cc-line bg-[linear-gradient(180deg,#23103f_0%,#150726_100%)] p-4 md:flex-row md:gap-7 md:p-6">
           <div className="relative aspect-[4/3] w-full flex-none overflow-hidden rounded-cc-xl border border-cc-line md:w-[46%]">
-            <GameArt name={g.name} src={g.logoUrl ?? g.thumbnailUrl} />
+            <GameArt name={g.name} src={g.logoUrl ?? g.thumbnailUrl} alt={t("game.artAlt", { name: g.name, provider: g.providerName })} priority />
             <HeartButton game={g} className="absolute top-3 left-3" />
           </div>
           <div className="flex min-w-0 flex-1 flex-col gap-4">
@@ -98,6 +100,34 @@ function GamePage() {
       ) : game.isPending ? (
         <div aria-hidden className="h-[420px] animate-pulse rounded-cc-2xl border border-cc-line bg-cc-surface-raised" />
       ) : null}
+      {g ? <MoreFromProvider game={g} /> : null}
     </Shell>
+  );
+}
+
+/**
+ * The provider's most played games after this one — where a player goes next, and the links that tie every game page
+ * to its neighbours for search engines (a game page is otherwise reached only from the grid and the sitemap). Ends on
+ * a link to the provider's own Games view.
+ */
+function MoreFromProvider({ game }: { game: GameDetail }) {
+  const { t } = useTranslation();
+  const more = useGames({ provider: game.providerCode, sort: "popular" }, 13);
+  const games = (more.data?.pages[0]?.items ?? []).filter((g) => g.id !== game.id).slice(0, 12);
+  if (!more.isPending && games.length === 0) return null;
+  const title = t("game.moreFrom", { provider: game.providerName });
+  return (
+    <Rail
+      title={title}
+      label={title}
+      arrows="games"
+      action={
+        <Link to="/games" search={{ provider: game.providerCode }} className="-mr-2 flex h-11 items-center rounded-cc-md px-2 text-[14px] font-bold whitespace-nowrap text-[#cbb6e6] hover:bg-white/[.05] hover:text-cc-gold-hover min-[600px]:mr-0 min-[600px]:px-[15px]">
+          {t("game.moreFromAll", { provider: game.providerName })} →
+        </Link>
+      }
+    >
+      {more.isPending ? Array.from({ length: 5 }, (_, i) => <GameCardSkeleton key={i} variant="row" />) : games.map((g) => <GameCardTile key={g.id} game={g} variant="row" />)}
+    </Rail>
   );
 }

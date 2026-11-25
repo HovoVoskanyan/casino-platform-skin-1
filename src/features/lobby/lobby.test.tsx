@@ -15,16 +15,65 @@ describe("Games (P3-27)", () => {
     const seen: URL[] = [];
     const languages: (string | null)[] = [];
     server.use(...catalogue(30, seen, languages));
-    renderRoute("/games");
+    const { router } = renderRoute("/games");
 
     const grid = await screen.findByRole("region", { name: /All Games/ });
     await waitFor(() => expect(within(grid).getAllByRole("link", { name: /Pragmatic Play/ })).toHaveLength(12));
     expect(within(grid).getByText("30 games")).toBeInTheDocument();
 
-    await user.click(within(grid).getByRole("button", { name: "Load More Games (12 of 30)" }));
+    // Load More is a link to the next page's own address (crawlers follow it); a click grows the grid in place.
+    const more = within(grid).getByRole("link", { name: "Load More Games (12 of 30)" });
+    expect(more).toHaveAttribute("href", "/games?page=2");
+    await user.click(more);
     await waitFor(() => expect(within(grid).getAllByRole("link", { name: /Pragmatic Play/ })).toHaveLength(24));
     expect(seen.some((u) => u.searchParams.get("page") === "2" && u.searchParams.get("pageSize") === "12")).toBe(true);
+    expect(router.state.location.search).toEqual({});
+    expect(within(grid).getByRole("link", { name: "Load More Games (24 of 30)" })).toHaveAttribute("href", "/games?page=3");
     expect(languages.every((l) => l === "en-PH")).toBe(true); // the UI language, not the browser's
+  });
+
+  it("the grid's heading is the page's H1 and names the view: all games, one category, one provider", async () => {
+    server.use(...catalogue(3));
+    renderRoute("/games");
+    expect(await screen.findByRole("heading", { level: 1, name: "All Games" })).toBeInTheDocument();
+    expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1); // the banner's line is not one
+  });
+
+  it("names one category or one provider in the H1 once the catalogue knows it", async () => {
+    server.use(...catalogue(3));
+    const { unmount } = renderRoute("/games?category=slots");
+    expect(await screen.findByRole("heading", { level: 1, name: "Slots" })).toBeInTheDocument();
+    unmount();
+    renderRoute("/games?provider=pragmatic");
+    expect(await screen.findByRole("heading", { level: 1, name: "Pragmatic Play Games" })).toBeInTheDocument();
+  });
+
+  it("Load More's own address starts the grid on that page, with its own title and canonical; a filter starts over", async () => {
+    const user = userEvent.setup();
+    const seen: URL[] = [];
+    server.use(...catalogue(30, seen));
+    const { router } = renderRoute("/games?category=slots&page=2");
+
+    const grid = await screen.findByRole("region", { name: /Slots/ });
+    await waitFor(() => expect(within(grid).getAllByRole("link", { name: /Pragmatic Play/ })).toHaveLength(12));
+    expect(within(grid).getByRole("link", { name: "Game 13, Pragmatic Play" })).toBeInTheDocument(); // the second twelve
+    expect(seen.some((u) => u.searchParams.get("page") === "2" && u.searchParams.get("category") === "slots")).toBe(true);
+    expect(seen.some((u) => u.searchParams.get("page") === "1" && u.searchParams.get("category") === "slots")).toBe(false);
+    await waitFor(() => expect(document.title).toBe("Slots – Play Slots Online in the Philippines – Page 2 | ChoCho"));
+    expect(document.head.querySelector('link[rel="canonical"]')?.getAttribute("href")).toMatch(/\/games\?category=slots&page=2$/);
+    expect(within(grid).getByRole("link", { name: /^Load More Games/ })).toHaveAttribute("href", "/games?category=slots&page=3");
+
+    await user.click(await screen.findByRole("button", { name: "New" }));
+    await waitFor(() => expect(router.state.location.search).toEqual({ badge: "new" }));
+  });
+
+  it("a page number that is not one is dropped, never sent", async () => {
+    const seen: URL[] = [];
+    server.use(...catalogue(30, seen));
+    renderRoute("/games?page=1.5");
+    await screen.findByRole("region", { name: /All Games/ });
+    await waitFor(() => expect(seen.length).toBeGreaterThan(0));
+    expect(seen.filter((u) => u.searchParams.get("pageSize") === "12").every((u) => u.searchParams.get("page") === "1")).toBe(true);
   });
 
   it("a filter from the URL reaches core as-is, and a pill changes it", async () => {
@@ -33,7 +82,7 @@ describe("Games (P3-27)", () => {
     server.use(...catalogue(3, seen));
     const { router } = renderRoute("/games?category=slots&sort=name");
 
-    await screen.findByRole("region", { name: /All Games/ });
+    await screen.findByRole("region", { name: /All Games|Slots/ });
     await waitFor(() => expect(seen.some((u) => u.searchParams.get("category") === "slots" && u.searchParams.get("sort") === "name")).toBe(true));
 
     await user.click(await screen.findByRole("button", { name: "New" }));
@@ -182,6 +231,20 @@ describe("game detail (P3-27)", () => {
     expect(screen.getByText("Candy and fruit.")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Play for Real" })).toBeEnabled(); // P3-28: launch is live
   });
+
+  it("names its picture and loads it first, then links on to the provider's most played games and their Games view", async () => {
+    const seen: URL[] = [];
+    server.use(...catalogue(20, seen), http.get("*/api/v1/games/:id", () => HttpResponse.json({ ...game(1), thumbnailUrl: "https://cdn.example/g1.png", logoUrl: null, description: null, rtp: null, volatility: null })));
+    renderRoute(`/games/${game(1).id}`);
+    const art = await screen.findByRole("img", { name: "Game 1 by Pragmatic Play" });
+    expect(art).toHaveAttribute("loading", "eager");
+    const more = await screen.findByRole("region", { name: "More from Pragmatic Play" });
+    await waitFor(() => expect(within(more).getAllByRole("link", { name: /, Pragmatic Play$/ })).toHaveLength(12));
+    expect(within(more).queryByRole("link", { name: "Game 1, Pragmatic Play" })).toBeNull(); // never the game itself
+    expect(within(more).getByRole("link", { name: "Game 2, Pragmatic Play" })).toHaveAttribute("href", `/games/${game(2).id}/game-2`);
+    expect(within(more).getByRole("link", { name: /All Pragmatic Play games/ })).toHaveAttribute("href", "/games?provider=pragmatic");
+    expect(seen.some((u) => u.searchParams.get("provider") === "pragmatic" && u.searchParams.get("sort") === "popular")).toBe(true);
+  });
 });
 
 describe("Bonuses switched on in the back office (owner 2026-10-13) — Promotions & Rewards (owner design 2026-10-18)", () => {
@@ -312,6 +375,7 @@ describe("Home (P3-27)", () => {
     server.use(...catalogue(3));
     renderRoute("/");
     expect(await screen.findByRole("region", { name: "Hot Games" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 1, name: "ChoCho: Online Casino in the Philippines" })).toBeInTheDocument();
     expect(await screen.findByRole("link", { name: "Slots, 30 games" })).toHaveAttribute("href", "/games?category=slots");
     expect(screen.getByRole("link", { name: "All Games" })).toHaveAttribute("href", "/games");
     const bonuses = await screen.findByRole("region", { name: "Bonuses" });

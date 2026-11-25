@@ -10,7 +10,7 @@ import { BRAND, COLLECTIONS, DEFAULT_IMAGE, IN_LANGUAGE, LOGO } from "../lib/seo
  * head between `<!-- seo:head -->` and `<!-- /seo:head -->` (the site-wide defaults the dev server keeps), and the
  * body's `<noscript>` at `<!-- seo:body -->`. Dev (`vite`) never runs this: the page sets its tags in the browser.
  */
-/** An i18n catalogue as its JSON file holds it — flat keys; a few (the info pages) hold objects the template never reads. */
+/** An i18n catalogue as its JSON file holds it — flat keys; a few (the info pages) hold objects, read by a key into them. */
 export type Catalogue = Record<string, unknown>;
 
 /** Languages the template can pick, the first being the fallback for keys a language lacks (i18next's fallbackLng). */
@@ -18,20 +18,40 @@ const LANGUAGES = ["en-PH", "fil"] as const;
 
 /**
  * Every catalogue key the template reads — each quoted `area.key` literal in it (`index $c "seo.home.title"`, the
- * pairs a `ternary` picks from, the private pages' titles, the not-found page's `notFound.*`). Every one must be in the catalogue: the build fails on a
- * typo instead of shipping a page with an empty title.
+ * pairs a `ternary` picks from, the private pages' titles, the not-found page's `notFound.*`, the Info documents'
+ * `info.page.<page>.title`). Every one must be in the catalogue: the build fails on a typo instead of shipping a page
+ * with an empty title.
  */
 export function templateKeys(template: string): string[] {
-  return [...new Set([...template.matchAll(/"([a-z][A-Za-z]*(?:\.[A-Za-z]+)+)"/g)].map((m) => m[1]!))].sort();
+  return [...new Set([...template.matchAll(/"([a-z][A-Za-z]*(?:\.[A-Za-z][A-Za-z-]*)+)"/g)].map((m) => m[1]!))].sort();
+}
+
+/**
+ * A key's text: the flat key itself, or a key into one of the catalogue's objects — `info.page.faq.title` is
+ * `info.page.faq`'s `title` (what `t("info.page.faq", { returnObjects: true }).title` reads in the page).
+ */
+function lookup(catalogue: Catalogue, key: string): unknown {
+  if (key in catalogue) return catalogue[key];
+  const parts = key.split(".");
+  for (let i = parts.length - 1; i > 0; i--) {
+    const head = catalogue[parts.slice(0, i).join(".")];
+    if (head && typeof head === "object") {
+      return parts.slice(i).reduce<unknown>((v, p) => (v && typeof v === "object" ? (v as Record<string, unknown>)[p] : undefined), head);
+    }
+  }
+  return undefined;
 }
 
 /** The copy the template carries: the keys it reads, per language, a missing translation falling back to English. */
 export function templateCopy(template: string, catalogues: Record<(typeof LANGUAGES)[number], Catalogue>) {
   const keys = templateKeys(template);
   const base = catalogues[LANGUAGES[0]];
-  const missing = keys.filter((k) => typeof base[k] !== "string");
+  const missing = keys.filter((k) => typeof lookup(base, k) !== "string");
   if (missing.length) throw new Error(`seo/head.gotmpl reads keys en-PH does not have: ${missing.join(", ")}`);
-  const pick = (catalogue: Catalogue, k: string) => (typeof catalogue[k] === "string" ? (catalogue[k] as string) : (base[k] as string));
+  const pick = (catalogue: Catalogue, k: string) => {
+    const text = lookup(catalogue, k);
+    return typeof text === "string" ? text : (lookup(base, k) as string);
+  };
   return Object.fromEntries(LANGUAGES.map((lng) => [lng, Object.fromEntries(keys.map((k) => [k, pick(catalogues[lng], k)]))]));
 }
 

@@ -68,6 +68,15 @@
 
 	handle {
 		root * /srv
+		# The build's scripts and styles carry a content hash in their names: a new build is a new address, so a phone keeps
+		# them for a year instead of the 4 hours Cloudflare gives a file that says nothing. The pictures in public/ keep
+		# their names across builds and are left alone. Only a file that is there: an old build's name falls through to the
+		# 404 below, which must never be kept a year.
+		@hashed {
+			path /assets/*
+			file
+		}
+		header @hashed Cache-Control "public, max-age=31536000, immutable"
 		try_files {path} /index.html
 		# only the page itself is a template; scripts, styles and pictures go out as built
 		templates {

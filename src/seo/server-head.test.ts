@@ -8,10 +8,17 @@ const catalogues = { "en-PH": en, fil };
 
 it("reads its copy from the catalogue — every key it names, the ternaries' too", () => {
   const keys = templateKeys(template);
-  for (const k of ["seo.home.title", "seo.game.title", "seo.game.demo", "seo.game.real", "game.seoAbout.noDemo", "notFound.game.title", "notFound.promotion.body", "wallet.title", "nav.signIn"]) {
+  for (const k of ["seo.home.title", "seo.game.title", "seo.game.demo", "seo.game.real", "game.seoAbout.noDemo", "notFound.game.title", "notFound.promotion.body", "wallet.title", "nav.signIn", "info.page.responsible-gaming.title", "info.page.faq.intro", "seo.page"]) {
     expect(keys).toContain(k);
   }
-  expect(keys.every((k) => typeof (catalogues["en-PH"] as Record<string, unknown>)[k] === "string")).toBe(true);
+  const copy = templateCopy(template, catalogues)["en-PH"]!;
+  expect(keys.every((k) => typeof copy[k] === "string" && copy[k] !== "")).toBe(true);
+});
+
+it("reads a key into one of the catalogue's objects as the page does — an Info document's title and intro", () => {
+  const copy = templateCopy(template, catalogues);
+  expect(copy["en-PH"]!["info.page.responsible-gaming.title"]).toBe(catalogues["en-PH"]["info.page.responsible-gaming"].title);
+  expect(copy.fil!["info.page.faq.intro"]).toBe(catalogues.fil["info.page.faq"].intro);
 });
 
 it("carries each language's own words, and English where a translation is missing", () => {

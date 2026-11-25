@@ -30,10 +30,11 @@ export function GamesBanner({ onExplore }: { onExplore: () => void }) {
         />
         <div className="relative grid min-h-[196px] grid-cols-[minmax(0,1fr)_clamp(96px,37cqw,168px)] items-center gap-[6px] py-[18px] pr-2 pl-[18px] @min-[640px]:absolute @min-[640px]:inset-0 @min-[640px]:block @min-[640px]:min-h-0 @min-[640px]:p-0">
           <div className="flex min-w-0 flex-col items-start">
-            <h1 id="games-banner-title" className="m-0 text-[clamp(21px,7.3cqw,28px)] leading-[1.06] font-extrabold tracking-[-0.6px] text-balance text-cc-ink @min-[640px]:sr-only">
+            {/* The banner's line, not the page's heading: the H1 is the grid's, which names the view (all games, a category, a provider). */}
+            <p id="games-banner-title" className="m-0 text-[clamp(21px,7.3cqw,28px)] leading-[1.06] font-extrabold tracking-[-0.6px] text-balance text-cc-ink @min-[640px]:sr-only">
               {t("games.titleLead")}{" "}
               <span className="block w-fit bg-[linear-gradient(180deg,#fff04d_0%,#ffc61a_45%,#ff9500_100%)] bg-clip-text pr-[0.06em] pb-[0.04em] text-transparent [filter:drop-shadow(0_0_14px_rgba(255,170,0,.35))]">{t("games.titleAccent")}</span>
-            </h1>
+            </p>
             <p className="mt-2 mb-0 text-[14px] leading-[1.4] font-semibold text-pretty text-[#d2c0ff] @min-[640px]:sr-only">{t("games.subtitle")}</p>
             <button
               type="button"

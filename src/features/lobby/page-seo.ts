@@ -22,7 +22,20 @@ export function homeSeo(t: TFunction): Seo {
 }
 
 export function promotionsSeo(t: TFunction): Seo {
-  return { title: t("promotions.title"), description: t("seo.promotions.description"), path: "/promotions", keywords: t("seo.promotions.keywords").split(", ") };
+  return { title: t("seo.promotions.title"), description: t("seo.promotions.description"), path: "/promotions", keywords: t("seo.promotions.keywords").split(", ") };
+}
+
+/** The Info pages' documents (`info.page.<page>`): their own title, the intro as the description (any markup dropped). */
+export const INFO_PAGES = ["responsible-gaming", "faq", "terms", "privacy"] as const;
+export type InfoPage = (typeof INFO_PAGES)[number];
+
+export function infoSeo(t: TFunction, page: InfoPage): Seo {
+  const copy = t(`info.page.${page}`, { returnObjects: true }) as { title: string; intro: string };
+  return { title: copy.title, description: copy.intro.replace(/<[^>]+>/g, ""), path: `/info/${page}` };
+}
+
+export function wheelSeo(t: TFunction): Seo {
+  return { title: t("seo.wheel.title"), description: t("seo.wheel.description"), path: "/lucky-wheel" };
 }
 
 /** A page that is not there (or no longer is): kept out of the index, no canonical — the dead address is not one. */
@@ -31,7 +44,7 @@ export function notFoundSeo(t: TFunction, missing: Missing): Seo {
 }
 
 export function vipSeo(t: TFunction): Seo {
-  return { title: t("vip.title"), description: t("seo.vip.description"), path: "/vip" };
+  return { title: t("seo.vip.title"), description: t("seo.vip.description"), path: "/vip" };
 }
 
 /** The Games page's filters as far as its search copy goes. */
@@ -41,6 +54,8 @@ export interface GamesSeoSearch {
   provider?: string;
   badge?: string;
   fav?: boolean;
+  /** Load More's address: from 2 on, its own canonical (`&page=N`) and "Page N" in the title — the view's own copy otherwise. */
+  page?: number;
 }
 
 interface Pill {
@@ -55,6 +70,13 @@ interface Pill {
  * sort, a mix) is the Games page itself as far as search engines go.
  */
 export function gamesSeo(t: TFunction, search: GamesSeoSearch, categories: Pill[], providers: Pill[]): Seo {
+  const seo = viewSeo(t, search, categories, providers);
+  const page = search.page;
+  if (!page || page < 2) return seo;
+  return { ...seo, title: `${seo.title} – ${t("seo.page", { page })}`, path: `${seo.path!}${seo.path!.includes("?") ? "&" : "?"}page=${page}` };
+}
+
+function viewSeo(t: TFunction, search: GamesSeoSearch, categories: Pill[], providers: Pill[]): Seo {
   const only = !search.q && !search.badge && !search.fav;
   const category = only && !search.provider ? categories.find((c) => c.code === search.category) : undefined;
   const provider = only && !search.category ? providers.find((p) => p.code === search.provider) : undefined;

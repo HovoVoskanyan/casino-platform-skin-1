@@ -14,7 +14,7 @@ import i18n from "@/i18n";
 import { server } from "@/test/server";
 import { seoHead, type Seo, type SeoHead } from "@/lib/seo";
 import { gameAbout, gameSeo, seoCategory } from "@/features/lobby/game-seo";
-import { gamesSeo, homeSeo, notFoundSeo, promotionsSeo, vipSeo } from "@/features/lobby/page-seo";
+import { gamesSeo, homeSeo, infoSeo, INFO_PAGES, notFoundSeo, promotionsSeo, vipSeo, wheelSeo } from "@/features/lobby/page-seo";
 import type { GameDetail } from "@/features/lobby/api";
 import { serverHead } from "./server-head";
 
@@ -217,11 +217,47 @@ describe.runIf(process.env.SEO_PARITY === "1")("the server-side head says what t
     await t("en-PH");
   });
 
-  it("Home, Promotions and VIP", async () => {
+  it("Home, Promotions, VIP and the Lucky Wheel", async () => {
     const tt = await t("en-PH");
     expect((await crawl("/")).head).toEqual(expected(homeSeo(tt)));
     expect((await crawl("/promotions")).head).toEqual(expected(promotionsSeo(tt)));
     expect((await crawl("/vip")).head).toEqual(expected(vipSeo(tt)));
+    expect((await crawl("/lucky-wheel")).head).toEqual(expected(wheelSeo(tt)));
+  });
+
+  it("every spelling of a page gets its own tags and its one canonical address", async () => {
+    const tt = await t("en-PH");
+    for (const path of ["/Promotions", "/promotions/"]) expect([path, (await crawl(path)).head]).toEqual([path, expected(promotionsSeo(tt))]);
+    expect((await crawl("/Games/")).head).toEqual(expected(gamesSeo(tt, {}, categories, providers)));
+  });
+
+  it("the Info documents, each in its own words — and one the front does not have is a 404", async () => {
+    for (const lng of ["en-PH", "fil"] as const) {
+      language = lng === "fil" ? "fil" : "en-ph";
+      const tt = await t(lng);
+      for (const page of INFO_PAGES) {
+        const crawled = await crawl(`/info/${page}`);
+        expect([lng, page, crawled.status]).toEqual([lng, page, 200]);
+        expect(crawled.head).toEqual(expected(infoSeo(tt, page)));
+      }
+    }
+    await t("en-PH");
+    language = "en-ph";
+    window.history.replaceState(null, "", "/info/cookies");
+    const missing = await crawl("/info/cookies");
+    expect(missing.status).toBe(404);
+    expect(missing.head).toEqual(expected(notFoundSeo(await t("en-PH"), "page")));
+    window.history.replaceState(null, "", "/");
+  });
+
+  it("Load More's address: its own canonical and page number — the view's own copy for anything that is not a page", async () => {
+    const tt = await t("en-PH");
+    expect((await crawl("/games?page=3")).head).toEqual(expected(gamesSeo(tt, { page: 3 }, categories, providers)));
+    expect((await crawl("/games?category=slots&page=2")).head).toEqual(expected(gamesSeo(tt, { category: "slots", page: 2 }, categories, providers)));
+    expect((await crawl("/games?provider=prov-3&page=12")).head).toEqual(expected(gamesSeo(tt, { provider: "prov-3", page: 12 }, categories, providers)));
+    for (const odd of ["1", "1.5", "-2", "x", ""]) {
+      expect([odd, (await crawl(`/games?category=slots&page=${odd}`)).head]).toEqual([odd, expected(gamesSeo(tt, { category: "slots" }, categories, providers))]);
+    }
   });
 
   it("the Games page, one category, one provider — and a search is the Games page itself", async () => {
