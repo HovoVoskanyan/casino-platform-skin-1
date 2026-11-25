@@ -12,12 +12,36 @@
   language). The facts are core's GET /api/v1/seo/page, through Caddy's /_seo/page, which answers {} when the
   gateway or core cannot: then the page keeps the site-wide defaults, as before. text/template does not escape:
   every value goes out through `html` (attributes, text) or `toJson` (JSON-LD, which escapes < > &).
+
+  A page the front has no route for — $routes below, which src/seo/routes.test.ts holds to the router — or a game core
+  does not show is a real 404 (owner 2026-11-25): `httpError 404` hands the request to the Caddyfile's handle_errors,
+  which runs this template again on the same index.html with the error set. That pass writes the not-found page's
+  tags (noindex, no canonical) and a noscript with links to what is live, so crawlers drop the dead address and follow
+  on. Never when core cannot answer: a page without facts keeps the site-wide defaults, as before.
 */ -}}
 {{- $site := `__SITE__` | fromJson -}}
 {{- $copies := `__COPY__` | fromJson -}}
 {{- $path := .OriginalReq.URL.Path -}}
 {{- $query := .OriginalReq.URL.Query -}}
 {{- $private := dict "/account" "account.title" "/wallet" "wallet.title" "/auth/callback" "nav.signIn" "/verify-email" "verify.title" -}}
+{{- $err := placeholder "http.error.status_code" -}}
+
+{{- /* the front's routes, as its router matches them: either case, one trailing slash or none */ -}}
+{{- $routes := list "^/$" "^/games$" "^/games/[^/]+(/[^/]*)?$" "^/promotions$" "^/vip$" "^/lucky-wheel$" "^/info/[^/]+$" "^/account$" "^/wallet$" "^/auth/callback$" "^/verify-email$" -}}
+{{- $route := lower $path -}}
+{{- if and (gt (len $route) 1) (hasSuffix "/" $route) -}}{{- $route = trimSuffix "/" $route -}}{{- end -}}
+{{- $routed := false -}}
+{{- range $routes -}}{{- if regexMatch . $route -}}{{- $routed = true -}}{{- end -}}{{- end -}}
+
+{{- /* what a dead address most likely pointed at (src/features/not-found/missing.ts): the old site's too */ -}}
+{{- $missing := "page" -}}
+{{- if regexMatch "^/(promotions?|bonuses|promo)(/|$)" $route -}}{{- $missing = "promotion" -}}
+{{- else if regexMatch "^/(games?|casino)(/|$)" $route -}}{{- $missing = "game" -}}
+{{- end -}}
+{{- $notFound := dict
+      "promotion" (list "notFound.promotion.title" "notFound.promotion.body")
+      "game" (list "notFound.game.title" "notFound.game.body")
+      "page" (list "notFound.page.title" "notFound.page.body") -}}
 
 {{- /* which page: the front's routes */ -}}
 {{- $kind := "other" -}}
@@ -28,6 +52,9 @@
 {{- else if eq $path "/promotions" -}}{{- $kind = "promotions" -}}
 {{- else if eq $path "/vip" -}}{{- $kind = "vip" -}}
 {{- else if hasKey $private $path -}}{{- $kind = "private" -}}
+{{- end -}}
+{{- if $err -}}{{- $kind = "notfound" -}}
+{{- else if not $routed -}}{{- httpError 404 -}}
 {{- end -}}
 
 {{- $f := dict -}}
@@ -50,6 +77,9 @@
 
 {{- if eq $kind "private" -}}
   {{- $seo = true -}}{{- $title = index $c (get $private $path) -}}{{- $desc = index $c "seo.private" -}}{{- $noindex = true -}}
+{{- else if eq $kind "notfound" -}}
+  {{- $seo = true -}}{{- $noindex = true -}}
+  {{- $title = index $c (index (get $notFound $missing) 0) -}}{{- $desc = index $c (index (get $notFound $missing) 1) -}}
 {{- else if not $origin -}}
   {{- /* no facts: the site-wide defaults */ -}}
 {{- else if eq $kind "home" -}}
@@ -99,7 +129,7 @@
   {{- end -}}
   {{- $ld = dict "@context" "https://schema.org" "@type" "BreadcrumbList" "itemListElement" $crumbs -}}
 {{- else if and (eq $kind "game") (not $f.game) -}}
-  {{- $seo = true -}}{{- $title = index $c "game.unavailable" -}}{{- $noindex = true -}}
+  {{- httpError 404 -}}
 {{- else if eq $kind "game" -}}
   {{- $seo = true -}}{{- $g = $f.game -}}{{- $type = "article" -}}{{- $pagePath = $f.gamePath -}}
   {{- /* seoCategory: the game's first shown category that is not a curated list, else its first */ -}}
@@ -195,7 +225,13 @@
     <meta name="description" content="{{ index $c "seo.home.description" | html }}" />
 {{- end }}
 @@body
-{{- if and $seo (not $noindex) }}
+{{- if eq $kind "notfound" }}
+    <noscript>
+      <h1>{{ $title | html }}</h1>
+      <p>{{ $desc | html }}</p>
+      <p><a href="/promotions">{{ index $c "nav.promotions" | html }}</a> · <a href="/games">{{ index $c "nav.games" | html }}</a> · <a href="/vip">{{ index $c "nav.vip" | html }}</a> · <a href="/">{{ index $c "nav.home" | html }}</a></p>
+    </noscript>
+{{- else if and $seo (not $noindex) }}
     <noscript>
       <h1>{{ ternary $g.name $title (eq $kind "game") | html }}</h1>
       {{- if eq $kind "game" }}

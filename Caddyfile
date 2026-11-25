@@ -78,6 +78,22 @@
 
 	handle_errors {
 		@seo path /_seo/*
-		respond @seo "{}" 200
+		handle @seo {
+			respond "{}" 200
+		}
+
+		# Owner 2026-11-25: a path the front has no page for, or a game core does not show — head.gotmpl says so with
+		# `httpError 404`. The same index.html again, so people get the designed not-found page (the router shows it) and
+		# crawlers a real 404 with its noindex tags and links to what is live; the template knows this pass by the error.
+		@missing expression `{err.status_code} == 404`
+		handle @missing {
+			encode gzip
+			root * /srv
+			rewrite * /index.html
+			templates {
+				mime text/html
+			}
+			file_server
+		}
 	}
 }

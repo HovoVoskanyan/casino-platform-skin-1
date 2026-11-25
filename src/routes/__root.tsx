@@ -17,6 +17,7 @@ import { captureAttribution } from "@/features/auth/attribution";
 import { authDialog } from "@/features/auth/auth-dialog-state";
 import { queryKeys } from "@/lib/queryKeys";
 import { applySiteConfig, siteConfigOptions } from "@/features/site/site-config";
+import { NotFoundPage } from "@/features/not-found/not-found-page";
 
 export interface RouterContext {
   queryClient: QueryClient;
@@ -44,6 +45,8 @@ export const Route = createRootRouteWithContext<RouterContext>()({
     if (config) applySiteConfig(config);
   },
   component: RootLayout,
+  // Any address the router has no page for (owner 2026-11-25) — the server has already answered it with a 404.
+  notFoundComponent: () => <NotFoundPage />,
 });
 
 function RootLayout() {

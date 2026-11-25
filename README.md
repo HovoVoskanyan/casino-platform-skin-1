@@ -73,6 +73,14 @@ HTML itself:
   path, the category and provider pills. Every other page is served as built.
 - **It never breaks the page.** `/_seo/page` answers `{}` when core says 4xx/5xx, takes longer than 2 s, or the
   gateway is down — and the template then writes the site-wide defaults, exactly the old `index.html`.
+- **A dead address is a real 404** (owner 2026-11-25). The template's `$routes` is the router's table
+  (`src/seo/routes.test.ts` holds the two to the same verdict); any other path, or a game core does not show, makes the
+  template call `httpError 404`, and the Caddyfile's `handle_errors` serves the same `index.html` again with status
+  404 — the template, seeing the error, writes the not-found page's tags (noindex, follow, no canonical) and a
+  `<noscript>` with links to Promotions, Games, VIP and Home. People get the app, whose not-found page
+  (`src/features/not-found/`) says what is gone by what the address pointed at — an ended promotion (`/promotions/…`,
+  the old site's `/bonuses`), a game (`/games/…`, the old `/casino/…`), a page — and shows the offers running now and
+  the hot games in its place. When core cannot answer, nothing is ever 404'd: the page keeps the defaults.
 - **One description, two writers.** `head.gotmpl` mirrors `seoHead`, `gameSeo` / `gameAbout` / `seoCategory`, and
   `homeSeo` / `gamesSeo` / `promotionsSeo` / `vipSeo` (`src/features/lobby/page-seo.ts`); the shared constants are
   `src/lib/seo-site.ts`. Change the copy in the catalogue and both follow; change the logic on one side and

@@ -14,7 +14,7 @@ import i18n from "@/i18n";
 import { server } from "@/test/server";
 import { seoHead, type Seo, type SeoHead } from "@/lib/seo";
 import { gameAbout, gameSeo, seoCategory } from "@/features/lobby/game-seo";
-import { gamesSeo, homeSeo, promotionsSeo, vipSeo } from "@/features/lobby/page-seo";
+import { gamesSeo, homeSeo, notFoundSeo, promotionsSeo, vipSeo } from "@/features/lobby/page-seo";
 import type { GameDetail } from "@/features/lobby/api";
 import { serverHead } from "./server-head";
 
@@ -117,15 +117,20 @@ describe.runIf(process.env.SEO_PARITY === "1")("the server-side head says what t
 
   /** What a crawler reads: the head's search tags (the site-wide static ones included) and the noscript copy. */
   async function crawl(path: string) {
-    const html = await (await fetch(`http://127.0.0.1:${port}${path}`, { headers: { "User-Agent": "facebookexternalhit/1.1" } })).text();
+    const response = await fetch(`http://127.0.0.1:${port}${path}`, { headers: { "User-Agent": "facebookexternalhit/1.1" } });
+    const html = await response.text();
     const doc = new DOMParser().parseFromString(html, "text/html");
     const meta = [...doc.head.querySelectorAll("meta[name], meta[property]")]
       .map((m) => [m.hasAttribute("name") ? "name" : "property", m.getAttribute("name") ?? m.getAttribute("property")!, m.getAttribute("content")!] as const)
       .filter(([, key]) => !["viewport", "color-scheme", "theme-color", "og:locale"].includes(key));
     const ld = doc.getElementById("seo-jsonld")?.textContent;
     const noscript = html.match(/<noscript>([\s\S]*?)<\/noscript>/)?.[1] ?? "";
-    const copy = [...new DOMParser().parseFromString(noscript, "text/html").body.querySelectorAll("h1, p")].map((e) => e.textContent);
+    const noscriptDoc = new DOMParser().parseFromString(noscript, "text/html");
+    const copy = [...noscriptDoc.body.querySelectorAll("h1, p")].map((e) => e.textContent);
+    const links = [...noscriptDoc.body.querySelectorAll("a")].map((a) => a.getAttribute("href"));
     return {
+      status: response.status,
+      links,
       lang: doc.documentElement.lang,
       head: { title: doc.title, meta: sorted(meta), canonical: doc.head.querySelector("link[rel=canonical]")?.getAttribute("href") ?? null, jsonLd: ld ? (JSON.parse(ld) as object) : null },
       copy,
@@ -167,13 +172,49 @@ describe.runIf(process.env.SEO_PARITY === "1")("the server-side head says what t
     expect(page.copy).toEqual([game.name, "The operator's own words."]);
   });
 
-  it("a game the skin does not show is unavailable and kept out of the index", async () => {
+  it("a game the skin does not show is a 404 — the not-found page for a game, kept out of the index", async () => {
     const tt = await t("en-PH");
-    window.history.replaceState(null, "", `/games/${"f".repeat(8)}-0000-0000-0000-000000000000`);
-    const page = await crawl(`/games/${"f".repeat(8)}-0000-0000-0000-000000000000`);
-    expect(page.head).toEqual(expected({ title: tt("game.unavailable"), noindex: true }));
-    expect(page.copy).toEqual([]);
+    const path = `/games/${"f".repeat(8)}-0000-0000-0000-000000000000`;
+    window.history.replaceState(null, "", path);
+    const page = await crawl(path);
+    expect(page.status).toBe(404);
+    expect(page.head).toEqual(expected(notFoundSeo(tt, "game")));
+    expect(page.copy.slice(0, 2)).toEqual([tt("notFound.game.title"), tt("notFound.game.body")]);
     window.history.replaceState(null, "", "/");
+  });
+
+  it("an address the front has no page for is a 404 that says what is gone and links on — the old site's too", async () => {
+    const tt = await t("en-PH");
+    for (const [path, missing] of [
+      ["/promotions/a399ce21-c434-48e2-8d51-3149516e268b", "promotion"],
+      ["/bonuses", "promotion"],
+      ["/casino/game/sweet-bonanza", "game"],
+      ["/no/such/page?x=1", "page"],
+    ] as const) {
+      window.history.replaceState(null, "", path);
+      const page = await crawl(path);
+      expect([path, page.status]).toEqual([path, 404]);
+      expect(page.head).toEqual(expected(notFoundSeo(tt, missing)));
+      expect(page.copy.slice(0, 2)).toEqual([tt(`notFound.${missing}.title`), tt(`notFound.${missing}.body`)]);
+      expect(page.links).toEqual(["/promotions", "/games", "/vip", "/"]);
+      expect(page.raw).toContain('<div id="root"></div>'); // people get the app, which shows the designed page
+    }
+    window.history.replaceState(null, "", "/");
+  });
+
+  it("every page the front has is a 200 — either case, a trailing slash, and the ones served as built", async () => {
+    for (const path of ["/", "/promotions/", "/Promotions", "/vip", "/lucky-wheel", "/info/terms", "/wallet", `/games/${GAME}/x`]) {
+      expect([path, (await crawl(path)).status]).toEqual([path, 200]);
+    }
+  });
+
+  it("a dead address in Filipino on a Filipino site", async () => {
+    language = "fil";
+    const tt = await t("fil");
+    const page = await crawl("/promotions/old-one");
+    expect(page.lang).toBe("fil");
+    expect(page.head.title).toBe(`${tt("notFound.promotion.title")} | ChoCho`);
+    await t("en-PH");
   });
 
   it("Home, Promotions and VIP", async () => {
@@ -211,8 +252,9 @@ describe.runIf(process.env.SEO_PARITY === "1")("the server-side head says what t
     expect(page.head.canonical).toBeNull();
   });
 
-  it("when core cannot answer the page still renders, with the site-wide defaults", async () => {
+  it("when core cannot answer the page still renders, with the site-wide defaults — never a 404", async () => {
     const page = await crawl("/games/broken");
+    expect(page.status).toBe(200);
     expect(page.head.title).toBe(en["seo.home.title"]);
     expect(page.head.meta).toContainEqual(["name", "description", en["seo.home.description"]]);
     expect(page.head.canonical).toBeNull();

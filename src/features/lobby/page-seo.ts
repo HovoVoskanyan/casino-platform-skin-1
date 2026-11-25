@@ -1,6 +1,7 @@
 import type { TFunction } from "i18next";
 import { absoluteUrl, type Seo } from "@/lib/seo";
 import { BRAND, IN_LANGUAGE, LOGO } from "@/lib/seo-site";
+import type { Missing } from "@/features/not-found/missing";
 
 /**
  * The lobby pages' search copy (owner 2026-10-15), as plain functions of the catalogue so the page and the
@@ -22,6 +23,11 @@ export function homeSeo(t: TFunction): Seo {
 
 export function promotionsSeo(t: TFunction): Seo {
   return { title: t("promotions.title"), description: t("seo.promotions.description"), path: "/promotions", keywords: t("seo.promotions.keywords").split(", ") };
+}
+
+/** A page that is not there (or no longer is): kept out of the index, no canonical — the dead address is not one. */
+export function notFoundSeo(t: TFunction, missing: Missing): Seo {
+  return { title: t(`notFound.${missing}.title`), description: t(`notFound.${missing}.body`), noindex: true };
 }
 
 export function vipSeo(t: TFunction): Seo {

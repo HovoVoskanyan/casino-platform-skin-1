@@ -3,7 +3,6 @@ import { useEffect } from "react";
 import { z } from "zod";
 import { useTranslation } from "react-i18next";
 import { Shell } from "@/components/layout/shell";
-import { Button } from "@/components/ui/button";
 import { Notice } from "@/components/ui/notice";
 import { ApiError } from "@/api/problem";
 import { useCategories, useGame } from "@/features/lobby/api";
@@ -13,6 +12,7 @@ import { PlayPanel } from "@/features/game/play-panel";
 import { gameSlug } from "@/lib/slug";
 import { useSeo } from "@/lib/seo";
 import { gameAbout, gameSeo, seoCategory } from "@/features/lobby/game-seo";
+import { NotFoundPage } from "@/features/not-found/not-found-page";
 
 /** `?play=real|demo`: the mode a guest chose before signing in — it opens once they are back (P3-28). */
 const searchSchema = z.object({ play: z.enum(["demo", "real"]).optional().catch(undefined) });
@@ -25,8 +25,8 @@ export const Route = createFileRoute("/games_/$id/{-$slug}")({
 /**
  * Game detail (design: Sweet Bonanza) — art, category, name, provider, about copy, the two play modes, "Before you
  * play". A game this skin does not show (hidden, inactive, another skin's, or a made-up id) is core's 404 and reads
- * as "This game is unavailable". The play modes are the `PlayPanel` (P3-28): launch, the bonus prompt, and the game
- * container the provider's fragment runs in.
+ * as the not-found page for a game, hot games in its place (the server answers it 404 too). The play modes are the
+ * `PlayPanel` (P3-28): launch, the bonus prompt, and the game container the provider's fragment runs in.
  *
  * The address is `/games/{id}/{slug}` (owner 2026-10-15: the game's name in the URL, for search engines). The id is
  * the key; a missing or stale slug — an old link, a renamed game — is put right in place, keeping the search.
@@ -50,25 +50,14 @@ function GamePage() {
   const categoryName = g ? categories.find((c) => g.categories.includes(c.code))?.name : undefined;
   const unavailable = game.error instanceof ApiError && game.error.status === 404;
   const kind = g ? seoCategory(categories, g.categories) : undefined;
-  useSeo(g ? gameSeo(t, g, kind) : unavailable ? { title: t("game.unavailable"), noindex: true } : null);
+  // An unavailable game's tags are the not-found page's own (as the server's 404 for it).
+  useSeo(g ? gameSeo(t, g, kind) : null);
 
   const back = (
     <Link to="/games" className="inline-flex h-10 items-center gap-1 self-start rounded-cc px-2 text-[14px] font-bold text-cc-control hover:text-cc-ink">‹ {t("game.back")}</Link>
   );
 
-  if (unavailable) {
-    return (
-      <Shell>
-        {back}
-        <section className="flex flex-col items-center gap-3 rounded-cc-2xl border border-cc-line bg-cc-surface px-6 py-10 text-center">
-          <span aria-hidden className="flex h-12 w-12 items-center justify-center rounded-full border border-cc-line-strong text-[20px] font-extrabold text-cc-control">?</span>
-          <h1 className="m-0 text-[22px] font-extrabold text-cc-ink">{t("game.unavailable")}</h1>
-          <p className="m-0 max-w-[420px] text-[14px] text-cc-lavender">{t("game.unavailableBody")}</p>
-          <Button asChild variant="primary" size="md"><Link to="/games">{t("game.back")}</Link></Button>
-        </section>
-      </Shell>
-    );
-  }
+  if (unavailable) return <NotFoundPage missing="game" />;
 
   return (
     <Shell>

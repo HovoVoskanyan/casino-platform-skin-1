@@ -165,10 +165,13 @@ describe("the ♥ (P3-27)", () => {
 });
 
 describe("game detail (P3-27)", () => {
-  it("a game the skin does not show reads as unavailable", async () => {
-    server.use(...catalogue(1), http.get("*/api/v1/games/:id", () => problem(404, "NOT_FOUND")));
+  it("a game the skin does not show is the not-found page for a game, hot games in its place", async () => {
+    server.use(...catalogue(2), http.get("*/api/v1/games/:id", () => problem(404, "NOT_FOUND")));
     renderRoute(`/games/${game(9).id}`);
-    expect(await screen.findByRole("heading", { name: "This game is unavailable" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 1, name: "This game isn’t here anymore" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Browse all games" })).toHaveAttribute("href", "/games");
+    expect(await screen.findByRole("link", { name: "Game 1, Pragmatic Play" })).toBeInTheDocument();
+    await waitFor(() => expect(document.head.querySelector('meta[name="robots"]')?.getAttribute("content")).toBe("noindex, follow"));
   });
 
   it("shows the game with its category and about copy, and its play modes", async () => {

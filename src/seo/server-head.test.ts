@@ -8,7 +8,7 @@ const catalogues = { "en-PH": en, fil };
 
 it("reads its copy from the catalogue — every key it names, the ternaries' too", () => {
   const keys = templateKeys(template);
-  for (const k of ["seo.home.title", "seo.game.title", "seo.game.demo", "seo.game.real", "game.seoAbout.noDemo", "game.unavailable", "wallet.title", "nav.signIn"]) {
+  for (const k of ["seo.home.title", "seo.game.title", "seo.game.demo", "seo.game.real", "game.seoAbout.noDemo", "notFound.game.title", "notFound.promotion.body", "wallet.title", "nav.signIn"]) {
     expect(keys).toContain(k);
   }
   expect(keys.every((k) => typeof (catalogues["en-PH"] as Record<string, unknown>)[k] === "string")).toBe(true);

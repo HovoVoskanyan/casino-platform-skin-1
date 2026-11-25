@@ -18,11 +18,11 @@ const LANGUAGES = ["en-PH", "fil"] as const;
 
 /**
  * Every catalogue key the template reads — each quoted `area.key` literal in it (`index $c "seo.home.title"`, the
- * pairs a `ternary` picks from, the private pages' titles). Every one must be in the catalogue: the build fails on a
+ * pairs a `ternary` picks from, the private pages' titles, the not-found page's `notFound.*`). Every one must be in the catalogue: the build fails on a
  * typo instead of shipping a page with an empty title.
  */
 export function templateKeys(template: string): string[] {
-  return [...new Set([...template.matchAll(/"([a-z]+(?:\.[A-Za-z]+)+)"/g)].map((m) => m[1]!))].sort();
+  return [...new Set([...template.matchAll(/"([a-z][A-Za-z]*(?:\.[A-Za-z]+)+)"/g)].map((m) => m[1]!))].sort();
 }
 
 /** The copy the template carries: the keys it reads, per language, a missing translation falling back to English. */
